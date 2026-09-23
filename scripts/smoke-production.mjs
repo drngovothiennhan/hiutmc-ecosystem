@@ -3,6 +3,8 @@ const routes = [
   ["/", "HIU YHCT"],
   ["/learn/", "Learning Center"],
   ["/ai/", "HIU YHCT AI Lab"],
+  ["/community/", "HIU YHCT Community"],
+  ["/discover/", "HIU YHCT Discover"],
   ["/ecosystem/study-os/", "Study OS"],
   ["/ecosystem/ai-thiet-chan/", "A.I Thiệt Chẩn"],
   ["/ecosystem/trung-y-van/", "Trung Y Văn HIU"],
