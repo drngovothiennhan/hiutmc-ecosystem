@@ -1,0 +1,27 @@
+{
+  "name": "hiu-yhct-ecosystem-hub",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "validate:registry": "node --experimental-strip-types scripts/validate-registry.mjs",
+    "check": "npm run validate:registry && npm run validate:assets && npm run build",
+    "validate:assets": "node scripts/validate-assets.mjs",
+    "smoke:production": "node scripts/smoke-production.mjs"
+  },
+  "dependencies": {
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "22.18.0",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
+    "typescript": "5.9.3",
+    "wrangler": "4.136.2"
+  },
+  "type": "module"
+}
