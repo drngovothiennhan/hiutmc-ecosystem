@@ -6,7 +6,7 @@ const routes = [
   ["/community/", "HIU YHCT Community"],
   ["/discover/", "HIU YHCT Discover"],
   ["/search/", "Search Hub"],
-  ["/admin/", "Đăng nhập quản trị chưa được kích hoạt"],
+  ["/admin/", "Nội dung Hub"],
   ["/ecosystem/study-os/", "Study OS"],
   ["/ecosystem/ai-thiet-chan/", "A.I Thiệt Chẩn"],
   ["/ecosystem/trung-y-van/", "Trung Y Văn HIU"],
@@ -63,15 +63,18 @@ for (const [name, expected] of requiredHeaders) {
 console.log("HIU YHCT production smoke passed.");
 
 const { text: liveHtml } = await getWithRetry(new URL('/', base));
-const cp11Markers = [
-  "Chọn điểm đến",
-  "Học đúng trọng tâm.",
-  "Kinh lạc · Huyệt vị",
+const approvedMarkers = [
+  "Học tinh hoa YHCT.",
+  "Kết nối tương lai số.",
+  "BẢN ĐỒ HỆ SINH THÁI HIU Y HỌC CỔ TRUYỀN",
   "Đăng nhập thành viên",
-  "Quản trị",
+  "approvedMobileTaskbar",
+  "Nhiệm vụ",
+  "Atlas 3D",
+  "Admin Center",
 ];
-for (const marker of cp11Markers) {
-  if (!liveHtml.includes(marker)) throw new Error(`Missing CP11 homepage marker: ${marker}`);
+for (const marker of approvedMarkers) {
+  if (!liveHtml.includes(marker)) throw new Error(`Missing approved CP12 homepage marker: ${marker}`);
 }
 const hiddenAvatarMarkers = [
   "Bước vào thế giới YHCT",
@@ -85,7 +88,7 @@ const hiddenAvatarMarkers = [
 for (const marker of hiddenAvatarMarkers) {
   if (liveHtml.includes(marker)) throw new Error(`Avatar must remain hidden until explicit approval: ${marker}`);
 }
-if (liveHtml.includes("Bản đồ hệ sinh thái")) throw new Error("Retired ecosystem map still appears on homepage");
+if (liveHtml.includes("Chọn điểm đến")) throw new Error("CP11 dashboard is still published instead of the approved CP12 map homepage");
 const memberAppUrls = [
   "https://yhct-hiu-final4-stage-hiu-yhct.vercel.app/",
   "https://ai-thiet-chan-hiu-yhct.vercel.app/",
@@ -110,4 +113,4 @@ for (const [path, marker] of [['/sw.js','hiutmc-offline-v1'],['/offline.html','B
   const { response, text } = await getWithRetry(new URL(path, base));
   if (!text.includes(marker) || !response.headers.get('cache-control')?.includes('no-cache')) throw new Error(`PWA asset/header check failed ${path}`);
 }
-console.log('PASS CP11 dashboard homepage, direct app destinations, contacts, PWA and offline worker.');
+console.log('PASS approved CP12 map homepage, mobile taskbar, Admin Center, direct app destinations, contacts, PWA and offline worker.');

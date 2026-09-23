@@ -1,5 +1,5 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260924-01",
+  "release": "HIU-YHCT-ECOSYSTEM-20260923-01",
   "product_name": "HIU YHCT Ecosystem",
   "checkpoint": "CP12",
   "base_checkpoint_sha": "77965d7167e9a6d8a0becf420c1eb28262e25f34",
@@ -7,5 +7,5 @@
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CI, release contract, static export, deployment and production smoke are mandatory release gates"
+  "verification": "CP12 approved map homepage and Admin Center, CI, static export, deployment and production smoke are mandatory release gates"
 }

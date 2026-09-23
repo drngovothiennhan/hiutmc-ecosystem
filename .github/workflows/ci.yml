@@ -70,6 +70,9 @@ jobs:
       - name: Build static export
         run: npm run build
 
+      - name: Verify approved CP12 homepage and Admin Center
+        run: npm run validate:approved
+
       - name: Verify export
         run: |
           test -f out/index.html
