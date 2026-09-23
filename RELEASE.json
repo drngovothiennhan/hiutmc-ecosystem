@@ -1,0 +1,8 @@
+{
+  "release": "HIU-TMC-ECOSYSTEM-20260923-01",
+  "source_checkpoint": "25da1d23059ed4e3fdd3d7535a2b7fece6981f4e",
+  "domain": "https://hiutmc.com",
+  "hosting": "Cloudflare Workers Static Assets",
+  "stage": "production",
+  "repository": "drngovothiennhan/hiutmc-ecosystem"
+}
