@@ -1,0 +1,78 @@
+name: HIU TMC Ecosystem CI
+
+on:
+  push:
+    branches:
+      - main
+      - release-candidate
+    paths:
+      - "app/**"
+      - "components/**"
+      - "data/**"
+      - "public/**"
+      - "scripts/**"
+      - "package.json"
+      - "next.config.ts"
+      - "tsconfig.json"
+      - "wrangler.jsonc"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hiu-tmc-ecosystem-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package.json
+
+      - name: Install
+        run: npm install --no-audit --no-fund
+
+      - name: Validate app registry
+        run: npm run validate:registry
+
+      - name: Validate map assets
+        run: npm run validate:assets
+
+      - name: Build static export
+        run: npm run build
+
+      - name: Verify export
+        run: |
+          test -f out/index.html
+          test -f out/ecosystem/study-os/index.html
+          test -f out/ecosystem/ai-thiet-chan/index.html
+          test -f out/ecosystem/trung-y-van/index.html
+          test -f out/ecosystem/atlas/index.html
+          test -f out/_headers
+
+      - name: Validate Cloudflare bundle
+        run: npx wrangler deploy --dry-run
+
+      - name: Upload static artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hiu-tmc-ecosystem-static
+          path: out
+          if-no-files-found: error
+          retention-days: 14

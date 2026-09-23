@@ -1,0 +1,82 @@
+name: Deploy HIU TMC Ecosystem to Cloudflare
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - production
+    paths:
+      - "app/**"
+      - "components/**"
+      - "data/**"
+      - "public/**"
+      - "scripts/**"
+      - "package.json"
+      - "next.config.ts"
+      - "tsconfig.json"
+      - "wrangler.jsonc"
+      - ".github/workflows/deploy-cloudflare.yml"
+      - "RELEASE.json"
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+
+concurrency:
+  group: hiutmc-production
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Require Cloudflare credentials
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "$CF_TOKEN" || (echo "::error::Missing CLOUDFLARE_API_TOKEN repository secret" && exit 1)
+          test -n "$CF_ACCOUNT" || (echo "::error::Missing CLOUDFLARE_ACCOUNT_ID repository secret" && exit 1)
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package.json
+
+      - name: Install
+        run: npm install --no-audit --no-fund
+
+      - name: Validate release contracts
+        run: npm run validate:registry && npm run validate:assets
+
+      - name: Build static export
+        run: npm run build
+
+      - name: Verify required routes
+        run: |
+          test -f out/index.html
+          test -f out/ecosystem/study-os/index.html
+          test -f out/ecosystem/ai-thiet-chan/index.html
+          test -f out/ecosystem/trung-y-van/index.html
+          test -f out/ecosystem/atlas/index.html
+          test -f out/_headers
+
+      - name: Deploy static assets
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.136.2"
+          command: deploy
+
+      - name: Smoke production domain
+        env:
+          BASE_URL: https://hiutmc.com
+        run: npm run smoke:production
