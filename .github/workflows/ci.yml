@@ -63,6 +63,7 @@ jobs:
       - name: Verify export
         run: |
           test -f out/index.html
+          test -f out/learn/index.html
           test -f out/ecosystem/study-os/index.html
           test -f out/ecosystem/ai-thiet-chan/index.html
           test -f out/ecosystem/trung-y-van/index.html
