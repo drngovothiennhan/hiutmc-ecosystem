@@ -90,3 +90,11 @@ For each checkpoint report only:
 - next checkpoint
 
 Continue automatically to the next approved checkpoint after the previous checkpoint is stable.
+
+
+### Approved avatar campus prototype (after CP7)
+- Replace the oversized/legacy map recognition area on the dashboard with a compact 2D academic campus and customizable anime-style member character.
+- Keep every CP7 route, direct app link, PWA behavior and verified public Community feed intact.
+- Let users choose character presentation (female/male/neutral), hair style and color, skin tone and clothing; support touch and arrow-key movement to the four registered apps.
+- This static prototype stores preferences only in the current browser. Do not claim account binding or cross-device sync until secure SSO, consent and an authenticated storage API are implemented.
+- Keep the animation light and honor reduced-motion settings. Do not introduce a new backend, paid service, or 3D runtime for this prototype.

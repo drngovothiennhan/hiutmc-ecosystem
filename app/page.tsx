@@ -1,7 +1,7 @@
-import EcosystemMap from "@/components/EcosystemMap";
 import { ecosystemApps } from "@/data/apps";
 import { hubPillars, learningShortcuts, plannedSpaces } from "@/data/hub";
 import styles from "./home.module.css";
+import AvatarCampus from "@/components/AvatarCampus";
 
 export default function Home() {
   return (
@@ -20,7 +20,10 @@ export default function Home() {
           <a href="/discover/">Khám phá</a>
           <a href="/search/">Tìm kiếm</a>
         </nav>
-        <a className={styles.primaryAction} href="/ai/">Mở AI Lab</a>
+        <div className={styles.headerActions}>
+          <a className={styles.memberLogin} href={ecosystemApps.find((app) => app.slug === "study-os")?.currentUpstreamUrl ?? "/ecosystem/study-os/"} aria-label="Đăng nhập thành viên bằng tài khoản HIU YHCT Study OS hiện có">Đăng nhập thành viên</a>
+          <a className={styles.primaryAction} href="/ai/">Mở AI Lab</a>
+        </div>
       </header>
 
       <section id="top" className={styles.hero}>
@@ -35,6 +38,7 @@ export default function Home() {
             <a className={styles.heroPrimary} href="/learn/">Bắt đầu học</a>
             <a className={styles.heroSecondary} href="/search/">Tìm trong Ecosystem</a>
           </div>
+          <small className={styles.loginNote}>Dùng tài khoản Study OS hiện có. Đăng nhập dùng chung giữa các ứng dụng vẫn cần tích hợp SSO an toàn.</small>
           <div className={styles.pillarRow}>
             {hubPillars.map((item) => (
               <article key={item.title}>
@@ -44,12 +48,8 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <div className={styles.heroVisual} aria-hidden="true">
-          <img src="/academy-world.webp" alt="" />
-          <div className={styles.heroVisualBadge}>
-            <strong>Học tập • Kết nối • Cập nhật</strong>
-            <span>Hệ sinh thái số dành cho sinh viên YHCT HIU</span>
-          </div>
+        <div className={styles.heroVisual}>
+          <AvatarCampus />
         </div>
       </section>
 
@@ -104,13 +104,6 @@ export default function Home() {
               <b>Mở ứng dụng ↗</b>
             </a>
           ))}
-        </div>
-        <div className={styles.mapPanel}>
-          <div>
-            <span className={styles.kicker}>Bản đồ hệ sinh thái</span>
-            <h3>Giữ lại hình ảnh nhận diện hiện có, nhưng đặt sau các tác vụ học tập chính.</h3>
-          </div>
-          <EcosystemMap />
         </div>
       </section>
 

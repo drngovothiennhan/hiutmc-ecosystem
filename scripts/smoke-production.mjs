@@ -62,8 +62,31 @@ for (const [name, expected] of requiredHeaders) {
 console.log("HIU YHCT production smoke passed.");
 
 const { text: liveHtml } = await getWithRetry(new URL('/', base));
-const districtLinks = [...liveHtml.matchAll(/class="districtBanner" href="(https:\/\/[^\"]+)"/g)];
-if (districtLinks.length !== 4 || new Set(districtLinks.map(item => item[1])).size !== 4 || liveHtml.includes('class="districtPreview"')) throw new Error('Direct app navigation contract failed');
+const dashboardMarkers = [
+  "Bước vào thế giới YHCT",
+  "Giới tính nhân vật",
+  "Kiểu tóc",
+  "Màu da",
+  "Trang phục",
+  "Đi tới Thư viện",
+  "Đi tới Vườn kinh lạc",
+  "Đi tới Phòng thực hành",
+  "Đi tới Nhà học thuật",
+  "Đăng nhập thành viên",
+];
+for (const marker of dashboardMarkers) {
+  if (!liveHtml.includes(marker)) throw new Error(`Missing CP8 avatar/dashboard marker: ${marker}`);
+}
+if (liveHtml.includes("Bản đồ hệ sinh thái")) throw new Error("Retired ecosystem map still appears on homepage");
+const memberAppUrls = [
+  "https://yhct-hiu-final4-stage-hiu-yhct.vercel.app/",
+  "https://ai-thiet-chan-hiu-yhct.vercel.app/",
+  "https://drngovothiennhan.github.io/trung-y-van-hiu/",
+  "https://drngovothiennhan.github.io/human-atlas/",
+];
+for (const appUrl of memberAppUrls) {
+  if (!liveHtml.includes(appUrl)) throw new Error(`Homepage is missing an app destination: ${appUrl}`);
+}
 if (!liveHtml.includes('clb.yhoccotruyen.hiu@gmail.com')) throw new Error('Missing club contact information');
 const { text: manifestText } = await getWithRetry(new URL('/manifest.webmanifest', base));
 const manifest = JSON.parse(manifestText);
@@ -79,4 +102,4 @@ for (const [path, marker] of [['/sw.js','hiutmc-offline-v1'],['/offline.html','B
   const { response, text } = await getWithRetry(new URL(path, base));
   if (!text.includes(marker) || !response.headers.get('cache-control')?.includes('no-cache')) throw new Error(`PWA asset/header check failed ${path}`);
 }
-console.log('PASS direct navigation, club contacts, PWA manifest/icons and offline worker.');
+console.log('PASS CP8 avatar, direct app destinations, contacts, PWA and offline worker.');
