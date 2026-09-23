@@ -1,5 +1,5 @@
 import { ecosystemApps } from "@/data/apps";
-import { hubPillars, learningShortcuts, plannedSpaces } from "@/data/hub";
+import { plannedSpaces } from "@/data/hub";
 import styles from "./home.module.css";
 
 export default function Home() {
@@ -28,59 +28,48 @@ export default function Home() {
       <section id="top" className={styles.hero}>
         <div className={styles.heroCopy}>
           <span className={styles.kicker}>Câu lạc bộ Y học cổ truyền · HIU</span>
-          <h1>Học tinh hoa YHCT.<br />Kết nối tương lai.</h1>
+          <h1>Học đúng trọng tâm.<br />Kết nối đúng công cụ.</h1>
           <p>
-            Một cổng chung để học tập, sử dụng công cụ AI, khám phá kinh lạc – huyệt vị,
-            trao đổi học thuật và theo dõi các hoạt động của cộng đồng HIU YHCT.
+            Một điểm vào gọn cho học liệu, kinh lạc – huyệt vị, công cụ AI và hoạt động học thuật của sinh viên YHCT HIU.
           </p>
           <div className={styles.heroActions}>
-            <a className={styles.heroPrimary} href="/learn/">Bắt đầu học</a>
-            <a className={styles.heroSecondary} href="/search/">Tìm trong Ecosystem</a>
+            <a className={styles.heroPrimary} href={ecosystemApps.find((app) => app.slug === "study-os")?.currentUpstreamUrl ?? "/ecosystem/study-os/"}>Tiếp tục học</a>
+            <a className={styles.heroSecondary} href="#main-content">Khám phá các Hub</a>
           </div>
-          <small className={styles.loginNote}>Dùng tài khoản Study OS hiện có. Đăng nhập dùng chung giữa các ứng dụng vẫn cần tích hợp SSO an toàn.</small>
-          <div className={styles.pillarRow}>
-            {hubPillars.map((item) => (
-              <article key={item.title}>
-                <span>{item.icon}</span>
-                <div><strong>{item.title}</strong><small>{item.body}</small></div>
-              </article>
-            ))}
+          <small className={styles.loginNote}>Đăng nhập thành viên dùng Study OS. Đăng nhập chung giữa các ứng dụng đang chờ tích hợp SSO an toàn.</small>
+          <div className={styles.heroTags} aria-label="Các nội dung chính">
+            <span>Học liệu YHCT</span><span>Kinh lạc · Huyệt vị</span><span>AI hỗ trợ học tập</span>
           </div>
         </div>
+
         <div className={styles.heroVisual}>
-          <div className={styles.heroQuietPanel} aria-label="Không gian học tập HIU YHCT">
-            <img src="/favicon.svg" width="76" height="76" alt="" />
-            <span>HIU YHCT ECOSYSTEM</span>
-            <strong>Học tập · Kết nối · Phát triển</strong>
-            <p>Một không gian chung cho sinh viên Y học cổ truyền HIU.</p>
-          </div>
+          <section className={styles.launchPanel} aria-labelledby="launch-title">
+            <div className={styles.launchHeading}>
+              <div><span className={styles.kicker}>HIU YHCT ECOSYSTEM</span><h2 id="launch-title">Chọn điểm đến</h2></div>
+              <span className={styles.launchMark} aria-hidden="true">✦</span>
+            </div>
+            <div className={styles.quickAppGrid}>
+              {ecosystemApps.map((app, index) => (
+                <a href={app.currentUpstreamUrl} className={styles.quickAppCard} key={app.slug}>
+                  <span className={styles.quickAppIndex}>0{index + 1}</span>
+                  <span className={styles.quickAppArrow} aria-hidden="true">↗</span>
+                  <strong>{app.shortName}</strong>
+                  <small>{app.tagline}</small>
+                  <span className={styles.quickAppStatus}>{app.status === "Production" ? "Đang hoạt động" : "Bản xem trước"}</span>
+                </a>
+              ))}
+            </div>
+            <p className={styles.launchFoot}>Mở trực tiếp ứng dụng cần dùng, không qua bước xác nhận trung gian.</p>
+          </section>
         </div>
       </section>
 
-      <section id="main-content" className={styles.today}>
-        <div className={styles.sectionTitle}>
-          <span className={styles.kicker}>Hôm nay tại HIU YHCT</span>
-          <h2>Đi thẳng tới việc bạn cần làm.</h2>
-        </div>
-        <div className={styles.shortcutGrid}>
-          {learningShortcuts.map((item, index) => (
-            <a key={item.label} href={item.href} className={styles.shortcutCard}>
-              <span className={styles.shortcutIndex}>{String(index + 1).padStart(2, "0")}</span>
-              <strong>{item.label}</strong>
-              <small>{item.detail}</small>
-              <b aria-hidden="true">↗</b>
-            </a>
-          ))}
-        </div>
-      </section>
-
-      <section id="learn" className={styles.learnSection}>
+      <section id="main-content" className={styles.learnSection}>
         <div className={styles.sectionTitle}>
           <span className={styles.kicker}>Learning Center</span>
           <h2>Một hành trình học, nhiều công cụ liên kết.</h2>
           <p>
-            Cấu trúc mới ưu tiên luồng: đọc kiến thức → quan sát trực quan → luyện tập →
-            hỏi AI → quay lại nội dung cần ôn, thay vì để sinh viên tự tìm giữa nhiều ứng dụng rời rạc.
+            Đi từ bài học đến quan sát trực quan, luyện tập, hỏi AI rồi quay lại nội dung cần ôn.
           </p>
         </div>
         <div className={styles.learningFlow}>
@@ -95,9 +84,9 @@ export default function Home() {
 
       <section id="ecosystem" className={styles.ecosystem}>
         <div className={styles.sectionTitle}>
-          <span className={styles.kicker}>Công cụ đang hoạt động</span>
-          <h2>Chạm một lần, vào thẳng ứng dụng.</h2>
-          <p>Không hiển thị bước xác nhận trung gian. Mỗi ứng dụng giữ chuyên môn riêng nhưng cùng xuất phát từ một Hub.</p>
+          <span className={styles.kicker}>Công cụ trong hệ sinh thái</span>
+          <h2>Vào thẳng ứng dụng bạn cần.</h2>
+          <p>Mỗi ứng dụng giữ nội dung chuyên biệt và mở tại địa chỉ đang hoạt động.</p>
         </div>
         <div className={styles.appGrid}>
           {ecosystemApps.map((app) => (
@@ -114,7 +103,7 @@ export default function Home() {
       <section id="community" className={styles.futureSection}>
         <div className={styles.sectionTitle}>
           <span className={styles.kicker}>Cộng đồng & Khám phá</span>
-          <h2>Mở rộng có kiểm soát, không công bố tính năng chưa có backend.</h2>
+          <h2>Không gian học thuật được cập nhật có kiểm chứng.</h2>
         </div>
         <div className={styles.futureGrid}>
           {plannedSpaces.map((space) => (
