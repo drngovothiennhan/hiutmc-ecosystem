@@ -62,14 +62,14 @@ for (const [name, expected] of requiredHeaders) {
 console.log("HIU YHCT production smoke passed.");
 
 const { text: liveHtml } = await getWithRetry(new URL('/', base));
-const cp10Markers = [
-  "HIU YHCT ECOSYSTEM",
-  "Học tập · Kết nối · Phát triển",
-  "Một không gian chung cho sinh viên Y học cổ truyền HIU.",
+const cp11Markers = [
+  "Chọn điểm đến",
+  "Học đúng trọng tâm.",
+  "Kinh lạc · Huyệt vị",
   "Đăng nhập thành viên",
 ];
-for (const marker of cp10Markers) {
-  if (!liveHtml.includes(marker)) throw new Error(`Missing CP10 homepage marker: ${marker}`);
+for (const marker of cp11Markers) {
+  if (!liveHtml.includes(marker)) throw new Error(`Missing CP11 homepage marker: ${marker}`);
 }
 const hiddenAvatarMarkers = [
   "Bước vào thế giới YHCT",
@@ -108,4 +108,4 @@ for (const [path, marker] of [['/sw.js','hiutmc-offline-v1'],['/offline.html','B
   const { response, text } = await getWithRetry(new URL(path, base));
   if (!text.includes(marker) || !response.headers.get('cache-control')?.includes('no-cache')) throw new Error(`PWA asset/header check failed ${path}`);
 }
-console.log('PASS CP10 hidden-avatar homepage, direct app destinations, contacts, PWA and offline worker.');
+console.log('PASS CP11 dashboard homepage, direct app destinations, contacts, PWA and offline worker.');
