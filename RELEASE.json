@@ -1,9 +1,11 @@
 {
-  "release": "HIU-TMC-ECOSYSTEM-20260923-04",
+  "release": "HIU-YHCT-ECOSYSTEM-20260923-05",
+  "product_name": "HIU YHCT Ecosystem",
+  "checkpoint": "CP5",
+  "base_checkpoint_sha": "84897d3edfc64cd4580355fe32ead04ebe8da203",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "visual_target": "preserve illustrated academy; logo attachment pending",
-  "verification": "Build, PWA validation and integrated browser checks passed"
+  "verification": "CI and production smoke are mandatory release gates"
 }
