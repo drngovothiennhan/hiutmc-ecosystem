@@ -18,6 +18,7 @@ export default function Home() {
           <a href="/ai/">AI Lab</a>
           <a href="/community/">Cộng đồng</a>
           <a href="/discover/">Khám phá</a>
+          <a href="/search/">Tìm kiếm</a>
         </nav>
         <a className={styles.primaryAction} href="/ai/">Mở AI Lab</a>
       </header>
@@ -32,7 +33,7 @@ export default function Home() {
           </p>
           <div className={styles.heroActions}>
             <a className={styles.heroPrimary} href="/learn/">Bắt đầu học</a>
-            <a className={styles.heroSecondary} href="#ecosystem">Mở công cụ</a>
+            <a className={styles.heroSecondary} href="/search/">Tìm trong Ecosystem</a>
           </div>
           <div className={styles.pillarRow}>
             {hubPillars.map((item) => (

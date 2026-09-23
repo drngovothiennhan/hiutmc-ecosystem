@@ -5,6 +5,7 @@ const routes = [
   ["/ai/", "HIU YHCT AI Lab"],
   ["/community/", "HIU YHCT Community"],
   ["/discover/", "HIU YHCT Discover"],
+  ["/search/", "Search Hub"],
   ["/ecosystem/study-os/", "Study OS"],
   ["/ecosystem/ai-thiet-chan/", "A.I Thiệt Chẩn"],
   ["/ecosystem/trung-y-van/", "Trung Y Văn HIU"],
