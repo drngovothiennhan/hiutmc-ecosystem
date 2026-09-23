@@ -15,5 +15,5 @@ export const plannedSpaces = [
   { title: "Learning Center", status: "Đang hoạt động", body: "Cổng học tập theo môn, chủ đề và công cụ đã được kết nối từ Hub." },
   { title: "AI Lab", status: "Đang hoạt động", body: "Một điểm vào chung cho trợ lý học tập và các công cụ chuyên biệt đang hoạt động." },
   { title: "Community", status: "Đang hoạt động", body: "Academic Feed đọc dữ liệu công khai đã duyệt từ backend CLB; đăng bài và tương tác vẫn chờ nối xác thực thành viên." },
-  { title: "Discover", status: "Đang phát triển", body: "Tin CLB, sự kiện và nội dung nghiên cứu sẽ chỉ hiển thị khi có nguồn xác thực." },
+  { title: "Discover", status: "Đang hoạt động", body: "Research Radar và tài liệu tham khảo đọc nguồn học thuật đã duyệt; sự kiện/cơ hội chỉ mở khi có nguồn công khai phù hợp." },
 ];
