@@ -18,6 +18,7 @@ export default function Home() {
           <a href="/community/">Cộng đồng</a>
           <a href="/discover/">Khám phá</a>
           <a href="/search/">Tìm kiếm</a>
+          <a href="/admin/">Quản trị</a>
         </nav>
         <div className={styles.headerActions}>
           <a className={styles.memberLogin} href={ecosystemApps.find((app) => app.slug === "study-os")?.currentUpstreamUrl ?? "/ecosystem/study-os/"} aria-label="Đăng nhập thành viên bằng tài khoản HIU YHCT Study OS hiện có">Đăng nhập thành viên</a>
@@ -135,6 +136,7 @@ export default function Home() {
         <a href="/ai/"><span>✦</span><small>AI Lab</small></a>
         <a href="/community/"><span>◎</span><small>Cộng đồng</small></a>
         <a href="/discover/"><span>◇</span><small>Khám phá</small></a>
+        <a href="/admin/"><span>⚙</span><small>Admin</small></a>
       </nav>
 
       <footer className={styles.footer}>
