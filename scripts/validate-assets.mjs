@@ -1,3 +1,4 @@
+import "./validate-pwa.mjs";
 import fs from 'node:fs';
 const image = fs.readFileSync('public/academy-world.webp');
 if (image.toString('ascii',0,4)!=='RIFF'||image.toString('ascii',8,12)!=='WEBP'||image.length<50000) throw new Error('Academy illustration is missing or invalid');

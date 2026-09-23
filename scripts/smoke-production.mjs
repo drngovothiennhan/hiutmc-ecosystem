@@ -55,3 +55,23 @@ for (const [name, expected] of requiredHeaders) {
 }
 
 console.log("HIU TMC production smoke passed.");
+
+const { text: liveHtml } = await getWithRetry(new URL('/', base));
+const districtLinks = [...liveHtml.matchAll(/class="districtBanner" href="(https:\/\/[^\"]+)"/g)];
+if (districtLinks.length !== 4 || new Set(districtLinks.map(item => item[1])).size !== 4 || liveHtml.includes('class="districtPreview"')) throw new Error('Direct app navigation contract failed');
+if (!liveHtml.includes('clb.yhoccotruyen.hiu@gmail.com')) throw new Error('Missing club contact information');
+const { text: manifestText } = await getWithRetry(new URL('/manifest.webmanifest', base));
+const manifest = JSON.parse(manifestText);
+if (manifest.id !== '/' || manifest.display !== 'standalone') throw new Error('Invalid live PWA manifest');
+for (const size of [192, 512]) {
+  const icon = manifest.icons.find(icon => icon.sizes === `${size}x${size}` && icon.type === 'image/png');
+  if (!icon) throw new Error(`Missing live PWA icon ${size}`);
+  const response = await fetch(new URL(icon.src, base));
+  const data = Buffer.from(await response.arrayBuffer());
+  if (!response.ok || data.length < 24 || data.toString('hex',0,8) !== '89504e470d0a1a0a' || data.readUInt32BE(16) !== size || data.readUInt32BE(20) !== size) throw new Error(`Invalid live PNG ${size}`);
+}
+for (const [path, marker] of [['/sw.js','hiutmc-offline-v1'],['/offline.html','Bạn đang ngoại tuyến']]) {
+  const { response, text } = await getWithRetry(new URL(path, base));
+  if (!text.includes(marker) || !response.headers.get('cache-control')?.includes('no-cache')) throw new Error(`PWA asset/header check failed ${path}`);
+}
+console.log('PASS direct navigation, club contacts, PWA manifest/icons and offline worker.');

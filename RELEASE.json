@@ -1,9 +1,9 @@
 {
-  "release": "HIU-TMC-ECOSYSTEM-20260923-03",
-  "source_checkpoint": "656fadc",
+  "release": "HIU-TMC-ECOSYSTEM-20260923-04",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "visual_target": "illustrated academy with responsive artwork and motion"
+  "visual_target": "preserve illustrated academy; logo attachment pending",
+  "verification": "Build, PWA validation and integrated browser checks passed"
 }

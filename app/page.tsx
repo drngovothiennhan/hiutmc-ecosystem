@@ -86,7 +86,7 @@ export default function Home() {
               <span>{app.status}</span>
               <h3>{app.name}</h3>
               <p>{app.description}</p>
-              <a href={`/ecosystem/${app.slug}/`}>Bước vào khu vực →</a>
+              <a href={app.currentUpstreamUrl}>Mở ứng dụng →</a>
             </article>
           ))}
         </div>
@@ -123,7 +123,13 @@ export default function Home() {
         <div className="communitySeal">☯</div>
         <p className="sectionKicker">Cộng đồng HIU YHCT</p>
         <h2>Học cùng nhau. Chia sẻ kinh nghiệm. Cùng xây dựng.</h2>
-        <p>Trang chủ là điểm quay về chung của các ứng dụng, hoạt động học thuật và những sản phẩm số đang phát triển trong câu lạc bộ.</p>
+        <h3>THÔNG TIN LIÊN HỆ &amp; TRAO ĐỔI HỌC THUẬT</h3>
+        <address className="clubContact">
+          <p><span aria-hidden="true">📩</span> <strong>Email:</strong> <a href="mailto:clb.yhoccotruyen.hiu@gmail.com">clb.yhoccotruyen.hiu@gmail.com</a></p>
+          <p><span aria-hidden="true">🌐</span> <strong>Fanpage:</strong> HIU CLB Y Học cổ truyền</p>
+          <p><span aria-hidden="true">🎵</span> <strong>TikTok:</strong> <a href="https://www.tiktok.com/@hiu.clb.yhoccotruyen">@hiu.clb.yhoccotruyen</a></p>
+          <p><span aria-hidden="true">📍</span> <strong>Địa điểm:</strong> CLB Y học cổ truyền – Trường Đại học Quốc tế Hồng Bàng (HIU), 215 Điện Biên Phủ, phường Gia Định, Thành phố Hồ Chí Minh</p>
+        </address>
         <a className="heroCta" href="#top">Trở lại bản đồ ↑</a>
       </section>
 

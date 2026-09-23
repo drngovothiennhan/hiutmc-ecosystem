@@ -10,7 +10,8 @@
     "check": "npm run validate:repo && npm run validate:registry && npm run validate:assets && npm run build",
     "validate:assets": "node scripts/validate-assets.mjs",
     "smoke:production": "node scripts/smoke-production.mjs",
-    "validate:repo": "node scripts/validate-repo-boundary.mjs"
+    "validate:repo": "node scripts/validate-repo-boundary.mjs",
+    "validate:pwa": "node scripts/validate-pwa.mjs"
   },
   "dependencies": {
     "next": "16.3.4",

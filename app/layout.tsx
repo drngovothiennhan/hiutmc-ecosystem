@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import PwaInstall from "@/components/PwaInstall";
 
 export const viewport = {
   themeColor: "#1f5d49",
@@ -15,7 +16,8 @@ export const metadata: Metadata = {
   description: "Cổng khám phá hệ sinh thái số của Câu lạc bộ Y học cổ truyền HIU: Study OS, A.I Thiệt Chẩn, Trung Y Văn HIU và 3D Huyệt vị – Kinh lạc.",
   alternates: { canonical: "/" },
   manifest: "/manifest.webmanifest",
-  icons: { icon: "/favicon.svg" },
+  icons: { icon: "/favicon.svg", apple: "/icons/apple-touch-icon.png" },
+  appleWebApp: { capable: true, title: "HIU TMC", statusBarStyle: "default" },
   openGraph: {
     type: "website",
     locale: "vi_VN",
@@ -29,7 +31,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="vi">
-      <body>{children}</body>
+      <body>{children}<PwaInstall /></body>
     </html>
   );
 }

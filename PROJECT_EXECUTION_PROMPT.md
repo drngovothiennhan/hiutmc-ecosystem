@@ -40,10 +40,10 @@ Chỉ đổi DNS sang subdomain canonical khi upstream tương ứng đã đư�
 ## UX bắt buộc
 - Hero toàn màn hình là bản đồ anime 2D.
 - 4 hotspot rõ ràng, có hover/focus/tap state.
-- Desktop: hover xem nhanh, click vào trang chi tiết.
-- Mobile: tap mở card, CTA mở trang chi tiết.
+- Desktop: click vào khu vực để mở trực tiếp ứng dụng trong registry, không có bảng xác nhận.
+- Mobile: tap mở trực tiếp ứng dụng.
 - Quick Dock luôn cung cấp đường vào 4 ứng dụng để không phụ thuộc hotspot.
-- Mỗi app có trang giới thiệu nội bộ trước khi rời Hub.
+- Các trang giới thiệu nội bộ cũ được giữ để tương thích liên kết; không còn là bước trung gian bắt buộc.
 - CTA “Mở ứng dụng” phải chỉ tới URL upstream đã xác minh.
 - Có nút quay về Hub ở trải nghiệm tích hợp khi khả thi.
 - Không dùng iframe để nhúng app thành viên.
