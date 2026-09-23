@@ -1,7 +1,6 @@
 import { ecosystemApps } from "@/data/apps";
 import { hubPillars, learningShortcuts, plannedSpaces } from "@/data/hub";
 import styles from "./home.module.css";
-import AvatarCampus from "@/components/AvatarCampus";
 
 export default function Home() {
   return (
@@ -49,7 +48,12 @@ export default function Home() {
           </div>
         </div>
         <div className={styles.heroVisual}>
-          <AvatarCampus />
+          <div className={styles.heroQuietPanel} aria-label="Không gian học tập HIU YHCT">
+            <img src="/favicon.svg" width="76" height="76" alt="" />
+            <span>HIU YHCT ECOSYSTEM</span>
+            <strong>Học tập · Kết nối · Phát triển</strong>
+            <p>Một không gian chung cho sinh viên Y học cổ truyền HIU.</p>
+          </div>
         </div>
       </section>
 
