@@ -15,11 +15,11 @@ export default function Home() {
         </a>
         <nav className={styles.desktopNav} aria-label="Điều hướng chính">
           <a href="/learn/">Học tập</a>
-          <a href="#ecosystem">Công cụ</a>
+          <a href="/ai/">AI Lab</a>
           <a href="#community">Cộng đồng</a>
           <a href="#discover">Khám phá</a>
         </nav>
-        <a className={styles.primaryAction} href="#ecosystem">Khám phá ngay</a>
+        <a className={styles.primaryAction} href="/ai/">Mở AI Lab</a>
       </header>
 
       <section id="top" className={styles.hero}>
@@ -145,7 +145,7 @@ export default function Home() {
       <nav className={styles.mobileDock} aria-label="Điều hướng nhanh trên điện thoại">
         <a href="#top"><span>⌂</span><small>Trang chủ</small></a>
         <a href="/learn/"><span>▤</span><small>Học tập</small></a>
-        <a href="#ecosystem"><span>✦</span><small>AI & Công cụ</small></a>
+        <a href="/ai/"><span>✦</span><small>AI Lab</small></a>
         <a href="#community"><span>◎</span><small>Cộng đồng</small></a>
         <a href="#discover"><span>◇</span><small>Khám phá</small></a>
       </nav>

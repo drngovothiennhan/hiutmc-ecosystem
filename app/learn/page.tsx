@@ -24,6 +24,7 @@ export default function LearnPage() {
           <div className={styles.actions}>
             <a href={learningModes[0].href}>Học 15 phút ↗</a>
             <a href="#subjects">Chọn môn học</a>
+            <a href="/ai/">Mở AI Lab</a>
           </div>
         </div>
         <aside className={styles.flow} aria-label="Luồng học đề xuất">
