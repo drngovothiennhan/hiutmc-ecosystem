@@ -67,6 +67,9 @@ jobs:
       - name: Validate Community backend
         run: npm run validate:community
 
+      - name: Validate local learning challenges
+        run: npm run validate:learning
+
       - name: Build static export
         run: npm run build
 

@@ -1,6 +1,7 @@
 "use client";
 
 import EcosystemMap from "@/components/EcosystemMap";
+import DailyMissions from "@/components/DailyMissions";
 import DisplayModeToggle from "@/components/DisplayModeToggle";
 import { useHubRegistry } from "@/components/hub-registry";
 import { ecosystemPrinciples, learningPaths } from "@/data/community";
@@ -88,6 +89,8 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      <DailyMissions apps={ecosystemApps} />
 
       <section id="ecosystem" className="heritageSection">
         <div className="sectionHeading">

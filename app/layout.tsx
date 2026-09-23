@@ -3,7 +3,7 @@ import "./globals.css";
 import PwaInstall from "@/components/PwaInstall";
 
 export const viewport = {
-  themeColor: "#1f5d49",
+  themeColor: "#981b36",
   colorScheme: "light",
 };
 
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description: "Cổng học tập và kết nối của Câu lạc bộ Y học cổ truyền HIU: Study OS, AI Lab, Cộng đồng và thế giới học thuật tương tác.",
   alternates: { canonical: "/" },
   manifest: "/manifest.webmanifest",
-  icons: { icon: "/favicon.svg", apple: "/icons/apple-touch-icon.png" },
+  icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" },
   appleWebApp: { capable: true, title: "HIU TMC", statusBarStyle: "default" },
   openGraph: {
     type: "website",

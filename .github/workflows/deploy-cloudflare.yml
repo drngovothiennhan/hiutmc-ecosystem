@@ -54,7 +54,7 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Validate release contracts
-        run: npm run validate:repo && npm run validate:release && npm run validate:registry && npm run validate:assets && npm run validate:pwa && npm run validate:community
+        run: npm run validate:repo && npm run validate:release && npm run validate:registry && npm run validate:assets && npm run validate:pwa && npm run validate:community && npm run validate:learning
 
       - name: Build static export
         run: npm run build

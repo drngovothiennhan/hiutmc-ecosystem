@@ -1,52 +1,32 @@
-# HIU TMC Ecosystem — Production Release Checklist
+# HIU YHCT Ecosystem — Production release checklist
 
-## Canonical repository
-- [x] Independent repository: `drngovothiennhan/hiutmc-ecosystem`.
-- [x] Repository boundary validation passes in CI.
-- [x] Study OS repository `drngovothiennhan/yhct-hiu-4-0` is no longer a release source for this Hub.
+## Approved CP12 experience
+- [x] Illustrated ecosystem map remains the homepage and links directly to all four registered Hubs.
+- [x] Traditional visual style, ambient weather-like motion, motion toggle and reduced-motion support are preserved.
+- [x] Mobile taskbar provides Trang chủ, Ứng dụng, Nhiệm vụ, Atlas 3D and Cộng đồng navigation.
+- [x] Admin Center route includes Hub content/URL editing, Mod review, export/import and activity notes.
+- [x] HIU CLB logo is present in the map and PWA icon set.
 
-## Build gate
-- [x] Next.js static export succeeds.
-- [x] Home route exists.
-- [x] Four application detail routes exist.
-- [x] App registry validation succeeds.
-- [x] Vector map asset integrity validation succeeds.
-- [x] Cloudflare Wrangler dry-run succeeds.
-- [x] robots.txt, sitemap.xml, favicon, manifest and 404 are generated.
-- [x] Keyboard focus states, skip link and mobile navigation are present.
-- [x] CI artifact is generated.
+## Learning engagement
+- [x] Three daily tasks rotate across the real Hub registry.
+- [x] Browser-local completions drive XP, daily completion count, streak, weekly challenge and earned badges.
+- [x] Data validation rejects unknown task IDs, malformed dates and duplicates.
+- [x] UI discloses that data is local to the current browser and XP is not an academic grade.
+- [x] No invented member identities, class rankings or scores are shown.
 
-## Routing gate
-- [x] Study OS production alias is registered in the central app registry.
-- [x] A.I Thiệt Chẩn production alias is registered in the central app registry.
-- [x] Trung Y Văn GitHub Pages endpoint is registered.
-- [x] 3D Atlas GitHub Pages endpoint is registered.
-- [ ] Canonical application subdomains under `hiutmc.com` are activated.
+## Known integration limits
+- Admin and Mod screens are a browser-local prototype; role labels are not server-enforced authorization.
+- Learning progress is not shared across members/devices. A real leaderboard requires verified membership and backend persistence.
+- Hub SSO and access rules are owned by each upstream service. The main site cannot change A.I Thiệt Chẩn's Vercel SSO setting.
+- Canonical Hub subdomains are not implied to be live unless verified in the registry and deployed separately.
 
-## Infrastructure gate
-- [x] `hiutmc.com` is registered.
-- [x] Cloudflare static-only Wrangler configuration exists.
-- [x] Production workflow is present in this repository.
-- [x] Branches `main`, `release-candidate`, and `production` exist.
-- [x] `CLOUDFLARE_API_TOKEN` is available to GitHub Actions.
-- [x] `CLOUDFLARE_ACCOUNT_ID` is available to GitHub Actions.
-- [x] First production deployment from this repository succeeds.
-- [x] `hiutmc.com` is attached as a Cloudflare custom domain.
-- [x] Live smoke test on `https://hiutmc.com` passes.
-- [x] Required security headers pass production smoke.
+## Required release checks
+- [x] Repository boundary, metadata, registry, asset, PWA and Community contract validators pass.
+- [x] Learning mission/streak/weekly challenge validator passes.
+- [x] Next.js static export and approved CP12 homepage/Admin markers pass.
+- [x] Required routes and Wrangler dry-run pass in CI.
+- [x] Cloudflare deployment completes and live production smoke passes before announcing a release.
 
-## Production evidence — 2026-09-23
-- Production source commit: `f2393175a45f607c4b247dbe6a17c8c538304ad7`
-- GitHub Actions run: `35813128206`
-- Cloudflare Worker: `hiutmc-ecosystem`
-- Cloudflare Version ID: `4bd15d4d-5b8b-4a96-b3d8-0a2731480366`
-- Custom domain: `https://hiutmc.com`
-- Worker fallback URL: `https://hiutmc-ecosystem.dr-ngovothiennhan.workers.dev`
-- Smoke: HTTP 200 on home + 4 application detail routes.
-- Security headers: `X-Content-Type-Options: nosniff` and `Referrer-Policy: strict-origin-when-cross-origin`.
-
-## Remaining ecosystem routing work
-The Hub itself is now production-live. Canonical application subdomains such as `study.hiutmc.com`, `thietchan.hiutmc.com`, `trungyvan.hiutmc.com`, and `atlas.hiutmc.com` remain a separate Stage B/D routing task and must be activated one at a time after verifying each upstream.
-
-## Release rule
-Future releases must pass repository boundary, registry, asset, static build, Cloudflare deployment, and live smoke gates.
+- Canonical repository: `drngovothiennhan/hiutmc-ecosystem`
+- Production: https://hiutmc.com
+- Admin Center: https://hiutmc.com/admin/

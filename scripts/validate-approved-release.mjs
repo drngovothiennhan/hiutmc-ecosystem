@@ -17,6 +17,12 @@ for (const marker of [
   "Admin Center",
   "approvedMobileTaskbar",
   "Nhiệm vụ",
+  "Nhiệm vụ hôm nay",
+  "Học tập trung 15 phút",
+  "Thử thách tuần",
+  "Huy hiệu khám phá",
+  "chưa đồng bộ với tài khoản thành viên",
+  "Bảng thi đua nhóm sẽ chỉ mở khi có dữ liệu thành viên đã xác thực",
   "Atlas 3D",
   "Cộng đồng",
   "clb.yhoccotruyen.hiu@gmail.com",
@@ -35,7 +41,7 @@ for (const marker of [
 if (home.includes("Chọn điểm đến") || admin.includes("Đăng nhập quản trị chưa được kích hoạt")) {
   errors.push("CP11 dashboard or placeholder Admin was exported instead of the approved CP12 experience");
 }
-for (const asset of ["out/hiu-club-logo.webp", "out/academy-world.webp", "out/academy-mobile.webp"]) {
+for (const asset of ["out/hiu-club-logo.webp", "out/academy-world.webp", "out/academy-mobile.webp", "out/icons/icon-192.png", "out/icons/icon-512.png", "out/icons/apple-touch-icon.png"]) {
   if (!fs.existsSync(asset)) errors.push(`missing approved visual asset: ${asset}`);
 }
 
@@ -44,4 +50,4 @@ if (errors.length) {
   for (const error of errors) console.error(`- ${error}`);
   process.exit(1);
 }
-console.log("Approved CP12 homepage, mobile taskbar, illustrated map, logo, community links and Admin Center are present.");
+console.log("Approved CP12 homepage, mobile taskbar, illustrated map, local learning features, logo, community links and Admin Center are present.");

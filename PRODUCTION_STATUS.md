@@ -1,56 +1,34 @@
 # HIU YHCT Ecosystem — Production status
 
-## Authoritative state
-- Website: https://hiutmc.com
-- Repository: drngovothiennhan/hiutmc-ecosystem
-- Hosting: Cloudflare Workers Static Assets
-- Release metadata: `RELEASE.json`
-- Production source of truth: tip of the `production` branch
-- Stable release rule: after production smoke passes, `main` and `production` must point to the same commit.
-- CI workflow: https://github.com/drngovothiennhan/hiutmc-ecosystem/actions/workflows/ci.yml
-- Production workflow: https://github.com/drngovothiennhan/hiutmc-ecosystem/actions/workflows/deploy-cloudflare.yml
+## Source of truth
+- Public site: https://hiutmc.com
+- Admin Center: https://hiutmc.com/admin/
+- Repository: `drngovothiennhan/hiutmc-ecosystem`
+- Host: Cloudflare Workers Static Assets
+- Production branch: `production`; stable releases keep `main` and `production` aligned.
+- CI: https://github.com/drngovothiennhan/hiutmc-ecosystem/actions/workflows/ci.yml
+- Production deploy and smoke: https://github.com/drngovothiennhan/hiutmc-ecosystem/actions/workflows/deploy-cloudflare.yml
+- Exact release contract: `RELEASE.json`.
 
-## Current product surface
-- Student Hub: `/`
-- Learning Center: `/learn/`
-- AI Lab: `/ai/`
-- Community: `/community/`
-- Discover: `/discover/`
-- Search Hub: `/search/`
-- Homepage: customizable 2D avatar campus prototype with keyboard/touch movement and browser-local preferences; the former ecosystem map is removed.
-- Study OS homepage link is a direct navigation shortcut. Shared sign-in and account-bound avatar sync are not yet implemented.
-- Existing upstream apps remain registered and open directly.
+## Approved product
+- The homepage is the approved illustrated HIU YHCT ecosystem map, with direct links to Study OS, A.I Thiệt Chẩn, Trung Y Văn and 3D Atlas.
+- The mobile taskbar links to Trang chủ, Ứng dụng, Nhiệm vụ, Atlas 3D and Cộng đồng.
+- Daily missions rotate across the registered learning hubs. Personal completions, experience points, current streak, weekly challenge and badges are saved in the browser on that device only.
+- The local points are not grades and are not synced to member accounts. A class leaderboard stays unavailable until verified member data and shared storage are connected; the app must not fabricate names or scores.
+- The Admin Center provides local Hub content/link editing, Mod review UI, export/import and activity notes. Its settings are browser-local; the displayed roles are not server-enforced authentication or shared permissions.
+- The HIU CLB logo is used in the academy map and PWA icons. Reduced-motion settings disable ambient animations.
 
-## Current production release
-- Checkpoint: CP8 — `HIU-YHCT-ECOSYSTEM-20260923-08`
-- Deployed application commit: `ac75463934c3afd30891e62373a4001a9c154ec3`
-- CI: successful, run #35 — https://github.com/drngovothiennhan/hiutmc-ecosystem/actions/runs/35852643452
-- Cloudflare deploy and production smoke: successful, run #15 — https://github.com/drngovothiennhan/hiutmc-ecosystem/actions/runs/35852731797
-- Production verification covered release contracts, static export, required routes, deployment, and smoke checks against `https://hiutmc.com`.
+## Integration boundaries
+- Each registered Hub opens its verified upstream URL. Authentication and availability inside a Hub belong to that Hub's hosting provider.
+- The main site does not control Vercel access protection or sign-in for A.I Thiệt Chẩn. Any Vercel SSO change must be made in that project's deployment settings by an owner.
+- Canonical Hub subdomains remain separate routing work recorded in the registry; current links must not imply that those aliases are active.
+- No other app repository is modified by this project.
 
-## Release verification
-Every production release must pass:
-1. repository boundary
-2. release metadata
-3. application registry
-4. static assets
-5. PWA contract
-6. Community backend contract when enabled
-7. static export and required routes
-8. Cloudflare deployment
-9. production smoke
+## Production release gates
+1. Repository boundary, release metadata and Hub registry validation.
+2. Map asset, PWA manifest/icons, Community contract and learning-progress validation.
+3. Static build, approved-home/Admin markers and required route checks.
+4. Wrangler dry-run in CI and Cloudflare deploy workflow.
+5. Production smoke against `https://hiutmc.com` after deployment.
 
-## Community data rule
-The Hub may only display anonymous Community feed records when the backend returns rows matching:
-- `moderation_status = approved`
-- `visibility = public`
-- `privacy_scrubbed = true`
-- `citation_verified = true`
-- `is_spam = false`
-
-No member identity data is required for the public feed. Posting, comments and reactions remain gated behind authenticated-member integration.
-
-## Rollback
-The immediately previous stable checkpoint is CP7 at `fd4bcc08a61a204109a85c7acb69a04247f893fb` (release `HIU-YHCT-ECOSYSTEM-20260923-07`). CP7 is based on CP6 commit `e1d71af1d50e4772dc8833efe1748c6d17a9dda9`.
-
-No other application repository is modified by this release process.
+GitHub Actions records the exact source commit and run for each CI/deployment. Do not mark a change production-live until the deploy workflow and live smoke succeed.
