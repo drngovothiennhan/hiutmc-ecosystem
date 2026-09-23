@@ -22,7 +22,7 @@ async function getWithRetry(url, attempts = 12) {
       const response = await fetch(url, {
         redirect: "follow",
         signal: controller.signal,
-        headers: { "user-agent": "HIU-TMC-release-smoke/1.0" },
+        headers: { "user-agent": "HIU-YHCT-release-smoke/1.0" },
       });
       clearTimeout(timer);
       const text = await response.text();
@@ -58,7 +58,7 @@ for (const [name, expected] of requiredHeaders) {
   console.log(`PASS header ${name}: ${value}`);
 }
 
-console.log("HIU TMC production smoke passed.");
+console.log("HIU YHCT production smoke passed.");
 
 const { text: liveHtml } = await getWithRetry(new URL('/', base));
 const districtLinks = [...liveHtml.matchAll(/class="districtBanner" href="(https:\/\/[^\"]+)"/g)];
