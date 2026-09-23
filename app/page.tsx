@@ -2,6 +2,7 @@
 
 import EcosystemMap from "@/components/EcosystemMap";
 import DailyMissions from "@/components/DailyMissions";
+import LearningAssistant from "@/components/LearningAssistant";
 import DisplayModeToggle from "@/components/DisplayModeToggle";
 import { useHubRegistry } from "@/components/hub-registry";
 import { ecosystemPrinciples, learningPaths } from "@/data/community";
@@ -163,6 +164,7 @@ export default function Home() {
         <a href={atlasUrl}><span aria-hidden="true">◎</span><small>Atlas 3D</small></a>
         <a href="#community"><span aria-hidden="true">◉</span><small>Cộng đồng</small></a>
       </nav>
+      <LearningAssistant apps={ecosystemApps} />
     </main>
   );
 }

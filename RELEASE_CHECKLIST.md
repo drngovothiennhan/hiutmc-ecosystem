@@ -4,6 +4,8 @@
 - [x] Illustrated ecosystem map remains the homepage and links directly to all four registered Hubs.
 - [x] Traditional visual style, ambient weather-like motion, motion toggle and reduced-motion support are preserved.
 - [x] Mobile taskbar provides Trang chủ, Ứng dụng, Nhiệm vụ, Atlas 3D and Cộng đồng navigation.
+- [x] Mobile/PC switch stays visible in PC mode and switches back to adaptive mobile layout.
+- [x] Approved learning assistant entry opens Study OS and exposes direct links to the other registered Hubs.
 - [x] Admin Center route includes Hub content/URL editing, Mod review, export/import and activity notes.
 - [x] HIU CLB logo is present in the map and PWA icon set.
 

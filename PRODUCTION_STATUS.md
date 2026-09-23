@@ -13,6 +13,8 @@
 ## Approved product
 - The homepage is the approved illustrated HIU YHCT ecosystem map, with direct links to Study OS, A.I Thiệt Chẩn, Trung Y Văn and 3D Atlas.
 - The mobile taskbar links to Trang chủ, Ứng dụng, Nhiệm vụ, Atlas 3D and Cộng đồng.
+- A reversible Mobile/PC switch remains visible in both modes; returning from PC mode restores the device-sized layout and taskbar.
+- The floating Trợ lý học tập button opens the approved Study OS assistant and direct routes to all four registered Hubs; it does not simulate an AI chat inside the portal.
 - Daily missions rotate across the registered learning hubs. Personal completions, experience points, current streak, weekly challenge and badges are saved in the browser on that device only.
 - The local points are not grades and are not synced to member accounts. A class leaderboard stays unavailable until verified member data and shared storage are connected; the app must not fabricate names or scores.
 - The Admin Center provides local Hub content/link editing, Mod review UI, export/import and activity notes. Its settings are browser-local; the displayed roles are not server-enforced authentication or shared permissions.

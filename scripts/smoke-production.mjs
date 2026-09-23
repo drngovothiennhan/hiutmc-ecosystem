@@ -72,6 +72,12 @@ const approvedMarkers = [
   "Nhiệm vụ",
   "Atlas 3D",
   "Admin Center",
+  "Chuyển đổi giữa giao diện Mobile và PC",
+  "Trợ lý học tập",
+  "Hỏi bài &amp; ôn tập",
+  "Học thiệt chẩn",
+  "Tra cứu Trung Y Văn",
+  "Quan sát Atlas 3D",
 ];
 for (const marker of approvedMarkers) {
   if (!liveHtml.includes(marker)) throw new Error(`Missing approved CP12 homepage marker: ${marker}`);
@@ -113,4 +119,4 @@ for (const [path, marker] of [['/sw.js','hiutmc-offline-v1'],['/offline.html','B
   const { response, text } = await getWithRetry(new URL(path, base));
   if (!text.includes(marker) || !response.headers.get('cache-control')?.includes('no-cache')) throw new Error(`PWA asset/header check failed ${path}`);
 }
-console.log('PASS approved CP12 map homepage, mobile taskbar, Admin Center, direct app destinations, contacts, PWA and offline worker.');
+console.log('PASS approved CP12 map homepage, mobile taskbar and reversible PC switch, learning assistant routes, Admin Center, app destinations, contacts, PWA and offline worker.');
