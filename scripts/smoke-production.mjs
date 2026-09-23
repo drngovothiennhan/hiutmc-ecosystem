@@ -2,6 +2,7 @@ const base = process.env.BASE_URL || "https://hiutmc.com";
 const routes = [
   ["/", "HIU YHCT"],
   ["/learn/", "Learning Center"],
+  ["/ai/", "HIU YHCT AI Lab"],
   ["/ecosystem/study-os/", "Study OS"],
   ["/ecosystem/ai-thiet-chan/", "A.I Thiệt Chẩn"],
   ["/ecosystem/trung-y-van/", "Trung Y Văn HIU"],
