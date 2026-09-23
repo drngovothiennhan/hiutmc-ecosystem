@@ -6,6 +6,7 @@ const routes = [
   ["/community/", "HIU YHCT Community"],
   ["/discover/", "HIU YHCT Discover"],
   ["/search/", "Search Hub"],
+  ["/admin/", "Đăng nhập quản trị chưa được kích hoạt"],
   ["/ecosystem/study-os/", "Study OS"],
   ["/ecosystem/ai-thiet-chan/", "A.I Thiệt Chẩn"],
   ["/ecosystem/trung-y-van/", "Trung Y Văn HIU"],
@@ -67,6 +68,7 @@ const cp11Markers = [
   "Học đúng trọng tâm.",
   "Kinh lạc · Huyệt vị",
   "Đăng nhập thành viên",
+  "Quản trị",
 ];
 for (const marker of cp11Markers) {
   if (!liveHtml.includes(marker)) throw new Error(`Missing CP11 homepage marker: ${marker}`);

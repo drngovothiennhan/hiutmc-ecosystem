@@ -28,44 +28,121 @@
 .headerActions{display:flex;align-items:center;gap:10px}.memberLogin{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 14px;border:1px solid rgba(116,21,29,.22);border-radius:999px;background:#fff;color:var(--wine)!important;font-size:12px;font-weight:850;white-space:nowrap}.loginNote{display:block;max-width:620px;margin-top:-17px;color:#705f5c;font-size:11px;line-height:1.5}.heroVisual{display:flex;align-items:center;justify-content:center;padding:28px;min-height:620px}.heroVisual:after{display:none}@media(max-width:900px){.heroVisual{min-height:0;padding:18px}}@media(max-width:620px){.headerActions{gap:6px}.memberLogin{min-height:40px;padding:8px 10px;font-size:10px}.loginNote{margin-top:-12px;font-size:10px}.heroVisual{padding:16px}}
 
 /* Avatar is intentionally hidden from the public homepage until explicit approval to reopen it. */
-.heroQuietPanel{width:min(100%,440px);padding:48px 36px;border:1px solid rgba(116,21,29,.12);border-radius:28px;background:rgba(255,255,255,.64);box-shadow:0 18px 48px rgba(67,25,28,.08);text-align:center}.heroQuietPanel img{display:block;margin:0 auto 18px}.heroQuietPanel span{display:block;color:var(--wine);font-size:10px;font-weight:900;letter-spacing:.18em}.heroQuietPanel strong{display:block;margin-top:12px;font-family:Georgia,serif;font-size:25px;color:var(--wine2)}.heroQuietPanel p{margin:12px auto 0;max-width:320px;color:var(--muted);font-size:13px;line-height:1.6}@media(max-width:680px){.heroQuietPanel{padding:34px 24px}.heroQuietPanel strong{font-size:22px}}
+.heroQuietPanel{width:min(100%,440px);padding:48px 36px;border:1px solid rgba(116,21,29,.12);border-radius:28px;background:rgba(255,255,255,.64);box-shadow:0 18px 48px rgba(67,25,28,.08);text-align:center}.heroQuietPanel img{display:block;margin:0 auto 18px}.heroQuietPanel span{di�N�����k�w��c bộ Y học cổ truyền · HIU</span>
+          <h1>Học đúng trọng tâm.<br />Kết nối đúng công cụ.</h1>
+          <p>
+            Một điểm vào gọn cho học liệu, kinh lạc – huyệt vị, công cụ AI và hoạt động học thuật của sinh viên YHCT HIU.
+          </p>
+          <div className={styles.heroActions}>
+            <a className={styles.heroPrimary} href={ecosystemApps.find((app) => app.slug === "study-os")?.currentUpstreamUrl ?? "/ecosystem/study-os/"}>Tiếp tục học</a>
+            <a className={styles.heroSecondary} href="#main-content">Khám phá các Hub</a>
+          </div>
+          <small className={styles.loginNote}>Đăng nhập thành viên dùng Study OS. Đăng nhập chung giữa các ứng dụng đang chờ tích hợp SSO an toàn.</small>
+          <div className={styles.heroTags} aria-label="Các nội dung chính">
+            <span>Học liệu YHCT</span><span>Kinh lạc · Huyệt vị</span><span>AI hỗ trợ học tập</span>
+          </div>
+        </div>
 
-/* CP11: concise dashboard hierarchy; keep the avatar hidden. */
-.page{--wine:#14543f;--wine2:#103b30;--paper:#f6f7f1;--cream:#e6eddf;--ink:#20332c;--muted:#5f7168;--line:rgba(20,84,63,.16);background:var(--paper)}
-.header{padding-top:10px;padding-bottom:10px}
-.brand strong,.desktopNav a:hover{color:var(--wine)}
-.hero{min-height:0;grid-template-columns:1.04fr .96fr;background:radial-gradient(ellipse at 85% 8%,rgba(211,180,102,.2),transparent 35%),linear-gradient(125deg,#f9faf5 0%,#edf2e8 56%,#e4ecdf 100%)}
-.heroCopy{padding:clamp(36px,5vw,72px) clamp(20px,5vw,72px);max-width:850px}
-.hero h1{max-width:720px;margin:14px 0 18px;color:var(--wine2);font-size:clamp(42px,5.3vw,72px);line-height:1.02}
-.heroCopy>p{max-width:600px;font-size:16px;line-height:1.65}
-.heroPrimary,.primaryAction{background:var(--wine)}
-.heroSecondary{background:rgba(255,255,255,.78)}
-.heroVisual{display:flex;align-items:center;justify-content:center;min-height:0;padding:30px clamp(20px,4vw,56px) 30px 12px}
-.heroVisual:after{display:none}
-.heroTags{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
-.heroTags span{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.55);padding:7px 11px;color:var(--wine2);font-size:11px;font-weight:750}
-.launchPanel{width:min(100%,560px);padding:25px;border:1px solid rgba(20,84,63,.14);border-radius:26px;background:rgba(255,255,255,.84);box-shadow:0 20px 52px rgba(22,62,47,.1)}
-.launchHeading{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px}
-.launchHeading h2{margin:7px 0 0;color:var(--wine2);font-family:Georgia,serif;font-size:31px;line-height:1.05}
-.launchMark{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:#eaf1e7;color:#a47c32;font-size:22px}
-.quickAppGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.quickAppCard{position:relative;display:flex;min-height:138px;flex-direction:column;justify-content:flex-end;padding:15px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(150deg,#fff 20%,#f2f5ef);transition:transform .18s ease,box-shadow .18s ease}
-.quickAppCard:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(22,62,47,.1)}
-.quickAppIndex{position:absolute;top:13px;left:14px;color:#a47c32;font-size:10px;font-weight:900;letter-spacing:.12em}
-.quickAppArrow{position:absolute;top:11px;right:14px;color:var(--wine);font-size:17px}
-.quickAppCard strong{color:var(--wine2);font-size:15px;line-height:1.25}
-.quickAppCard small{min-height:30px;margin-top:4px;color:var(--muted);font-size:10px;line-height:1.45}
-.quickAppStatus{align-self:flex-start;margin-top:9px;color:var(--wine);font-size:9px;font-weight:850}
-.launchFoot{margin:16px 2px 0;color:var(--muted);font-size:11px;line-height:1.5}
-.memberLogin{border-color:rgba(20,84,63,.22);color:var(--wine)!important}
-.loginNote{margin-top:-12px;color:var(--muted)}
-.learnSection{background:var(--wine2)}
-.learnSection .kicker{color:#d9c489}
-.inlineCta{color:var(--wine2)}
-.appMeta span{background:#e8f1e9;color:var(--wine)}
-.appCard h3,.futureGrid h3{color:var(--wine2)}
-.appCard b{color:var(--wine)}
-.mobileDock{background:rgba(16,59,48,.97)}
-@media(max-width:1050px){.hero{grid-template-columns:1fr}.heroCopy{max-width:none}.heroVisual{padding:8px 5vw 34px;min-height:0}.launchPanel{max-width:none}.quickAppCard{min-height:126px}}
-@media(max-width:680px){.heroCopy{padding:32px 18px 22px}.hero h1{font-size:43px}.heroCopy>p{font-size:14px}.heroActions{margin:20px 0}.heroVisual{padding:8px 14px 24px;min-height:0}.launchPanel{padding:17px;border-radius:21px}.launchHeading h2{font-size:27px}.quickAppGrid{gap:8px}.quickAppCard{min-height:126px;padding:12px}.quickAppCard strong{font-size:13px}.quickAppCard small{font-size:9px}.heroTags{gap:6px}.heroTags span{font-size:9px;padding:6px 8px}.mobileDock{bottom:max(8px,env(safe-area-inset-bottom))}}
-@media(prefers-reduced-motion:reduce){.quickAppCard{transition:none}}
+        <div className={styles.heroVisual}>
+          <section className={styles.launchPanel} aria-labelledby="launch-title">
+            <div className={styles.launchHeading}>
+              <div><span className={styles.kicker}>HIU YHCT ECOSYSTEM</span><h2 id="launch-title">Chọn điểm đến</h2></div>
+              <span className={styles.launchMark} aria-hidden="true">✦</span>
+            </div>
+            <div className={styles.quickAppGrid}>
+              {ecosystemApps.map((app, index) => (
+                <a href={app.currentUpstreamUrl} className={styles.quickAppCard} key={app.slug}>
+                  <span className={styles.quickAppIndex}>0{index + 1}</span>
+                  <span className={styles.quickAppArrow} aria-hidden="true">↗</span>
+                  <strong>{app.shortName}</strong>
+                  <small>{app.tagline}</small>
+                  <span className={styles.quickAppStatus}>{app.status === "Production" ? "Đang hoạt động" : "Bản xem trước"}</span>
+                </a>
+              ))}
+            </div>
+            <p className={styles.launchFoot}>Mở trực tiếp ứng dụng cần dùng, không qua bước xác nhận trung gian.</p>
+          </section>
+        </div>
+      </section>
+
+      <section id="main-content" className={styles.learnSection}>
+        <div className={styles.sectionTitle}>
+          <span className={styles.kicker}>Learning Center</span>
+          <h2>Một hành trình học, nhiều công cụ liên kết.</h2>
+          <p>
+            Đi từ bài học đến quan sát trực quan, luyện tập, hỏi AI rồi quay lại nội dung cần ôn.
+          </p>
+        </div>
+        <div className={styles.learningFlow}>
+          {["Bài học", "Atlas 3D", "Flashcard / Quiz", "AI hỗ trợ", "Ôn lại"].map((item, index) => (
+            <div key={item} className={styles.flowItem}>
+              <span>{index + 1}</span><strong>{item}</strong>
+            </div>
+          ))}
+        </div>
+        <a className={styles.inlineCta} href="/learn/">Mở Learning Center →</a>
+      </section>
+
+      <section id="ecosystem" className={styles.ecosystem}>
+        <div className={styles.sectionTitle}>
+          <span className={styles.kicker}>Công cụ trong hệ sinh thái</span>
+          <h2>Vào thẳng ứng dụng bạn cần.</h2>
+          <p>Mỗi ứng dụng giữ nội dung chuyên biệt và mở tại địa chỉ đang hoạt động.</p>
+        </div>
+        <div className={styles.appGrid}>
+          {ecosystemApps.map((app) => (
+            <a href={app.currentUpstreamUrl} className={styles.appCard} key={app.slug}>
+              <div className={styles.appMeta}><span>{app.status}</span><small>{app.tagline}</small></div>
+              <h3>{app.name}</h3>
+              <p>{app.description}</p>
+              <b>Mở ứng dụng ↗</b>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section id="community" className={styles.futureSection}>
+        <div className={styles.sectionTitle}>
+          <span className={styles.kicker}>Cộng đồng & Khám phá</span>
+          <h2>Không gian học thuật được cập nhật có kiểm chứng.</h2>
+        </div>
+        <div className={styles.futureGrid}>
+          {plannedSpaces.map((space) => (
+            <article key={space.title} id={space.title === "Discover" ? "discover" : undefined}>
+              <span>{space.status}</span>
+              <h3>{space.title}</h3>
+              <p>{space.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.contact}>
+        <div>
+          <span className={styles.kicker}>Liên hệ & trao đổi học thuật</span>
+          <h2>HIU CLB Y Học cổ truyền</h2>
+        </div>
+        <address>
+          <a href="mailto:clb.yhoccotruyen.hiu@gmail.com">📩 clb.yhoccotruyen.hiu@gmail.com</a>
+          <span>🌐 Fanpage: HIU CLB Y Học cổ truyền</span>
+          <a href="https://www.tiktok.com/@hiu.clb.yhoccotruyen">🎵 @hiu.clb.yhoccotruyen</a>
+          <span>📍 215 Điện Biên Phủ, phường Gia Định, Thành phố Hồ Chí Minh</span>
+        </address>
+      </section>
+
+      <nav className={styles.mobileDock} aria-label="Điều hướng nhanh trên điện thoại">
+        <a href="#top"><span>⌂</span><small>Trang chủ</small></a>
+        <a href="/learn/"><span>▤</span><small>Học tập</small></a>
+        <a href="/ai/"><span>✦</span><small>AI Lab</small></a>
+        <a href="/community/"><span>◎</span><small>Cộng đồng</small></a>
+        <a href="/discover/"><span>◇</span><small>Khám phá</small></a>
+        <a href="/admin/"><span>⚙</span><small>Admin</small></a>
+      </nav>
+
+      <footer className={styles.footer}>
+        <strong>HIU YHCT Ecosystem</strong>
+        <span>Học tập · Kết nối · Cập nhật · Phát triển</span>
+      </footer>
+    </main>
+  );
+}
