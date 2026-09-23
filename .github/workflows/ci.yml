@@ -74,6 +74,7 @@ jobs:
           test -f out/ai/index.html
           test -f out/community/index.html
           test -f out/discover/index.html
+          test -f out/search/index.html
           test -f out/ecosystem/study-os/index.html
           test -f out/ecosystem/ai-thiet-chan/index.html
           test -f out/ecosystem/trung-y-van/index.html
