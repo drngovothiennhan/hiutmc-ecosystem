@@ -1,4 +1,5 @@
 import { discoverChannels } from "@/data/community-hub";
+import DiscoverFeed from "./DiscoverFeed";
 import styles from "./discover.module.css";
 
 export default function DiscoverPage() {
@@ -13,9 +14,14 @@ export default function DiscoverPage() {
         <span className={styles.kicker}>HIU YHCT Discover</span>
         <h1>Cập nhật có nguồn.<br />Không chạy theo số lượng.</h1>
         <p>
-          Discover là lớp tập trung thông tin của hệ sinh thái. Nội dung chỉ được xuất bản khi có
-          nguồn xác thực; phiên bản hiện tại không chèn tin, sự kiện hoặc nghiên cứu giả để lấp giao diện.
+          Discover đọc nội dung học thuật công khai đã duyệt từ backend CLB và chỉ tạo liên kết khi
+          nguồn xác minh có URL hợp lệ. Sự kiện/cơ hội nội bộ không bị mở công khai nếu chưa có nguồn
+          public phù hợp.
         </p>
+      </section>
+
+      <section className={styles.liveSection}>
+        <DiscoverFeed />
       </section>
 
       <section className={styles.channels}>
@@ -24,7 +30,7 @@ export default function DiscoverPage() {
             <span>{String(index + 1).padStart(2, "0")}</span>
             <h2>{channel.title}</h2>
             <p>{channel.body}</p>
-            <small>Chờ nguồn xác thực</small>
+            <small>{channel.title === "Học thuật" ? "Đang hoạt động" : "Chờ nguồn công khai"}</small>
           </article>
         ))}
       </section>
