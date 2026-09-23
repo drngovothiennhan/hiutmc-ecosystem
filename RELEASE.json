@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260924-01",
+  "release": "HIU-YHCT-ECOSYSTEM-20260923-01",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP12",
-  "base_checkpoint_sha": "749655c7e8d1bd94e2a034f6208764917283e8ad",
+  "checkpoint": "CP13",
+  "base_checkpoint_sha": "35f8ea99980850fe609609463d0094e3eda6a956",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP12 approved map homepage, reversible Mobile/PC mode, learning assistant Hub routes, Admin Center, local learning missions, HIU PWA branding, CI, static export, Cloudflare deployment and production smoke are mandatory release gates"
+  "verification": "CP12 approved map homepage, reversible Mobile/PC mode, temporary removal of failing learning assistant UI, Admin Center, local learning missions, HIU PWA branding, CI, static export, Cloudflare deployment and production smoke are mandatory release gates"
 }

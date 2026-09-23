@@ -24,11 +24,6 @@ for (const marker of [
   "chưa đồng bộ với tài khoản thành viên",
   "Bảng thi đua nhóm sẽ chỉ mở khi có dữ liệu thành viên đã xác thực",
   "Chuyển đổi giữa giao diện Mobile và PC",
-  "Trợ lý học tập",
-  "Hỏi bài &amp; ôn tập",
-  "Học thiệt chẩn",
-  "Tra cứu Trung Y Văn",
-  "Quan sát Atlas 3D",
   "Atlas 3D",
   "Cộng đồng",
   "clb.yhoccotruyen.hiu@gmail.com",
@@ -47,6 +42,9 @@ for (const marker of [
 if (home.includes("Chọn điểm đến") || admin.includes("Đăng nhập quản trị chưa được kích hoạt")) {
   errors.push("CP11 dashboard or placeholder Admin was exported instead of the approved CP12 experience");
 }
+if (home.includes("assistantLauncher") || home.includes("learning-assistant-panel") || home.includes("Trợ lý học tập")) {
+  errors.push("learning assistant must remain temporarily hidden until its error is fixed");
+}
 for (const asset of ["out/hiu-club-logo.webp", "out/academy-world.webp", "out/academy-mobile.webp", "out/icons/icon-192.png", "out/icons/icon-512.png", "out/icons/apple-touch-icon.png"]) {
   if (!fs.existsSync(asset)) errors.push(`missing approved visual asset: ${asset}`);
 }
@@ -54,11 +52,10 @@ const cssHrefs = [...home.matchAll(/href="([^"]+\.css[^"]*)"/g)].map((match) => 
 const css = cssHrefs.map((href) => fs.readFileSync(`out/${href.replace(/^\//, "").split("?")[0]}`, "utf8")).join("\n");
 if (!css.includes("html[data-display-mode=pc] .approvedMobileTaskbar{display:none}")) errors.push("PC mode must hide the mobile taskbar");
 if (css.includes("html[data-display-mode=pc] .displayModeToggle{display:none}")) errors.push("display mode switch must remain visible so mobile users can switch back");
-if (!css.includes(".assistantLauncher{")) errors.push("approved learning assistant launcher is missing from the responsive layout");
 
 if (errors.length) {
   console.error("Approved release validation failed:");
   for (const error of errors) console.error(`- ${error}`);
   process.exit(1);
 }
-console.log("Approved CP12 homepage, mobile taskbar, illustrated map, local learning features, logo, community links and Admin Center are present.");
+console.log("Approved CP12 homepage, mobile taskbar, illustrated map, local learning features, logo, community links and Admin Center are present; learning assistant is temporarily hidden.");
