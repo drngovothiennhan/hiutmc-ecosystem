@@ -1,0 +1,9 @@
+{
+  "release": "HIU-TMC-ECOSYSTEM-20260923-03",
+  "source_checkpoint": "656fadc",
+  "domain": "https://hiutmc.com",
+  "hosting": "Cloudflare Workers Static Assets",
+  "stage": "production",
+  "repository": "drngovothiennhan/hiutmc-ecosystem",
+  "visual_target": "illustrated academy with responsive artwork and motion"
+}

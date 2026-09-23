@@ -26,8 +26,8 @@ export const ecosystemApps: EcosystemApp[] = [
     plannedCanonicalDomain: "https://study.hiutmc.com/",
     verifiedAt: "2026-09-23",
     status: "Production",
-    x: 30,
-    y: 30,
+    x: 28,
+    y: 34,
     accent: "#e9b84a"
   },
   {
@@ -41,8 +41,8 @@ export const ecosystemApps: EcosystemApp[] = [
     plannedCanonicalDomain: "https://thietchan.hiutmc.com/",
     verifiedAt: "2026-09-23",
     status: "Production",
-    x: 70,
-    y: 30,
+    x: 73,
+    y: 34,
     accent: "#56c9ff"
   },
   {
@@ -56,8 +56,8 @@ export const ecosystemApps: EcosystemApp[] = [
     plannedCanonicalDomain: "https://trungyvan.hiutmc.com/",
     verifiedAt: "2026-09-22",
     status: "Production",
-    x: 28,
-    y: 66,
+    x: 26,
+    y: 67,
     accent: "#c79a5c"
   },
   {
@@ -71,8 +71,8 @@ export const ecosystemApps: EcosystemApp[] = [
     plannedCanonicalDomain: "https://atlas.hiutmc.com/",
     verifiedAt: "2026-09-23",
     status: "Preview",
-    x: 71,
-    y: 66,
+    x: 76,
+    y: 67,
     accent: "#5ee1d2"
   }
 ];

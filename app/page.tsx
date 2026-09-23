@@ -29,7 +29,7 @@ export default function Home() {
 
       <header className="heritageNav">
         <a className="navBrand" href="#top">
-          <span className="navLeaf">☯</span>
+          <img className="navLeaf" src="/favicon.svg" width="38" height="38" alt="" />
           <span>HIU TMC ECOSYSTEM</span>
         </a>
         <nav className="desktopNav" aria-label="Điều hướng chính">
@@ -59,16 +59,10 @@ export default function Home() {
 
         <EcosystemMap />
 
-        <div className="heroStatement">
-          <p className="heroEyebrow">HIU · Y HỌC CỔ TRUYỀN · CÔNG NGHỆ SỐ</p>
-          <h1>Khám phá hệ sinh thái số của<br />Câu lạc bộ Y học cổ truyền HIU</h1>
-          <a className="heroCta" href="#ecosystem">Khám phá ngay →</a>
-        </div>
-
         <div className="portalCards" aria-label="Khám phá nhanh">
-          {portalCards.map((card) => (
+          {portalCards.map((card, index) => (
             <a className="portalCard" href={card.href} key={card.eyebrow}>
-              <span className="portalThumb" aria-hidden="true">✦</span>
+              <span className={`portalThumb portalThumb${index}`} aria-hidden="true" />
               <span>
                 <small>{card.eyebrow}</small>
                 <strong>{card.title}</strong>
@@ -86,8 +80,9 @@ export default function Home() {
           <h2>Mỗi khu vực là một cánh cửa vào hệ sinh thái HIU TMC.</h2>
         </div>
         <div className="appGrid heritageAppGrid">
-          {ecosystemApps.map((app) => (
+          {ecosystemApps.map((app, index) => (
             <article className="appCard heritageAppCard" key={app.slug}>
+              <div className={`districtThumbnail districtThumbnail${index}`} aria-hidden="true" />
               <span>{app.status}</span>
               <h3>{app.name}</h3>
               <p>{app.description}</p>

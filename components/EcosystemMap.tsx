@@ -1,62 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ecosystemApps } from "@/data/apps";
 
 export default function EcosystemMap() {
   const [active, setActive] = useState<string | null>(null);
-
+  const [paused, setPaused] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setPaused(media.matches);
+    update(); media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+  useEffect(() => {
+    document.documentElement.dataset.motion = paused ? "off" : "on";
+    return () => { delete document.documentElement.dataset.motion; };
+  }, [paused]);
   return (
-    <div className="heritageMapWrap" aria-label="Bản đồ hệ sinh thái HIU Y học cổ truyền">
-      <aside className="mapScroll mapScrollLeft" aria-hidden="true">
-        <span>Y<br />học<br />cổ<br />truyền</span>
-        <small>Gìn giữ tinh hoa<br />Lan tỏa giá trị<br />Kiến tạo tương lai</small>
-      </aside>
-
-      <div className="mapStage heritageMapStage">
-        <img className="mapArtwork" src="/ecosystem-map-art.svg" alt="Bản đồ anime 2D hệ sinh thái HIU Y học cổ truyền" />
-        <div className="mapShade" />
-
-        <div className="centralSeal" aria-hidden="true">
-          <span>☯</span>
-          <strong>HIU</strong>
-        </div>
-
+    <div className="heritageMapWrap" onKeyDown={(event) => { if (event.key === "Escape") setActive(null); }}>
+      <div className="mapStage heritageMapStage" aria-label="Bản đồ học viện HIU: bốn khu vực học tập">
+        <picture><source media="(max-width: 700px)" srcSet="/academy-mobile.webp" type="image/webp" /><source srcSet="/academy-world.webp" type="image/webp" /><img className="mapArtwork" src="/ecosystem-map-art.svg" alt="Học viện giữa núi mây: bốn đảo học tập nối bằng cầu đá quanh quảng trường âm dương, thác nước và vườn hoa" fetchPriority="high" /></picture>
+        <div className="mapAtmosphere" aria-hidden="true"><i className="mist mistOne" /><i className="mist mistTwo" /><i className="lightPool lightAI" /><i className="lightPool lightAtlas" />{Array.from({length:12},(_,i)=><i key={i} className="petal" style={{left:`${8+i*7.5}%`,animationDelay:`${-i*2.7}s`,animationDuration:`${18+i%4*3}s`}} />)}</div>
+        <aside className="mapScroll mapScrollLeft" aria-hidden="true"><span>Y<br />học<br />cổ<br />truyền</span><small>Gìn giữ tinh hoa<br />Lan tỏa giá trị<br />Kiến tạo tương lai</small></aside>
+        <aside className="mapScroll mapScrollRight" aria-hidden="true"><span>ÂM DƯƠNG<br />HÒA HỢP</span><small>CON NGƯỜI<br />VỚI THIÊN NHIÊN</small><em>Đông y<br />dưỡng sinh<br />Sống khỏe<br />Sống đẹp<br />cùng HIU</em></aside>
+        <span className="plazaLabel" aria-hidden="true">HIU</span>
         {ecosystemApps.map((app) => (
-          <div
-            className={`districtMarker ${active === app.slug ? "isActive" : ""}`}
-            style={{ left: `${app.x}%`, top: `${app.y}%`, ["--accent" as string]: app.accent }}
-            key={app.slug}
-            onMouseEnter={() => setActive(app.slug)}
-            onMouseLeave={() => setActive(null)}
-          >
-            <button
-              className="districtPulse"
-              onClick={() => setActive(active === app.slug ? null : app.slug)}
-              onFocus={() => setActive(app.slug)}
-              aria-expanded={active === app.slug}
-              aria-label={`Xem khu vực ${app.name}`}
-            />
-            <Link className="districtBanner" href={`/ecosystem/${app.slug}/`}>
-              <strong>{app.name}</strong>
-              <small>{app.tagline}</small>
-            </Link>
+          <div className={`districtMarker district-${app.slug} ${active===app.slug?"isActive":""}`} key={app.slug} style={{left:`${app.x}%`,top:`${app.y}%`,["--accent" as string]:app.accent}} onMouseEnter={()=>setActive(app.slug)} onMouseLeave={()=>setActive(null)} onBlur={(event)=>{if(!event.currentTarget.contains(event.relatedTarget))setActive(null);}}>
+            <button className="districtBanner" onClick={()=>setActive(active===app.slug?null:app.slug)} aria-expanded={active===app.slug} aria-controls={`card-${app.slug}`}><strong>{app.name}</strong><small>{app.tagline}</small></button>
+            <div className="districtPreview" id={`card-${app.slug}`} hidden={active!==app.slug}><p>{app.description}</p><Link href={`/ecosystem/${app.slug}/`}>Khám phá {app.shortName} →</Link></div>
           </div>
         ))}
+        <div className="heroStatement"><p className="heroEyebrow">HỌC · HIỂU · KẾT NỐI</p><h1>Khám phá hệ sinh thái số của<br />Câu lạc bộ Y học cổ truyền HIU</h1><a className="heroCta" href="#ecosystem">Khám phá ngay →</a></div>
+        <button className="motionToggle" onClick={()=>setPaused(!paused)} aria-pressed={paused}>{paused?"▷ Bật chuyển động":"Ⅱ Tạm dừng chuyển động"}</button>
       </div>
-
-      <aside className="mapScroll mapScrollRight" aria-hidden="true">
-        <span>ÂM DƯƠNG<br />HÒA HỢP</span>
-        <small>CON NGƯỜI<br />VỚI THIÊN NHIÊN</small>
-        <em>Đông y dưỡng sinh<br />Sống khỏe · Sống đẹp<br />Cùng HIU</em>
-      </aside>
-
-      <nav className="quickDock heritageQuickDock" aria-label="Khám phá nhanh">
-        {ecosystemApps.map((app) => (
-          <Link href={`/ecosystem/${app.slug}/`} key={app.slug}>{app.shortName}</Link>
-        ))}
-      </nav>
+      <nav className="quickDock heritageQuickDock" aria-label="Vào nhanh bốn ứng dụng">{ecosystemApps.map(app=><Link href={`/ecosystem/${app.slug}/`} key={app.slug}>{app.shortName} <span aria-hidden="true">↗</span></Link>)}</nav>
     </div>
   );
 }

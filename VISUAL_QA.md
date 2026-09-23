@@ -1,27 +1,17 @@
-# HIU TMC Ecosystem — Visual QA checkpoint
+# Illustrated academy QA — 2026-09-23
 
-Date: 2026-09-23
+- Build and TypeScript: passed; all four app detail routes statically exported.
+- Repository, app registry and asset validators: passed.
+- Cloudflare static bundle dry run: passed.
+- Browser: Chromium, widths 1440, 768, 390 and 360 px.
+- Desktop WebP decoded at 1774 × 887 (about 710 KB); mobile image at 1536 × 1024 (629 KB).
+- Horizontal overflow: none at all four sizes.
+- All four district controls: tap/click, Enter and Escape checked.
+- Page-wide pause and prefers-reduced-motion: passed.
+- Client JavaScript exceptions: none.
+- Screenshots reviewed; mobile CTA and tablet headline overlap found and fixed before handoff.
+- Live deployment validation is recorded separately in PRODUCTION_STATUS.md.
 
-## Tested artifact
-Branch: `main`
+The page reproduces the reference's composition and style. A numerical 95% image-similarity result has not been measured and is not claimed.
 
-## Static render checks
-- Desktop viewport: 1440 × 1000.
-- Mobile viewport: 390 × 844.
-- Horizontal overflow: **none** on both tested viewports.
-- Map artwork: SVG loads successfully; intrinsic image is valid and complete.
-- Home page: 4 map hotspots present.
-- Home page: 4 application cards present.
-- Home page: 4 learning-journey cards present.
-- Required static routes return exported HTML:
-  - `/`
-  - `/ecosystem/study-os/`
-  - `/ecosystem/ai-thiet-chan/`
-  - `/ecosystem/trung-y-van/`
-  - `/ecosystem/atlas/`
-
-## UX correction made from QA
-The original hero narrative overlapped the lower-left map district and its hotspot. The narrative was moved below the map, while the Quick Dock remains close to the map. This keeps all four districts unobstructed on desktop and mobile.
-
-## Remaining visual acceptance
-A live-browser smoke on `https://hiutmc.com` is still required after Cloudflare deployment because local static rendering does not validate public DNS, TLS, CDN headers or real production network behavior.
+All four internal application routes returned success with their upstream CTA present. Vietnamese handwriting glyph coverage was checked. No production release was attempted after automatic approval rejected the main-branch push.
