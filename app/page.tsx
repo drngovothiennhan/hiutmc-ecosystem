@@ -14,7 +14,7 @@ export default function Home() {
           <span><strong>HIU YHCT</strong><small>ECOSYSTEM</small></span>
         </a>
         <nav className={styles.desktopNav} aria-label="Điều hướng chính">
-          <a href="#learn">Học tập</a>
+          <a href="/learn/">Học tập</a>
           <a href="#ecosystem">Công cụ</a>
           <a href="#community">Cộng đồng</a>
           <a href="#discover">Khám phá</a>
@@ -31,7 +31,7 @@ export default function Home() {
             trao đổi học thuật và theo dõi các hoạt động của cộng đồng HIU YHCT.
           </p>
           <div className={styles.heroActions}>
-            <a className={styles.heroPrimary} href="#learn">Bắt đầu học</a>
+            <a className={styles.heroPrimary} href="/learn/">Bắt đầu học</a>
             <a className={styles.heroSecondary} href="#ecosystem">Mở công cụ</a>
           </div>
           <div className={styles.pillarRow}>
@@ -85,7 +85,7 @@ export default function Home() {
             </div>
           ))}
         </div>
-        <a className={styles.inlineCta} href={ecosystemApps[0].currentUpstreamUrl}>Mở Study OS hiện tại ↗</a>
+        <a className={styles.inlineCta} href="/learn/">Mở Learning Center →</a>
       </section>
 
       <section id="ecosystem" className={styles.ecosystem}>
@@ -144,7 +144,7 @@ export default function Home() {
 
       <nav className={styles.mobileDock} aria-label="Điều hướng nhanh trên điện thoại">
         <a href="#top"><span>⌂</span><small>Trang chủ</small></a>
-        <a href="#learn"><span>▤</span><small>Học tập</small></a>
+        <a href="/learn/"><span>▤</span><small>Học tập</small></a>
         <a href="#ecosystem"><span>✦</span><small>AI & Công cụ</small></a>
         <a href="#community"><span>◎</span><small>Cộng đồng</small></a>
         <a href="#discover"><span>◇</span><small>Khám phá</small></a>
