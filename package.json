@@ -7,9 +7,10 @@
     "build": "next build",
     "start": "next start",
     "validate:registry": "node --experimental-strip-types scripts/validate-registry.mjs",
-    "check": "npm run validate:registry && npm run validate:assets && npm run build",
+    "check": "npm run validate:repo && npm run validate:registry && npm run validate:assets && npm run build",
     "validate:assets": "node scripts/validate-assets.mjs",
-    "smoke:production": "node scripts/smoke-production.mjs"
+    "smoke:production": "node scripts/smoke-production.mjs",
+    "validate:repo": "node scripts/validate-repo-boundary.mjs"
   },
   "dependencies": {
     "next": "16.3.4",
