@@ -28,19 +28,25 @@
 - [x] Cloudflare static-only Wrangler configuration exists.
 - [x] Production workflow is present in this repository.
 - [x] Branches `main`, `release-candidate`, and `production` exist.
-- [ ] `CLOUDFLARE_API_TOKEN` is stored as a GitHub Actions secret in **this repository**.
-- [ ] `CLOUDFLARE_ACCOUNT_ID` is stored as a GitHub Actions secret in **this repository**.
-- [ ] First production deployment from this repository succeeds.
-- [ ] SSL for `hiutmc.com` is active.
-- [ ] Live smoke test on `https://hiutmc.com` passes.
+- [x] `CLOUDFLARE_API_TOKEN` is available to GitHub Actions.
+- [x] `CLOUDFLARE_ACCOUNT_ID` is available to GitHub Actions.
+- [x] First production deployment from this repository succeeds.
+- [x] `hiutmc.com` is attached as a Cloudflare custom domain.
+- [x] Live smoke test on `https://hiutmc.com` passes.
+- [x] Required security headers pass production smoke.
 
-## Current verified checkpoint
-- Repository: `drngovothiennhan/hiutmc-ecosystem`
-- Main checkpoint: `1ec3c1cfb8423500a5f74ddf6734b22583aadf22`
-- CI run: `35812155622`
-- CI result: **PASS**
-- Release-candidate branch: `release-candidate`
-- Production branch: `production`
+## Production evidence — 2026-09-23
+- Production source commit: `f2393175a45f607c4b247dbe6a17c8c538304ad7`
+- GitHub Actions run: `35813128206`
+- Cloudflare Worker: `hiutmc-ecosystem`
+- Cloudflare Version ID: `4bd15d4d-5b8b-4a96-b3d8-0a2731480366`
+- Custom domain: `https://hiutmc.com`
+- Worker fallback URL: `https://hiutmc-ecosystem.dr-ngovothiennhan.workers.dev`
+- Smoke: HTTP 200 on home + 4 application detail routes.
+- Security headers: `X-Content-Type-Options: nosniff` and `Referrer-Policy: strict-origin-when-cross-origin`.
+
+## Remaining ecosystem routing work
+The Hub itself is now production-live. Canonical application subdomains such as `study.hiutmc.com`, `thietchan.hiutmc.com`, `trungyvan.hiutmc.com`, and `atlas.hiutmc.com` remain a separate Stage B/D routing task and must be activated one at a time after verifying each upstream.
 
 ## Release rule
-Do not announce production completion until the Cloudflare deployment and live smoke test both have evidence.
+Future releases must pass repository boundary, registry, asset, static build, Cloudflare deployment, and live smoke gates.
