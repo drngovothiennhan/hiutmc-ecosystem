@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260923-10",
+  "release": "HIU-YHCT-ECOSYSTEM-20260923-11",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP10",
-  "base_checkpoint_sha": "1c8ed6fc097d2314f482716ebd53317e0600206c",
+  "checkpoint": "CP11",
+  "base_checkpoint_sha": "baa109443bb2522af54c7f13cd9388f9cf6d31e0",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CI, Community backend contract and production smoke are mandatory release gates"
+  "verification": "CI, release contract, static export, deployment and production smoke are mandatory release gates"
 }
