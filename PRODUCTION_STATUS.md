@@ -1,15 +1,29 @@
-# Production and candidate status — 2026-09-23
+# Production checkpoint — 2026-09-23
 
-## Current public site
-The last verified public release remains Heritage Map Homepage V2 at https://hiutmc.com.
-- Hosting: Cloudflare Workers Static Assets
+**LIVE: Illustrated Academy Homepage**
+
+- Website: https://hiutmc.com
 - Repository: drngovothiennhan/hiutmc-ecosystem
-- Prior successful production workflow: 35813734146
-- Prior production commit: 1ce0a12497f4e583ae8c225331b477769b9c0020
+- Hosting: Cloudflare Workers Static Assets
+- Deployed commit: 73e3d4d935f461e349f8a72b50d9b1246a01a4b8
+- Verified source tree: 387dbd51131d8e3edb3bb4ec7b0ebefeecb0cdf0
+- CI: https://github.com/drngovothiennhan/hiutmc-ecosystem/actions/runs/35815910062 — success
+- Production: https://github.com/drngovothiennhan/hiutmc-ecosystem/actions/runs/35815935741 — success
+- Cloudflare version: 9f9d4a36-bebc-40d3-a0a1-3985e15a2f40
+- Deployment completed: 2026-09-23 03:51 UTC (10:51 Vietnam)
 
-## Illustrated academy candidate
-The new 2D academy redesign is implemented in the local repository. It adds original illustrated scenery, four interactive district signs, responsive art direction, page-wide motion controls, handwritten Vietnamese typography and illustrated application cards.
+## Verification
+- Production workflow: build, route checks, deployment and smoke all passed.
+- Homepage and all four internal application routes: HTTP 200.
+- Required security headers: passed.
+- Public desktop artwork SHA-256 matches the reviewed local asset: 393df3e80909e40503d25bfc903a4ff6f8d9c3924bae3aab56961859229c9518.
+- Browser checks and visual evidence: see VISUAL_QA.md.
 
-The user explicitly authorized GitHub push and Cloudflare production deployment in this session. Release is now in progress; live verification will be recorded after the deployment completes.
+## Scope
+Original 2D academy artwork, separate desktop/mobile compositions, four interactive application districts, Vietnamese handwritten accents, cloud/petal/light animation, page-wide pause and reduced-motion support. Application upstream URLs remain in the existing registry.
 
-See VISUAL_QA.md and docs/VISUAL-DIRECTION.md for the candidate's evidence and visual limits. Do not report the candidate as live until production deployment and live verification succeed.
+User explicitly authorized GitHub publication and Cloudflare deployment. No other application repository was modified.
+
+## Rollback
+Previous production commit: 1ce0a12497f4e583ae8c225331b477769b9c0020.
+Previous Cloudflare version: e15ed2b0-8542-41e4-abd8-0d0d6928c887.
