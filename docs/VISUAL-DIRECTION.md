@@ -22,3 +22,7 @@ This is a reconstruction of the reference composition, not a pixel-identical cop
 Wide desktop illustration is regenerated at a landscape-native ratio, avoiding geometric distortion. Mobile retains the dedicated 3:2 composition. Application signs are lighter and narrower; the original botanical favicon becomes the nav mark. Application and portal cards use district-specific artwork crops. No numerical similarity percentage is asserted.
 
 Typography: the self-hosted Charm font provides Vietnamese handwriting for the masthead and scrolls. SIL OFL license is retained in public/fonts/Charm-OFL.txt. Body copy and controls remain semantic HTML.
+
+
+## Approved CP8 avatar prototype — 2026-09-23
+The current CP7 Student Hub and all CP7 routes remain intact. The old recognition map is removed from the homepage hero and map panel; a compact SVG 2D campus character occupies the hero visual instead. Users can adjust presentation, hair, skin tone and outfit, move to the four registered learning apps with touch controls or arrow keys, then open the selected destination. Preferences persist only in the current browser. Cross-device member profiles and SSO remain separate backend work.

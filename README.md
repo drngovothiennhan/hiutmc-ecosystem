@@ -35,3 +35,7 @@ It must not write into or be merged into the Study OS repository `drngovothiennh
 - `production`: Cloudflare deployment branch
 
 See `PROJECT_EXECUTION_PROMPT.md`, `RELEASE_CHECKLIST.md`, `CLOUDFLARE_RELEASE_SETUP.md` and `APP_ONBOARDING.md`.
+
+
+## Current dashboard direction
+The CP7 student dashboard is the production source of truth. The old oversized ecosystem map is removed from the main task flow and replaced in the approved prototype by a compact, low-cost 2D avatar campus. Avatar preferences are browser-local only; Study OS remains the member sign-in source until a secure cross-app SSO flow is implemented.
