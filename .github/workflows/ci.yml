@@ -48,6 +48,9 @@ jobs:
       - name: Install
         run: npm install --no-audit --no-fund
 
+      - name: Validate repository boundary
+        run: npm run validate:repo
+
       - name: Validate app registry
         run: npm run validate:registry
 
