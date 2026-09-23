@@ -1,8 +1,8 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260923-09",
+  "release": "HIU-YHCT-ECOSYSTEM-20260923-10",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP9",
-  "base_checkpoint_sha": "67733569e4515e8e4d1705c534af719360f29acf",
+  "checkpoint": "CP10",
+  "base_checkpoint_sha": "1c8ed6fc097d2314f482716ebd53317e0600206c",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
