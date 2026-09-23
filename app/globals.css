@@ -28,3 +28,123 @@ footer span{color:#62736b}
 .mobileMenuPanel{position:absolute;right:0;top:52px;width:210px;padding:10px;border-radius:16px;background:#fffdf8;border:1px solid var(--line);box-shadow:0 18px 42px rgba(24,58,45,.18)}
 .mobileMenuPanel a{display:block;padding:12px;border-radius:10px;font-size:14px;font-weight:700}
 .mobileMenuPanel a:hover,.mobileMenuPanel a:focus-visible{background:#eaf1e8;outline:none}
+
+
+/* ===== HIU TMC Heritage Map Homepage v2 ===== */
+.tmcHome{background:
+  radial-gradient(circle at 15% 15%,rgba(65,112,77,.08),transparent 28%),
+  radial-gradient(circle at 85% 20%,rgba(193,145,74,.08),transparent 25%),
+  #f3ead4;color:#18372e}
+.heritageMasthead{min-height:118px;display:grid;grid-template-columns:1.05fr 1fr .9fr;align-items:center;gap:34px;padding:18px 5vw;border-bottom:1px solid rgba(72,91,67,.26);background:
+  linear-gradient(rgba(248,242,223,.72),rgba(248,242,223,.72)),
+  radial-gradient(circle at 30% 20%,#d9ead6 0 18%,transparent 19%),
+  linear-gradient(110deg,#eef1dd,#f5e8ca 60%,#e7efdd);position:relative;overflow:hidden}
+.heritageMasthead::after{content:"";position:absolute;inset:auto 0 0;height:18px;background:linear-gradient(90deg,transparent,rgba(35,91,69,.14),transparent)}
+.heritageBrand{display:flex;align-items:center;gap:16px}
+.heritageHIU{font-family:Georgia,serif;font-size:clamp(46px,5vw,74px);font-weight:900;font-style:italic;letter-spacing:-.06em;color:#103d31;transform:rotate(-3deg)}
+.heritageClub{font-family:Georgia,serif;font-size:17px;line-height:1.2;font-style:italic;color:#254b3f}
+.heritageSlogan{font-family:Georgia,serif;text-align:center;font-size:clamp(17px,2vw,28px);font-style:italic;line-height:1.25;margin:0;color:#1d4236}
+.heritagePlaque{justify-self:end;padding:12px 18px;text-align:center;border:1px solid rgba(94,74,48,.36);background:#e7d2aa;box-shadow:inset 0 0 0 4px rgba(255,249,232,.38),0 7px 20px rgba(80,56,26,.1);transform:rotate(-1deg);min-width:235px}
+.heritagePlaque strong,.heritagePlaque span,.heritagePlaque small{display:block}
+.heritagePlaque strong{font-family:Georgia,serif;font-size:13px;letter-spacing:.12em}
+.heritagePlaque span{font-size:11px;font-weight:800;letter-spacing:.1em;margin:4px 0}
+.heritagePlaque small{font-family:Georgia,serif;font-style:italic;font-size:11px}
+.heritageNav{position:sticky;top:0;z-index:60;display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:24px;min-height:66px;padding:0 4.3vw;border-bottom:1px solid rgba(31,93,73,.18);background:rgba(255,252,242,.94);backdrop-filter:blur(12px)}
+.navBrand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.06em}
+.navLeaf{display:grid;place-items:center;width:38px;height:38px;border:1px solid rgba(31,93,73,.28);border-radius:50%;background:#e7efe4;color:#164d3d;font-size:20px}
+.heritageNav .desktopNav{justify-self:center;display:flex;gap:28px;font-size:13px;font-weight:700}
+.heritageNav .desktopNav a{position:relative}
+.heritageNav .desktopNav a:not(:last-child)::after{content:"";position:absolute;right:-14px;top:50%;width:1px;height:13px;background:rgba(31,93,73,.25);transform:translateY(-50%)}
+.communityBadge{padding:9px 16px;border-radius:999px;background:#2e7158;color:#fff;font-size:12px;font-weight:800;box-shadow:0 5px 14px rgba(31,93,73,.2)}
+.heritageHeroFrame{margin:22px 2.2vw 0;padding:0 0 24px;border:1px solid rgba(95,83,57,.34);border-radius:18px;background:
+  linear-gradient(rgba(250,246,232,.96),rgba(250,246,232,.96)),
+  repeating-linear-gradient(0deg,rgba(120,95,57,.035) 0 1px,transparent 1px 5px);
+box-shadow:0 18px 48px rgba(82,65,41,.14);overflow:hidden}
+.heroTitleRow{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:15px 22px;border-bottom:1px solid rgba(90,78,56,.18);font-family:Georgia,serif}
+.heroTitleRow strong{font-size:clamp(16px,2vw,24px);letter-spacing:.02em}
+.brushMark{font-size:22px;color:#185440}
+.heroWhisper{font-size:13px;font-style:italic;color:#5c695e}
+.heritageMapWrap{display:grid;grid-template-columns:88px minmax(0,1fr) 118px;align-items:stretch;gap:0;position:relative}
+.heritageMapStage{min-height:680px;height:min(74vh,760px);border-radius:0;box-shadow:none;border-left:1px solid rgba(85,80,60,.18);border-right:1px solid rgba(85,80,60,.18);background:#dbe8dc}
+.heritageMapStage .mapArtwork{height:100%;min-height:100%;object-fit:cover}
+.mapScroll{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 8px;text-align:center;background:linear-gradient(180deg,#ead9b4,#f6ecd1 35%,#e4cea3);color:#513c2f;border-top:1px solid rgba(112,90,55,.16);border-bottom:1px solid rgba(112,90,55,.16)}
+.mapScrollLeft>span{font-family:Georgia,serif;font-size:29px;line-height:1.05;font-style:italic}
+.mapScrollLeft small{margin-top:18px;font-family:Georgia,serif;font-size:10px;line-height:1.65;font-style:italic}
+.mapScrollRight span{font-family:Georgia,serif;font-size:13px;line-height:1.5;font-weight:800;letter-spacing:.08em}
+.mapScrollRight small{margin-top:8px;font-size:10px;line-height:1.5;letter-spacing:.08em}
+.mapScrollRight em{margin-top:48px;font-family:Georgia,serif;font-size:13px;line-height:1.6}
+.centralSeal{position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;width:105px;height:105px;border-radius:50%;background:rgba(242,224,182,.86);border:3px solid rgba(95,66,38,.38);box-shadow:0 6px 24px rgba(35,65,48,.16);pointer-events:none}
+.centralSeal span{font-size:48px;line-height:.9;color:#1c3f36}
+.centralSeal strong{font-family:Georgia,serif;font-size:18px;margin-top:5px}
+.districtMarker{position:absolute;transform:translate(-50%,-50%);z-index:18;min-width:190px;text-align:center}
+.districtPulse{position:absolute;left:50%;top:-18px;transform:translateX(-50%);width:22px;height:22px;border-radius:50%;border:3px solid rgba(255,255,255,.95);background:var(--accent);box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 58%,transparent);animation:pulse 2.3s infinite;cursor:pointer}
+.districtBanner{display:block;min-width:190px;padding:10px 16px 9px;border-radius:10px;background:linear-gradient(180deg,#29496a,#112a48);border:2px solid rgba(238,211,153,.86);box-shadow:0 8px 22px rgba(14,40,53,.3),inset 0 0 0 1px rgba(255,255,255,.12);color:white;transition:transform .2s ease,box-shadow .2s ease}
+.districtBanner strong{display:block;font-family:Georgia,serif;font-size:18px;line-height:1.05}
+.districtBanner small{display:block;margin-top:7px;padding:5px 8px;border-radius:8px;background:rgba(255,247,223,.94);color:#4f402d;font-size:10px;font-weight:700;white-space:nowrap}
+.districtMarker:hover .districtBanner,.districtMarker:focus-within .districtBanner,.districtMarker.isActive .districtBanner{transform:translateY(-5px) scale(1.04);box-shadow:0 15px 34px rgba(14,40,53,.36),0 0 0 4px color-mix(in srgb,var(--accent) 30%,transparent)}
+.heritageQuickDock{grid-column:1/-1;margin:-18px auto 0}
+.heritageQuickDock a{background:#fff8e8;border-color:rgba(89,73,47,.26)}
+.heroStatement{text-align:center;padding:30px 7vw 18px}
+.heroEyebrow{font-size:11px;letter-spacing:.2em;font-weight:900;color:#527063}
+.heroStatement h1{font-family:Georgia,serif;font-size:clamp(30px,4vw,52px);line-height:1.08;margin:9px auto 20px;max-width:900px;color:#17372c}
+.heroCta{display:inline-flex;align-items:center;justify-content:center;padding:13px 28px;border-radius:999px;background:linear-gradient(180deg,#2c6a52,#1c523e);border:2px solid #d9c08a;color:white;font-weight:900;box-shadow:0 7px 18px rgba(31,93,73,.22)}
+.portalCards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:12px 26px 0}
+.portalCard{display:grid;grid-template-columns:56px 1fr auto;align-items:center;gap:12px;min-height:86px;padding:10px 13px;border:1px solid rgba(87,78,58,.18);border-radius:12px;background:#fffaf0;box-shadow:0 5px 14px rgba(84,67,40,.07)}
+.portalThumb{display:grid;place-items:center;width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#cadfd4,#e3c996);font-size:22px;color:#1f5d49}
+.portalCard small,.portalCard strong,.portalCard em{display:block}
+.portalCard small{font-size:10px;font-weight:900;color:#56685f}
+.portalCard strong{font-family:Georgia,serif;font-size:14px;margin:2px 0}
+.portalCard em{font-size:10px;line-height:1.35;color:#68736d;font-style:normal}
+.portalCard b{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#3a745d;color:white}
+.heritageSection,.heritageJourney{padding:78px 6vw;background:#f4ead5}
+.sectionHeading{display:grid;grid-template-columns:.8fr 1.2fr;align-items:end;gap:30px;margin-bottom:30px}
+.sectionHeading h2{font-family:Georgia,serif;font-size:clamp(32px,4.3vw,55px);line-height:1.06;margin:0}
+.heritageAppGrid{gap:14px}
+.heritageAppCard{background:#fff9ec;border-color:rgba(87,78,58,.2);box-shadow:0 9px 22px rgba(78,60,35,.08)}
+.heritageStory{display:grid;grid-template-columns:1fr 1fr;gap:58px;padding:78px 7vw;background:linear-gradient(120deg,#e3eadb,#f1e4c8)}
+.heritageStory h2{font-family:Georgia,serif;font-size:clamp(34px,4vw,54px);line-height:1.07;margin:10px 0 18px}
+.heritageStory p{font-size:17px;line-height:1.75;color:#4d6157}
+.heritageJourney{background:#efe2c6}
+.heritageJourneyGrid .journeyCard{background:#fff7e6;border-color:rgba(78,64,42,.15);color:#17372c}
+.heritageJourneyGrid .journeyCard p{color:#58675f}
+.heritageJourneyGrid .journeyCard>span{background:#2a6b52;color:white}
+.heritageCommunity{text-align:center;padding:86px 7vw;background:
+  radial-gradient(circle at 50% 0,rgba(255,255,255,.45),transparent 36%),
+  #dce8d8}
+.communitySeal{display:grid;place-items:center;margin:0 auto 16px;width:58px;height:58px;border-radius:50%;background:#fff7e6;border:2px solid rgba(46,105,82,.35);font-size:30px;color:#2e7158}
+.heritageCommunity h2{font-family:Georgia,serif;font-size:clamp(34px,4.6vw,56px);line-height:1.05;margin:8px auto 18px;max-width:850px}
+.heritageCommunity>p{max-width:760px;margin:0 auto 24px;line-height:1.75;color:#52665d}
+.heritageFooter{display:flex;justify-content:space-between;gap:20px;align-items:center;padding:24px 6vw;border-top:1px solid rgba(78,65,43,.2);background:#efe2c7;font-size:11px;letter-spacing:.08em}
+.heritageFooter strong{font-size:13px}
+
+@media(max-width:1100px){
+  .heritageMasthead{grid-template-columns:1fr 1fr}.heritagePlaque{display:none}
+  .heritageMapWrap{grid-template-columns:66px minmax(0,1fr) 82px}
+  .mapScrollLeft>span{font-size:22px}.mapScrollRight em{display:none}
+  .districtMarker{min-width:160px}.districtBanner{min-width:160px;padding:8px 10px}.districtBanner strong{font-size:15px}
+  .portalCards{grid-template-columns:1fr 1fr}
+}
+@media(max-width:900px){
+  .heritageMasthead{grid-template-columns:1fr;padding:14px 5vw;min-height:auto}.heritageSlogan{text-align:left}
+  .heritageNav{grid-template-columns:1fr auto auto}.heritageNav .desktopNav{display:none}.heritageNav .mobileMenu{display:block}.communityBadge{display:none}
+  .heritageMapWrap{grid-template-columns:1fr}.mapScroll{display:none}
+  .heritageMapStage{height:62vh;min-height:560px;border-left:0;border-right:0}
+  .districtMarker{min-width:145px}.districtBanner{min-width:145px}.districtBanner strong{font-size:14px}.districtBanner small{font-size:9px}
+  .heritageQuickDock{grid-column:1}
+  .sectionHeading,.heritageStory{grid-template-columns:1fr}
+}
+@media(max-width:620px){
+  .heritageHIU{font-size:50px}.heritageClub{font-size:13px}.heritageSlogan{font-size:16px}
+  .heritageHeroFrame{margin:10px 8px 0;border-radius:12px}
+  .heroTitleRow{grid-template-columns:auto 1fr;padding:11px 12px}.heroWhisper{display:none}
+  .heritageMapStage{height:54vh;min-height:500px}
+  .centralSeal{width:72px;height:72px}.centralSeal span{font-size:32px}.centralSeal strong{font-size:13px}
+  .districtMarker{min-width:112px}.districtBanner{min-width:112px;padding:7px 7px}.districtBanner strong{font-size:12px}.districtBanner small{display:none}
+  .districtPulse{width:18px;height:18px;top:-15px}
+  .heroStatement{padding:26px 18px 12px}.heroStatement h1{font-size:31px}
+  .portalCards{grid-template-columns:1fr;padding:10px 14px 0}.portalCard{min-height:72px}
+  .heritageSection,.heritageJourney,.heritageStory,.heritageCommunity{padding:58px 5vw}
+  .heritageAppGrid{grid-template-columns:1fr}
+  .heritageJourneyGrid{grid-template-columns:1fr}
+  .heritageFooter{align-items:flex-start;flex-direction:column}
+}

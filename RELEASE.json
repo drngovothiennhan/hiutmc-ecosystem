@@ -1,8 +1,9 @@
 {
-  "release": "HIU-TMC-ECOSYSTEM-20260923-01",
-  "source_checkpoint": "25da1d23059ed4e3fdd3d7535a2b7fece6981f4e",
+  "release": "HIU-TMC-ECOSYSTEM-20260923-02",
+  "source_checkpoint": "eafb944b2e979934f8a81198a9658553d542029f",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
-  "repository": "drngovothiennhan/hiutmc-ecosystem"
+  "repository": "drngovothiennhan/hiutmc-ecosystem",
+  "visual_target": "approved heritage anime map homepage"
 }
