@@ -23,9 +23,9 @@
 
 ## Current production release
 - Checkpoint: CP8 — `HIU-YHCT-ECOSYSTEM-20260923-08`
-- Application commit deployed: `269bb4accaa45028b90f800d5f4338964c4b5e60`
-- CI: successful, run #34 — https://github.com/drngovothiennhan/hiutmc-ecosystem/actions/runs/35852234097
-- Cloudflare deploy and production smoke: successful, run #14 — https://github.com/drngovothiennhan/hiutmc-ecosystem/actions/runs/35852346924
+- Deployed application commit: `ac75463934c3afd30891e62373a4001a9c154ec3`
+- CI: successful, run #35 — https://github.com/drngovothiennhan/hiutmc-ecosystem/actions/runs/35852643452
+- Cloudflare deploy and production smoke: successful, run #15 — https://github.com/drngovothiennhan/hiutmc-ecosystem/actions/runs/35852731797
 - Production verification covered release contracts, static export, required routes, deployment, and smoke checks against `https://hiutmc.com`.
 
 ## Release verification
