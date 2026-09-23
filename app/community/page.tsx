@@ -1,4 +1,5 @@
 import { academicRooms, communityFeatures } from "@/data/community-hub";
+import CommunityFeed from "./CommunityFeed";
 import styles from "./community.module.css";
 
 export default function CommunityPage() {
@@ -16,9 +17,9 @@ export default function CommunityPage() {
         <span className={styles.kicker}>HIU YHCT Community</span>
         <h1>Học cùng nhau.<br />Chia sẻ có kiểm chứng.</h1>
         <p>
-          Community được tổ chức theo không gian học thuật. Giai đoạn này ưu tiên kiến trúc
-          và luồng trải nghiệm; các tính năng cần backend cộng đồng được ghi rõ trạng thái,
-          không giả lập thành chức năng đã hoạt động.
+          Community kết nối trực tiếp với backend CLB hiện có để hiển thị nội dung học thuật
+          công khai đã duyệt. Đăng bài, bình luận và tương tác chỉ được bật khi luồng xác thực
+          thành viên được nối an toàn; hệ thống không giả lập hoạt động chưa phát hành.
         </p>
       </section>
 
@@ -36,6 +37,10 @@ export default function CommunityPage() {
             </article>
           ))}
         </div>
+      </section>
+
+      <section className={styles.feedSection}>
+        <CommunityFeed />
       </section>
 
       <section className={styles.features}>
