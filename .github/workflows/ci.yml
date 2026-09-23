@@ -15,6 +15,7 @@ on:
       - "next.config.ts"
       - "tsconfig.json"
       - "wrangler.jsonc"
+      - "RELEASE.json"
       - ".github/workflows/ci.yml"
   pull_request:
     branches:
