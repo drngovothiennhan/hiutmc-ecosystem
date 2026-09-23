@@ -1,7 +1,7 @@
 {
-  "name": "HIU TMC Ecosystem",
-  "short_name": "HIU TMC",
-  "description": "Cổng khám phá hệ sinh thái số Y học cổ truyền HIU.",
+  "name": "HIU YHCT Ecosystem",
+  "short_name": "HIU YHCT",
+  "description": "Hệ sinh thái số học tập, AI, cộng đồng và khám phá dành cho sinh viên Y học cổ truyền HIU.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
