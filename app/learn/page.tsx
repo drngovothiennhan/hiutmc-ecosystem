@@ -24,6 +24,7 @@ export default function LearnPage() {
           <div className={styles.actions}>
             <a href={learningModes[0].href}>Học 15 phút ↗</a>
             <a href="#subjects">Chọn môn học</a>
+            <a href="/search/">Tìm trong Ecosystem</a>
             <a href="/ai/">Mở AI Lab</a>
           </div>
         </div>
@@ -62,11 +63,14 @@ export default function LearnPage() {
         </div>
         <div className={styles.subjectGrid}>
           {subjectGroups.map((subject) => (
-            <article key={subject.title}>
+            <a
+              key={subject.title}
+              href={`/search/?q=${encodeURIComponent(subject.title)}`}
+            >
               <h3>{subject.title}</h3>
               <p>{subject.body}</p>
-              <span>Đang chuẩn hóa nội dung</span>
-            </article>
+              <span>Tìm tài nguyên liên quan →</span>
+            </a>
           ))}
         </div>
       </section>
