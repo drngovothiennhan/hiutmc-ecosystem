@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     default: "HIU TMC Ecosystem",
     template: "%s | HIU TMC Ecosystem",
   },
-  description: "Cổng khám phá hệ sinh thái số của Câu lạc bộ Y học cổ truyền HIU: Study OS, A.I Thiệt Chẩn, Trung Y Văn HIU và 3D Huyệt vị – Kinh lạc.",
+  description: "Cổng học tập và kết nối của Câu lạc bộ Y học cổ truyền HIU: Study OS, AI Lab, Cộng đồng và thế giới học thuật tương tác.",
   alternates: { canonical: "/" },
   manifest: "/manifest.webmanifest",
   icons: { icon: "/favicon.svg", apple: "/icons/apple-touch-icon.png" },
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     url: "https://hiutmc.com",
     siteName: "HIU TMC Ecosystem",
     title: "HIU TMC Ecosystem",
-    description: "Một bản đồ. Nhiều hành trình học tập Y học cổ truyền.",
+    description: "Học tập, kết nối và khám phá thế giới học thuật YHCT cùng HIU.",
   },
 };
 
