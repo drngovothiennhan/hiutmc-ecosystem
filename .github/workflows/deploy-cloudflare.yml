@@ -1,4 +1,4 @@
-name: Deploy HIU TMC Ecosystem to Cloudflare
+name: Deploy HIU YHCT Ecosystem to Cloudflare
 
 on:
   workflow_dispatch:
@@ -54,7 +54,7 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Validate release contracts
-        run: npm run validate:registry && npm run validate:assets
+        run: npm run validate:repo && npm run validate:release && npm run validate:registry && npm run validate:assets && npm run validate:pwa
 
       - name: Build static export
         run: npm run build
