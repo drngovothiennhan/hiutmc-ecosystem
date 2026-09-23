@@ -20,6 +20,8 @@ export default function DisplayModeToggle() {
     setMode(next);
     try { window.localStorage.setItem(KEY, next); } catch { /* The display switch still works for this visit. */ }
   };
-  const label = mode === "pc" ? "↔ Giao diện Mobile" : "▣ Giao diện PC";
-  return <button className="displayModeToggle" type="button" onClick={toggle} aria-label="Chuyển đổi giữa giao diện Mobile và PC" aria-pressed={mode === "pc"} title={mode === "pc" ? "Trở lại bố cục phù hợp với thiết bị" : "Dùng bố cục PC trên thiết bị hiện tại"}>{label}</button>;
+  const currentMode = mode === "pc" ? "PC" : "Mobile";
+  const nextMode = mode === "pc" ? "Mobile" : "PC";
+  const label = mode === "pc" ? "PC → Mobile" : "Mobile → PC";
+  return <button className="displayModeToggle" type="button" onClick={toggle} aria-label={`Chuyển đổi giữa giao diện Mobile và PC. Hiện đang ở giao diện ${currentMode}.`} aria-pressed={mode === "pc"} title={`Đang ở giao diện ${currentMode}; chuyển sang ${nextMode}`}>{label}</button>;
 }

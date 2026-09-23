@@ -208,3 +208,54 @@ html[data-display-mode="pc"] .approvedMobileTaskbar{display:none}
 .dailyMissions{max-width:1390px;margin:50px auto;padding:0 clamp(18px,4vw,54px);scroll-margin-top:85px}.missionHeader,.weeklyChallengeTop{display:flex;align-items:flex-end;justify-content:space-between;gap:18px}.missionHeader h2,.weeklyChallenge h3,.badgePanel h3{margin:2px 0 7px;color:#213348;font-family:Georgia,serif;font-size:clamp(25px,3vw,36px);line-height:1.15}.missionHeader>div>p:last-child,.weeklyChallenge>p{margin:0;color:#667168;font-size:14px;line-height:1.6}.localProgressLabel{padding:8px 12px;border:1px solid #d9cdb4;border-radius:999px;background:#fcf8ed;color:#665d4f;font-size:11px;font-weight:750;white-space:nowrap}.missionStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:23px 0 15px}.missionStats article{position:relative;display:grid;gap:5px;min-height:118px;padding:17px 20px;border:1px solid #d9d7c9;border-radius:13px;background:linear-gradient(140deg,#fffdf7,#f4efdf);box-shadow:0 7px 22px #253c2d0b}.missionStats article>span{position:absolute;top:15px;right:18px;color:#a91838;font-size:19px}.missionStats small{color:#6c756d;font-size:9px;font-weight:900;letter-spacing:.13em}.missionStats strong{color:#9f1936;font-family:Georgia,serif;font-size:32px;line-height:1.05}.missionStats strong i{font-family:system-ui,sans-serif;font-size:13px;font-style:normal;font-weight:600}.missionStats em{color:#70776f;font-size:10px;font-style:normal}.missionGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.missionCard{display:grid;grid-template-columns:36px minmax(0,1fr);gap:12px;min-height:190px;padding:17px;border:1px solid #e3dccb;border-radius:14px;background:#fffdf6;box-shadow:0 8px 24px #30291c0a;transition:border-color .2s,transform .2s,box-shadow .2s}.missionCard:hover{transform:translateY(-2px);box-shadow:0 13px 28px #30291c17}.missionCard.isDone{border-color:#a8c8ac;background:#f4faf2}.missionNumber{display:grid;place-items:center;width:34px;height:34px;border:1px solid #e5d5b1;border-radius:50%;background:#f6efd9;color:#886522;font-family:Georgia,serif;font-size:13px;font-weight:800}.missionCopy{display:flex;min-width:0;flex-direction:column}.missionNameRow{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.missionNameRow h3{margin:1px 0 5px;color:#243a32;font-size:16px;line-height:1.35}.missionNameRow>span{padding:4px 7px;border-radius:999px;background:#f7e8ec;color:#9c1a38;font-size:9px;font-weight:900;white-space:nowrap}.missionCopy>p{margin:2px 0 12px;color:#68716a;font-size:12px;line-height:1.55}.missionActions{display:flex;flex-wrap:wrap;gap:7px;margin-top:auto}.missionActions a,.missionActions button{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:7px 10px;border:1px solid #d7dacf;border-radius:8px;background:#fff;color:#315846;font-size:10px;font-weight:800;text-decoration:none;cursor:pointer}.missionActions button{border-color:#9d203b;background:#9d203b;color:#fff}.missionActions button[aria-pressed="true"]{border-color:#578060;background:#e6f1e4;color:#315b39}.missionActions button:disabled{opacity:.55;cursor:wait}.missionLowerGrid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:12px;margin-top:13px}.weeklyChallenge,.badgePanel{padding:19px;border:1px solid #ddd5c3;border-radius:13px;background:#f7f2e6}.weeklyChallengeTop{align-items:center}.weeklyChallenge h3,.badgePanel h3{margin:4px 0 0;font-size:22px}.weeklyChallengeTop>span{display:grid;place-items:center;min-width:52px;height:36px;padding:0 10px;border:1px solid #d2b780;border-radius:999px;background:#fffaf0;color:#8d6a2d;font-size:13px;font-weight:900}.weeklyChallenge>p{margin:13px 0;font-size:12px}.weeklyChallenge progress{width:100%;height:10px;overflow:hidden;appearance:none;border:0;border-radius:999px;background:#e4ddce}.weeklyChallenge progress::-webkit-progress-bar{border-radius:999px;background:#e4ddce}.weeklyChallenge progress::-webkit-progress-value{border-radius:999px;background:linear-gradient(90deg,#b11b3b,#c49a52)}.weeklyChallenge progress::-moz-progress-bar{border-radius:999px;background:linear-gradient(90deg,#b11b3b,#c49a52)}.badgeList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:13px}.badgeItem{display:flex;align-items:center;gap:9px;min-width:0;padding:9px;border:1px solid #e3ddcf;border-radius:10px;background:#fffaf0;opacity:.64}.badgeItem.earned{border-color:#d4b77d;opacity:1;box-shadow:inset 0 0 0 1px #d4b77d44}.badgeItem>span{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border-radius:50%;background:#efe7d6;color:#8b692c;font-size:16px}.badgeItem.earned>span{background:#f7e8ec;color:#a01938}.badgeItem>div{display:grid;gap:2px;min-width:0}.badgeItem strong{color:#374538;font-size:10px}.badgeItem small{color:#73786e;font-size:9px;line-height:1.35}.missionDisclosure{margin:13px 0 0;color:#626b65;font-size:11px;line-height:1.65}.dailyMissions .sectionKicker{margin:0;color:#971935;font-size:10px;font-weight:900;letter-spacing:.16em}
 @media(max-width:950px){.dailyMissions{margin:36px auto;padding:0 22px}.missionGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.missionLowerGrid{grid-template-columns:1fr}.missionCard{min-height:170px}}
 @media(max-width:700px){.dailyMissions{margin:27px auto 35px;padding:0 14px}.missionHeader{display:block}.missionHeader h2{font-size:27px}.missionHeader>div>p:last-child{font-size:12px}.localProgressLabel{display:inline-flex;margin-top:11px;font-size:9px}.missionStats{gap:6px;margin:15px 0 10px}.missionStats article{min-height:99px;padding:12px 8px}.missionStats article>span{top:9px;right:9px;font-size:14px}.missionStats small{max-width:90%;font-size:7px;letter-spacing:.06em;line-height:1.3}.missionStats strong{font-size:25px}.missionStats strong i{font-size:10px}.missionStats em{font-size:8px;line-height:1.35}.missionGrid{grid-template-columns:1fr;gap:8px}.missionCard{grid-template-columns:29px minmax(0,1fr);gap:9px;min-height:0;padding:13px}.missionNumber{width:29px;height:29px;font-size:11px}.missionNameRow h3{font-size:14px}.missionCopy>p{font-size:11px;margin:3px 0 10px}.missionActions{gap:6px}.missionActions a,.missionActions button{min-height:42px;padding:7px 9px;font-size:9px}.missionLowerGrid{gap:8px;margin-top:9px}.weeklyChallenge,.badgePanel{padding:14px}.weeklyChallenge h3,.badgePanel h3{font-size:20px}.weeklyChallenge>p{font-size:11px}.badgeList{gap:6px}.badgeItem{gap:6px;padding:7px}.badgeItem>span{flex-basis:25px;width:25px;height:25px;font-size:13px}.badgeItem strong{font-size:9px}.badgeItem small{font-size:8px}.heritageNav .displayModeToggle{display:block}}
+
+/* CP14 UI refinement: keep the approved identity and controls inside the layout. */
+.navLeaf{display:block;flex:0 0 auto;width:68px;height:46px;object-fit:contain;border:0;border-radius:0;background:transparent}
+.navBrand{min-width:0;gap:10px;white-space:nowrap}
+.displayModeToggle{min-height:44px;padding:0 14px;border-color:#b9a678;color:#285541;font-size:12px;font-weight:800;letter-spacing:.01em;box-shadow:0 2px 7px #253a3014}
+.displayModeToggle:focus-visible,.mobileMenu summary:focus-visible,.mobileMenuPanel a:focus-visible,.navBrand:focus-visible{outline:3px solid #a3193a;outline-offset:3px}
+.heritageNav .mobileMenuPanel{z-index:90}
+@media(max-width:700px){
+  .approvedHero{padding:20px 16px 18px}
+  .approvedHeroBrand{font-size:8px;letter-spacing:.1em}
+  .approvedHeroDot{width:8px;height:8px;flex:0 0 8px}
+  .approvedHero h1{margin-top:11px;font-size:clamp(31px,8vw,38px);line-height:1.04}
+  .approvedHeroCopy>p{margin:9px 0 12px;font-size:13px;line-height:1.45}
+  .approvedHeroActions{gap:7px}
+  .approvedHeroActions a{min-height:44px;padding:0 10px;font-size:11px}
+  .approvedHeroNote{margin-top:9px;font-size:9px;line-height:1.4}
+  .heritageNav{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand menu" "actions actions";gap:5px 12px;min-height:0;padding:8px 12px 10px}
+  .heritageNav .navBrand{grid-area:brand;gap:8px;font-size:11px;letter-spacing:.035em}
+  .heritageNav .navLeaf{width:60px;height:40px}
+  .heritageNav .mobileMenu{grid-area:menu;justify-self:end}
+  .heritageNav .mobileMenu summary{width:44px;height:44px}
+  .heritageNavActions{grid-area:actions;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;justify-self:stretch;gap:8px;width:100%}
+  .heritageMemberLogin{justify-content:center;min-height:44px;padding:0 10px;font-size:11px}
+  .heritageNav .displayModeToggle{position:static;z-index:auto;min-width:126px;min-height:44px;padding:0 11px;font-size:11px;box-shadow:0 2px 7px #253a3014}
+  .heritageHeroFrame{margin:8px 8px 0;padding-bottom:12px}
+  .heroTitleRow{min-height:48px;padding:9px 11px;gap:8px}
+  .heroTitleRow strong{font-size:11px;line-height:1.35}
+  .heritageMapStage{margin-bottom:184px}
+  .heritageMapStage .heroStatement{height:184px;padding:10px 12px 14px}
+  .heroStatement h1{font-size:20px;line-height:1.18;margin:7px auto 12px}
+  .heroCta{min-height:44px;padding:10px 20px;font-size:13px}
+  .heritageQuickDock{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0;padding:13px 12px 0}
+  .heritageQuickDock a{display:flex;align-items:center;justify-content:center;gap:5px;min-width:0;min-height:50px;padding:9px 8px;font-size:13px;line-height:1.25;text-align:center}
+  .portalCards{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:10px 12px 0}
+  .portalCard{grid-template-columns:38px minmax(0,1fr);gap:7px;min-height:64px;padding:8px}
+  .portalThumb{width:38px;height:46px}
+  .portalCard b{display:none}
+  .approvedMobileTaskbar{min-height:64px;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;padding:5px 5px calc(5px + env(safe-area-inset-bottom))}
+  .approvedMobileTaskbar a{align-content:center;align-items:center;gap:3px;min-width:0;min-height:54px;padding:2px 1px;font-size:21px;line-height:1}
+  .approvedMobileTaskbar small{font-size:10px;line-height:1.25;letter-spacing:.01em}
+  .tmcHome{padding-bottom:calc(70px + env(safe-area-inset-bottom))}
+}
+@media(max-width:380px){
+  .heritageNav .navLeaf{width:52px;height:36px}
+  .heritageNav .navBrand{font-size:10px;gap:6px}
+  .heritageMemberLogin{font-size:10px}
+  .heritageNav .displayModeToggle{min-width:116px;font-size:10px}
+  .heritageQuickDock a{font-size:12px}
+  .approvedMobileTaskbar small{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){.approvedHeroActions a,.heritageCommunity .communityActionGrid>a{transition:none!important}}

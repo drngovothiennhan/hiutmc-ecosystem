@@ -43,7 +43,7 @@ export default function Home() {
 
       <header className="heritageNav">
         <a className="navBrand" href="#top">
-          <img className="navLeaf" src="/favicon.svg" width="38" height="38" alt="" />
+          <img className="navLeaf" src="/hiu-club-logo.webp" width="68" height="46" alt="Logo Câu lạc bộ Y học cổ truyền HIU" />
           <span>HIU TMC ECOSYSTEM</span>
         </a>
         <nav className="desktopNav" aria-label="Điều hướng chính">
