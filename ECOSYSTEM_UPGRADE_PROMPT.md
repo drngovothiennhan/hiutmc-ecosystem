@@ -51,10 +51,28 @@ Upgrade only `drngovothiennhan/hiutmc-ecosystem` into a student-first YHCT ecosy
 - Remove obsolete duplicate presentation code only after visual parity is confirmed.
 - Final production checkpoint and rollback record.
 
+### CP6 — Learning Search Hub
+- Add a verified local Search Hub over existing app registry and approved subject routes.
+- Connect Home and Learning Center to Search Hub.
+- Never invent learning material when detailed source data is not connected.
+
+### CP7 — Live Community academic feed
+- Reuse the existing club Supabase backend; do not create a duplicate database.
+- Read only approved, public, privacy-scrubbed, citation-verified, non-spam academic posts for anonymous visitors.
+- Keep member posting/comments/reactions disabled in the Hub until authentication is safely integrated.
+- Case Lab must show a truthful empty state if no approved case records exist.
+
+### Continued roadmap
+- CP8: verified Discover feed from real club/research sources.
+- CP9: authenticated Community interactions and Personal area only after auth/RLS acceptance.
+- CP10: progress synchronization and YHCT Daily only when reliable cross-app data is available.
+
 ## Acceptance gates for every checkpoint
 - `npm run validate:repo`
 - `npm run validate:registry`
 - `npm run validate:assets`
+- `npm run validate:pwa`
+- `npm run validate:community` when Community backend is part of the release
 - `npm run build`
 - Cloudflare dry-run
 - Required route export check

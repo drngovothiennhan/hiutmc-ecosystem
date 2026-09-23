@@ -64,6 +64,9 @@ jobs:
       - name: Validate PWA
         run: npm run validate:pwa
 
+      - name: Validate Community backend
+        run: npm run validate:community
+
       - name: Build static export
         run: npm run build
 
