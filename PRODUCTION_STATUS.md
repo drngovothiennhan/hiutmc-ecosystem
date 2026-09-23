@@ -17,7 +17,16 @@
 - Community: `/community/`
 - Discover: `/discover/`
 - Search Hub: `/search/`
+- Homepage: customizable 2D avatar campus prototype with keyboard/touch movement and browser-local preferences; the former ecosystem map is removed.
+- Study OS homepage link is a direct navigation shortcut. Shared sign-in and account-bound avatar sync are not yet implemented.
 - Existing upstream apps remain registered and open directly.
+
+## Current production release
+- Checkpoint: CP8 — `HIU-YHCT-ECOSYSTEM-20260923-08`
+- Application commit deployed: `269bb4accaa45028b90f800d5f4338964c4b5e60`
+- CI: successful, run #34 — https://github.com/drngovothiennhan/hiutmc-ecosystem/actions/runs/35852234097
+- Cloudflare deploy and production smoke: successful, run #14 — https://github.com/drngovothiennhan/hiutmc-ecosystem/actions/runs/35852346924
+- Production verification covered release contracts, static export, required routes, deployment, and smoke checks against `https://hiutmc.com`.
 
 ## Release verification
 Every production release must pass:
@@ -42,6 +51,6 @@ The Hub may only display anonymous Community feed records when the backend retur
 No member identity data is required for the public feed. Posting, comments and reactions remain gated behind authenticated-member integration.
 
 ## Rollback
-The immediately previous stable checkpoint is the rollback target. CP7 is based on CP6 commit `e1d71af1d50e4772dc8833efe1748c6d17a9dda9`.
+The immediately previous stable checkpoint is CP7 at `fd4bcc08a61a204109a85c7acb69a04247f893fb` (release `HIU-YHCT-ECOSYSTEM-20260923-07`). CP7 is based on CP6 commit `e1d71af1d50e4772dc8833efe1748c6d17a9dda9`.
 
 No other application repository is modified by this release process.
