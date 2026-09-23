@@ -16,8 +16,8 @@ export default function Home() {
         <nav className={styles.desktopNav} aria-label="Điều hướng chính">
           <a href="/learn/">Học tập</a>
           <a href="/ai/">AI Lab</a>
-          <a href="#community">Cộng đồng</a>
-          <a href="#discover">Khám phá</a>
+          <a href="/community/">Cộng đồng</a>
+          <a href="/discover/">Khám phá</a>
         </nav>
         <a className={styles.primaryAction} href="/ai/">Mở AI Lab</a>
       </header>
@@ -146,8 +146,8 @@ export default function Home() {
         <a href="#top"><span>⌂</span><small>Trang chủ</small></a>
         <a href="/learn/"><span>▤</span><small>Học tập</small></a>
         <a href="/ai/"><span>✦</span><small>AI Lab</small></a>
-        <a href="#community"><span>◎</span><small>Cộng đồng</small></a>
-        <a href="#discover"><span>◇</span><small>Khám phá</small></a>
+        <a href="/community/"><span>◎</span><small>Cộng đồng</small></a>
+        <a href="/discover/"><span>◇</span><small>Khám phá</small></a>
       </nav>
 
       <footer className={styles.footer}>

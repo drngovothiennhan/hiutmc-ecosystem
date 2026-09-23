@@ -12,8 +12,8 @@ export const learningShortcuts = [
 ];
 
 export const plannedSpaces = [
-  { title: "Learning Center", status: "Đang nâng cấp", body: "Cổng học tập theo môn, chủ đề và công cụ đang được chuẩn hóa trên Hub." },
-  { title: "AI Lab", status: "Đang nâng cấp", body: "Một điểm vào chung cho trợ lý học tập và các AI chuyên biệt." },
+  { title: "Learning Center", status: "Đang hoạt động", body: "Cổng học tập theo môn, chủ đề và công cụ đã được kết nối từ Hub." },
+  { title: "AI Lab", status: "Đang hoạt động", body: "Một điểm vào chung cho trợ lý học tập và các công cụ chuyên biệt đang hoạt động." },
   { title: "Community", status: "Đang phát triển", body: "Không gian thảo luận, nhóm học và Case Lab; backend cộng đồng chưa được công bố là đã hoàn tất." },
   { title: "Discover", status: "Đang phát triển", body: "Tin CLB, sự kiện và nội dung nghiên cứu sẽ chỉ hiển thị khi có nguồn xác thực." },
 ];
