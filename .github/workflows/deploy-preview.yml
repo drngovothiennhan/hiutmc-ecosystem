@@ -56,9 +56,10 @@ jobs:
       - name: Capture responsive visual QA
         run: |
           mkdir -p visual-qa
-          npx -y playwright@1.55.0 screenshot --browser=chromium --viewport-size="1440,900" "$PREVIEW_URL" visual-qa/desktop-1440x900.png
-          npx -y playwright@1.55.0 screenshot --browser=chromium --viewport-size="1024,768" "$PREVIEW_URL" visual-qa/tablet-1024x768.png
-          npx -y playwright@1.55.0 screenshot --browser=chromium --viewport-size="390,844" "$PREVIEW_URL" visual-qa/mobile-390x844.png
+          npx -y playwright@1.55.0 screenshot --browser=chromium --viewport-size="1440,900" "$PREVIEW_URL/?petPreview=chu-tuoc" visual-qa/desktop-1440x900.png
+          npx -y playwright@1.55.0 screenshot --browser=chromium --viewport-size="1024,768" "$PREVIEW_URL/?petPreview=chu-tuoc" visual-qa/tablet-1024x768.png
+          npx -y playwright@1.55.0 screenshot --browser=chromium --viewport-size="390,844" "$PREVIEW_URL/?petPreview=chu-tuoc" visual-qa/mobile-390x844.png
+          npx -y playwright@1.55.0 screenshot --browser=chromium --viewport-size="390,844" "$PREVIEW_URL/?petPreview=chu-tuoc&petPanel=1&petEvolution=1&petStage=4" visual-qa/mobile-chu-tuoc-stage4-panel.png
       - name: Upload visual QA screenshots
         uses: actions/upload-artifact@v4
         with:
