@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import DailyMissions from "@/components/DailyMissions";
 import DisplayModeToggle from "@/components/DisplayModeToggle";
 import SpiritCompanion from "@/components/SpiritCompanion";
+import { MemberAccount, MemberAuthProvider, StudyOsLink, useMemberAuth } from "@/components/MemberAuthBridge";
 import { useHubRegistry } from "@/components/hub-registry";
 import styles from "./dashboard.module.css";
 
@@ -26,8 +27,9 @@ const events = [
   { day: "—", month: "Cộng đồng", title: "Thông báo cộng đồng", meta: "Chỉ hiển thị nội dung đã được xác thực." },
 ];
 
-export default function Home() {
+function HomeContent() {
   const apps = useHubRegistry();
+  const { openStudyOs } = useMemberAuth();
   const studyOsUrl = apps.find((app) => app.slug === "study-os")?.currentUpstreamUrl ?? "/learn/";
   const atlasUrl = apps.find((app) => app.slug === "atlas")?.currentUpstreamUrl ?? "/ecosystem/atlas/";
 
@@ -40,7 +42,7 @@ export default function Home() {
         </a>
         <nav className={styles.nav}>
           <a href="#top"><i>⌂</i>Trang chủ</a>
-          <a href={studyOsUrl}><i>▤</i>Học tập</a>
+          <StudyOsLink href={studyOsUrl}><i>▤</i>Học tập</StudyOsLink>
           <a href={atlasUrl}><i>◎</i>Atlas 3D</a>
           <a href="/ai/"><i>◈</i>AI YHCT</a>
           <a href="/community/"><i>♧</i>Cộng đồng</a>
@@ -59,10 +61,7 @@ export default function Home() {
           <div className={styles.topActions}>
             <a className={styles.bell} href="#missions" aria-label="Thông báo">♢</a>
             <DisplayModeToggle />
-            <a className={styles.member} href={studyOsUrl}>
-              <i className={styles.memberAvatar}>HIU</i>
-              <span><strong>Thành viên YHCT</strong><small>Đăng nhập / tiếp tục học</small></span>
-            </a>
+            <MemberAccount studyOsUrl={studyOsUrl} />
           </div>
         </header>
 
@@ -82,7 +81,7 @@ export default function Home() {
                 <h2>Tiếp tục bài học gần nhất</h2>
                 <p>Mở Study OS để xem bài đang học và tiến độ thật của bạn.</p>
               </div>
-              <a className={styles.continueButton} href={studyOsUrl}>Tiếp tục →</a>
+              <a className={styles.continueButton} href={studyOsUrl} aria-label="Tiếp tục trong Study OS" onClick={(event) => { event.preventDefault(); void openStudyOs(studyOsUrl); }}>Tiếp tục <span aria-hidden="true">→</span></a>
             </article>
 
             <section id="ecosystem" className={styles.panel}>
@@ -94,7 +93,7 @@ export default function Home() {
                 {apps.map((app) => {
                   const meta = hubMeta[app.slug] ?? { icon: "✦", tone: app.accent };
                   return (
-                    <a key={app.slug} className={styles.hub} href={app.currentUpstreamUrl} style={{ "--hub": meta.tone } as CSSProperties}>
+                    <a key={app.slug} className={styles.hub} href={app.currentUpstreamUrl} onClick={app.slug === "study-os" ? (event) => { event.preventDefault(); void openStudyOs(app.currentUpstreamUrl); } : undefined} style={{ "--hub": meta.tone } as CSSProperties}>
                       <span className={styles.hubIcon}>{meta.icon}</span>
                       <strong>{app.shortName}</strong>
                       <p>{app.tagline}</p>
@@ -165,7 +164,7 @@ export default function Home() {
 
       <nav className={styles.mobileDock} aria-label="Điều hướng nhanh trên điện thoại">
         <a href="#top"><i>⌂</i><span>Trang chủ</span></a>
-        <a href={studyOsUrl}><i>▤</i><span>Học tập</span></a>
+        <StudyOsLink href={studyOsUrl}><i>▤</i><span>Học tập</span></StudyOsLink>
         <a href={atlasUrl}><i>◎</i><span>Atlas</span></a>
         <a href="/ai/"><i>◈</i><span>AI</span></a>
         <a href="/community/"><i>♧</i><span>Cộng đồng</span></a>
@@ -174,4 +173,8 @@ export default function Home() {
       <SpiritCompanion />
     </main>
   );
+}
+
+export default function Home() {
+  return <MemberAuthProvider><HomeContent /></MemberAuthProvider>;
 }

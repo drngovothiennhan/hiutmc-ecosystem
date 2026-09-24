@@ -35,3 +35,13 @@
   .hero h1{font-size:23px}.hero p{font-size:10.5px;max-width:79%}
   .hub p{font-size:9.8px}.mobileDock a{font-size:9.5px}
 }
+
+/* ===== CP18 Overflow Guard + Member SSO ===== */
+.continueButton{max-width:132px;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:820px){
+  .continueButton{display:grid;place-items:center;flex:0 0 44px;width:44px;min-width:44px;max-width:44px;height:44px;min-height:44px;padding:0!important;border-radius:50%;overflow:hidden;white-space:nowrap;font-size:0!important;line-height:0;color:transparent}
+  .continueButton span{display:block;color:#fff;font-size:19px;line-height:1}
+}
+@media(max-width:520px){
+  .continueButton{width:42px;min-width:42px;max-width:42px;height:42px;min-height:42px}
+}
