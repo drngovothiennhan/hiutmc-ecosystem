@@ -264,3 +264,5 @@ jobs:
           git add deploy/agent-workspace/LAST_DEPLOYED
           git commit -m "chore(agent): record deployed checkpoint $SOURCE_SHA"
           git push origin HEAD:main
+
+# Deployment trigger source: ai-agent-workspace@853a336d46f5287829ab885defd84c3d84de8071
