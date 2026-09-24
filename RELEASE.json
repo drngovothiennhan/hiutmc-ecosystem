@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260924-01",
+  "release": "HIU-YHCT-ECOSYSTEM-20260924-02",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP14",
-  "base_checkpoint_sha": "93331d29fb0c0ca17687bdeefbe1c11190ceaa71",
+  "checkpoint": "CP15",
+  "base_checkpoint_sha": "5593a128b414ba0da638cd3dbca6c86b59dfebf3",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP14 responsive homepage refinement, approved HIU YHCT logo, reversible accessible Mobile/PC control, larger safe-area-aware mobile dock, CP13 temporary learning assistant removal, Admin Center, existing Hubs, local learning missions, HIU PWA branding, CI, static export, Cloudflare deployment and production smoke are mandatory release gates"
+  "verification": "CP15 Digital Campus dashboard, preserved CP14 responsive and branding hotfixes, compact spirit companion, dedicated four-stage Chu Tuoc SVG artwork, local learning mission integration, Admin Center, existing Hubs, PWA, CI, static export, Cloudflare deployment and production smoke are mandatory release gates"
 }
