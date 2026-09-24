@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
+import DisplayModeToggle from "./DisplayModeToggle";
 import styles from "./MemberAuthBridge.module.css";
 
 const SUPABASE_URL = "https://gzmpnsrwqjpsbklyflqr.supabase.co";
@@ -15,6 +16,20 @@ export type Member = {
   role: string;
   title: string;
   avatarUrl?: string;
+};
+
+export type LearningProgress = {
+  hasSync: boolean;
+  syncedAt?: string;
+  activeDate?: string | null;
+  streak: number;
+  xp: number;
+  todayQuestions: number;
+  examAttempts: number;
+  lastExamScore: number | null;
+  aiUses: number;
+  reviewCardCount: number;
+  sourceVersion?: string | null;
 };
 
 export type StaffAccess = {
@@ -41,10 +56,13 @@ type StoredSession = {
 type AuthContextValue = {
   member: Member | null;
   staffAccess: StaffAccess | null;
+  learningProgress: LearningProgress | null;
+  learningProgressReady: boolean;
   ready: boolean;
   login: (studentCode: string, password: string) => Promise<StaffAccess | null>;
   logout: () => Promise<void>;
   openStudyOs: (url: string) => Promise<void>;
+  refreshLearningProgress: () => Promise<void>;
   openStaffConsole: () => void;
 };
 
@@ -143,6 +161,35 @@ async function clearStaffSession() {
   } catch {}
 }
 
+async function fetchLearningProgress(accessToken: string): Promise<LearningProgress | null> {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/learning-sync`, {
+      method: "GET",
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    });
+    if (!response.ok) return null;
+    const body = (await response.json().catch(() => null)) as Record<string, unknown> | null;
+    if (!body) return null;
+    const stats = body.stats && typeof body.stats === "object" ? body.stats as Record<string, unknown> : null;
+    return {
+      hasSync: body.hasSync === true && Boolean(stats),
+      syncedAt: stats ? String(stats.syncedAt || "") || undefined : undefined,
+      activeDate: stats ? String(stats.activeDate || "") || null : null,
+      streak: stats ? Math.max(0, Number(stats.streak) || 0) : 0,
+      xp: stats ? Math.max(0, Number(stats.xp) || 0) : 0,
+      todayQuestions: stats ? Math.max(0, Number(stats.todayQuestions) || 0) : 0,
+      examAttempts: stats ? Math.max(0, Number(stats.examAttempts) || 0) : 0,
+      lastExamScore: stats && stats.lastExamScore !== null && stats.lastExamScore !== undefined ? Math.max(0, Math.min(100, Number(stats.lastExamScore) || 0)) : null,
+      aiUses: stats ? Math.max(0, Number(stats.aiUses) || 0) : 0,
+      reviewCardCount: stats ? Math.max(0, Number(stats.reviewCardCount) || 0) : 0,
+      sourceVersion: stats ? String(stats.sourceVersion || "") || null : null,
+    };
+  } catch {
+    return null;
+  }
+}
+
 async function refreshSession(current: StoredSession): Promise<StoredSession> {
   let accessToken = current.accessToken;
   let refreshToken = current.refreshToken;
@@ -204,6 +251,8 @@ async function consumeIncomingBridge(): Promise<StoredSession | null> {
 export function MemberAuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<StoredSession | null>(null);
   const [staffAccess, setStaffAccess] = useState<StaffAccess | null>(null);
+  const [learningProgress, setLearningProgress] = useState<LearningProgress | null>(null);
+  const [learningProgressReady, setLearningProgressReady] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -244,9 +293,54 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     return () => { live = false; };
   }, []);
 
+  useEffect(() => {
+    let live = true;
+    const refresh = async () => {
+      if (!session?.accessToken) {
+        if (live) {
+          setLearningProgress(null);
+          setLearningProgressReady(true);
+        }
+        return;
+      }
+      const progress = await fetchLearningProgress(session.accessToken);
+      if (live) {
+        setLearningProgress(progress);
+        setLearningProgressReady(true);
+      }
+    };
+    setLearningProgressReady(false);
+    void refresh();
+    const onFocus = () => void refresh();
+    const onVisible = () => { if (document.visibilityState === "visible") void refresh(); };
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisible);
+    const timer = window.setInterval(() => void refresh(), 60_000);
+    return () => {
+      live = false;
+      window.clearInterval(timer);
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [session?.accessToken, session?.member.id]);
+
+  const refreshLearningProgress = async () => {
+    if (!session?.accessToken) {
+      setLearningProgress(null);
+      setLearningProgressReady(true);
+      return;
+    }
+    setLearningProgressReady(false);
+    const progress = await fetchLearningProgress(session.accessToken);
+    setLearningProgress(progress);
+    setLearningProgressReady(true);
+  };
+
   const value = useMemo<AuthContextValue>(() => ({
     member: session?.member ?? null,
     staffAccess,
+    learningProgress,
+    learningProgressReady,
     ready,
     login: async (studentCode, password) => {
       const next = await loginMember(studentCode, password);
@@ -260,6 +354,8 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       saveStored(null);
       setSession(null);
       setStaffAccess(null);
+      setLearningProgress(null);
+      setLearningProgressReady(true);
       await clearStaffSession();
       if (accessToken) {
         void fetch(`${SUPABASE_URL}/auth/v1/logout?scope=local`, {
@@ -297,11 +393,12 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
         window.location.assign(target.toString());
       }
     },
+    refreshLearningProgress,
     openStaffConsole: () => {
       if (!staffAccess?.authorized) return;
       window.location.assign(staffAccess.canAdmin ? "/admin/" : "/mod/");
     },
-  }), [ready, session, staffAccess]);
+  }), [ready, session, staffAccess, learningProgress, learningProgressReady]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
@@ -332,7 +429,7 @@ export function StudyOsLink({
 }
 
 export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
-  const { member, staffAccess, ready, login, logout, openStudyOs, openStaffConsole } = useMemberAuth();
+  const { member, staffAccess, learningProgress, ready, login, logout, openStudyOs, openStaffConsole } = useMemberAuth();
   const [open, setOpen] = useState(false);
   const [studentCode, setStudentCode] = useState("");
   const [password, setPassword] = useState("");
@@ -380,6 +477,14 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
             <span><small>THÀNH VIÊN ĐÃ ĐỒNG BỘ</small><strong>{member.fullName}</strong><em>{member.studentCode || "HIU YHCT"} · {member.title}</em></span>
           </div>
           <p>Phiên đăng nhập trang chủ dùng cùng hệ tài khoản với Study OS. Quyền Admin/Mod được xác minh lại tại máy chủ trước khi mở khu vực quản trị.</p>
+          <div className={styles.displayModeSetting}>
+            <span><strong>Chế độ hiển thị</strong><small>Chuyển Mobile/PC ngay trong hồ sơ thành viên.</small></span>
+            <DisplayModeToggle className={styles.profileModeButton} />
+          </div>
+          <div className={styles.syncState}>
+            <strong>{learningProgress?.hasSync ? "Tiến độ Study OS đã đồng bộ" : "Tiến độ Study OS chưa có bản đồng bộ thành công"}</strong>
+            <small>{learningProgress?.hasSync ? `Streak ${learningProgress.streak} ngày · ${learningProgress.todayQuestions} câu hôm nay · ${learningProgress.xp} XP` : "Mở Study OS sau bản sửa để hệ thống gửi lại dữ liệu học tập lên máy chủ."}</small>
+          </div>
           {staffAccess?.authorized && <button className={styles.staff} type="button" onClick={openStaffConsole}>Mở {staffLabel} →</button>}
           <button className={styles.primary} type="button" onClick={() => void openStudyOs(studyOsUrl)}>Mở Study OS →</button>
           <button className={styles.secondary} type="button" onClick={() => void logout().then(() => setOpen(false))}>Đăng xuất</button>
@@ -391,6 +496,10 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
           <label>Mật khẩu<input value={password} onChange={(e) => { setPassword(e.target.value); if (error) setError(""); }} type="password" autoComplete="current-password" disabled={busy} /></label>
           {error && <div className={styles.error} role="alert">{error}</div>}
           <button className={styles.primary} type="submit" disabled={busy || !studentCode.trim() || !password}>{busy ? "Đang xác thực…" : "Đăng nhập"}</button>
+          <div className={styles.displayModeSetting}>
+            <span><strong>Chế độ hiển thị</strong><small>Đổi Mobile/PC trước hoặc sau khi đăng nhập.</small></span>
+            <DisplayModeToggle className={styles.profileModeButton} />
+          </div>
           <small className={styles.note}>Tài khoản và quyền thành viên được xác thực trực tiếp từ hệ thống Study OS và hồ sơ club_members.</small>
         </form>}
       </section>

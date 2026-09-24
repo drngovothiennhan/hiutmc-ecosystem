@@ -29,9 +29,30 @@ const events = [
 
 function HomeContent() {
   const apps = useHubRegistry();
-  const { openStudyOs } = useMemberAuth();
+  const { openStudyOs, member, learningProgress, learningProgressReady } = useMemberAuth();
   const studyOsUrl = apps.find((app) => app.slug === "study-os")?.currentUpstreamUrl ?? "/learn/";
   const atlasUrl = apps.find((app) => app.slug === "atlas")?.currentUpstreamUrl ?? "/ecosystem/atlas/";
+  const synced = Boolean(member && learningProgressReady && learningProgress?.hasSync);
+  const latestScore = synced ? learningProgress?.lastExamScore ?? null : null;
+  const ringLabel = !member ? "—" : !learningProgressReady ? "…" : synced ? (latestScore !== null ? `${latestScore}%` : "✓") : "—";
+  const progressTitle = !member
+    ? "Chưa đăng nhập"
+    : !learningProgressReady
+      ? "Đang kiểm tra đồng bộ"
+      : synced
+        ? "Đã đồng bộ Study OS"
+        : "Chưa có bản đồng bộ thành công";
+  const progressDetail = !member
+    ? "Đăng nhập thành viên để đọc dữ liệu học tập đã xác thực."
+    : !learningProgressReady
+      ? "Đang đọc dữ liệu học tập từ máy chủ."
+      : synced && learningProgress
+        ? `Streak ${learningProgress.streak} ngày · ${learningProgress.todayQuestions} câu hôm nay · ${learningProgress.xp} XP${latestScore !== null ? ` · Điểm gần nhất ${latestScore}%` : ""}.`
+        : "Mở Study OS một lần để gửi lại dữ liệu học tập sau bản sửa đồng bộ.";
+  const ringClass = [styles.ring, synced && latestScore === null ? styles.ringSyncedNoScore : "", !synced ? styles.ringSyncPending : ""].filter(Boolean).join(" ");
+  const ringStyle = synced && latestScore !== null
+    ? ({ background: `conic-gradient(#219d6e 0 ${latestScore}%,#e6dfd2 ${latestScore}%)` } as CSSProperties)
+    : undefined;
 
   return (
     <main className={styles.shell}>
@@ -137,8 +158,8 @@ function HomeContent() {
 
           <aside className={styles.rightRail}>
             <section className={styles.progressCard}>
-              <div className={styles.ring}><strong>—</strong></div>
-              <div className={styles.progressText}><small>Tiến độ học tập</small><strong>Chưa đồng bộ</strong><span>Đăng nhập Study OS để sử dụng dữ liệu tiến độ đã xác thực.</span></div>
+              <div className={ringClass} style={ringStyle}><strong>{ringLabel}</strong></div>
+              <div className={styles.progressText}><small>Tiến độ học tập</small><strong>{progressTitle}</strong><span>{progressDetail}</span></div>
             </section>
 
             <section id="missions" className={styles.missionWrap}>

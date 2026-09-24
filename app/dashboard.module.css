@@ -186,3 +186,12 @@
   bottom:auto!important;
   z-index:auto!important;
 }
+
+
+/* ===== CP25 Profile-Owned Mobile Display Switch ===== */
+@media(max-width:820px){
+  :global(html:not([data-display-mode="pc"])) .topActions :global(.displayModeToggle){display:none!important}
+}
+.ringSyncPending{background:#e6dfd2!important}
+.ringSyncedNoScore{background:#e7f1e9!important;box-shadow:inset 0 0 0 10px #d7e7da}
+.ringSyncedNoScore:after{background:#fffdf8}
