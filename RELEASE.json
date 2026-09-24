@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260924-13",
+  "release": "HIU-YHCT-ECOSYSTEM-20260924-14",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP27",
-  "base_checkpoint_sha": "1ecbd6ac7bef9432b71c181b1c56cb23032d0ae8",
+  "checkpoint": "CP28",
+  "base_checkpoint_sha": "58c6e88adb53d4cc0f254242b34288fbb0965d1f",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP27 is a narrow responsive typography hotfix on top of CP26. The authenticated Study OS member full name in the homepage hero is forced to remain on one visual line, with a small responsive size guard in true Mobile mode. No approved colors, cards, backgrounds, imagery, routing, SSO, learning-sync, Admin/Mod behavior, or application architecture are changed. CI, Cloudflare deployment and production smoke remain mandatory."
+  "verification": "CP28 is a typography clarity hotfix on top of CP27. Across the app, text that inherits the Inter/system UI sans stack is increased by 0.5px where an explicit px font-size is defined, while Georgia/serif display typography and icon-like glyph rules are preserved. The global sans body gains a slightly stronger inherited weight (450) and font optical sizing for clearer rendering. The approved visual hierarchy, colors, imagery, routing, SSO, learning-sync, Admin/Mod behavior, and application architecture are unchanged. CI, Cloudflare deployment and production smoke remain mandatory."
 }
