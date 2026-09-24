@@ -1,0 +1,50 @@
+name: Deploy UI Pet Preview
+
+on:
+  push:
+    branches:
+      - "ui/pet-dashboard-v1"
+    paths:
+      - "app/**"
+      - "components/**"
+      - "data/**"
+      - "public/**"
+      - "scripts/**"
+      - "package.json"
+      - "next.config.ts"
+      - "tsconfig.json"
+      - "wrangler.preview.jsonc"
+      - ".github/workflows/deploy-preview.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hiutmc-pet-preview
+  cancel-in-progress: true
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package.json
+      - run: npm install --no-audit --no-fund
+      - run: npm run validate:repo && npm run validate:release && npm run validate:registry && npm run validate:assets && npm run validate:pwa && npm run validate:community && npm run validate:learning
+      - run: npm run build
+      - run: npm run validate:approved
+      - name: Deploy isolated preview worker
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.136.2"
+          command: deploy --config wrangler.preview.jsonc
