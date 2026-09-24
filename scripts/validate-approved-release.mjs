@@ -48,7 +48,7 @@ for (const marker of [
   "Nội dung Hub",
   "Liên kết",
   "Duyệt của Mod",
-  "Thành viên &amp; vai trò",
+  "Thành viên & vai trò",
   "Nhật ký",
   "Cấu hình",
   "SERVER VERIFIED",
