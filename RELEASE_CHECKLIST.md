@@ -16,8 +16,15 @@
 - [x] UI discloses that data is local to the current browser and XP is not an academic grade.
 - [x] No invented member identities, class rankings or scores are shown.
 
+## Staff authorization
+- [x] Member login is the single public login entry; Admin/Mod detection occurs after server validation.
+- [x] `/admin/` requires canonical `club_members.role = admin`.
+- [x] `/mod/` accepts `mod`, `super_mod`, or `admin`.
+- [x] Staff cookie is HttpOnly, Secure and SameSite=Strict.
+- [x] Logout clears the server staff session.
+
 ## Known integration limits
-- Admin and Mod screens are a browser-local prototype; role labels are not server-enforced authorization.
+- Admin/Mod access is server-enforced, but Hub drafts, moderation queue and local activity notes are still browser-local until shared publishing storage is connected.
 - Learning progress is not shared across members/devices. A real leaderboard requires verified membership and backend persistence.
 - Hub SSO and access rules are owned by each upstream service. The main site cannot change A.I Thiệt Chẩn's Vercel SSO setting.
 - Canonical Hub subdomains are not implied to be live unless verified in the registry and deployed separately.
@@ -25,10 +32,12 @@
 ## Required release checks
 - [x] Repository boundary, metadata, registry, asset, PWA and Community contract validators pass.
 - [x] Learning mission/streak/weekly challenge validator passes.
-- [x] Next.js static export and approved CP12 homepage/Admin markers pass.
+- [x] Server staff authorization validator passes.
+- [x] Next.js static export includes approved homepage plus gated Admin/Mod routes.
 - [x] Required routes and Wrangler dry-run pass in CI.
 - [x] Cloudflare deployment completes and live production smoke passes before announcing a release.
 
 - Canonical repository: `drngovothiennhan/hiutmc-ecosystem`
 - Production: https://hiutmc.com
 - Admin Center: https://hiutmc.com/admin/
+- Mod Center: https://hiutmc.com/mod/
