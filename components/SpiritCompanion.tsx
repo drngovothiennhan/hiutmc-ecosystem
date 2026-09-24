@@ -117,6 +117,18 @@ export default function SpiritCompanion() {
     setProgress(readLocalProgress());
 
     try {
+      const params = new URLSearchParams(window.location.search);
+      const isPreviewHost = window.location.hostname.endsWith("workers.dev");
+      if (isPreviewHost && params.get("petPreview") === "chu-tuoc") {
+        const chuTuoc = species.find((item) => item.kind === "phoenix");
+        if (chuTuoc) setPet(chuTuoc);
+        const requestedStage = Number(params.get("petStage"));
+        if ([1, 2, 3, 4].includes(requestedStage)) setPreviewStage(requestedStage as ChuTuocStage);
+        if (params.get("petPanel") === "1") setOpen(true);
+        if (params.get("petEvolution") === "1") setShowEvolution(true);
+        return;
+      }
+
       const saved = window.localStorage.getItem(PET_STORAGE_KEY);
       if (saved) {
         const found = species.find((item) => item.kind === saved);
