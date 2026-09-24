@@ -1,170 +1,178 @@
 "use client";
 
-import EcosystemMap from "@/components/EcosystemMap";
+import type { CSSProperties } from "react";
 import DailyMissions from "@/components/DailyMissions";
-import LearningAssistant from "@/components/LearningAssistant";
 import DisplayModeToggle from "@/components/DisplayModeToggle";
+import SpiritCompanion from "@/components/SpiritCompanion";
 import { useHubRegistry } from "@/components/hub-registry";
-import { ecosystemPrinciples, learningPaths } from "@/data/community";
+import styles from "./dashboard.module.css";
 
-const portalCards = [
-  { href: "#about", eyebrow: "Giới thiệu", title: "Về HIU YHCT", body: "Không gian chung của câu lạc bộ và hệ sinh thái học tập." },
-  { href: "#ecosystem", eyebrow: "Ứng dụng nổi bật", title: "Khám phá hệ sinh thái", body: "Đi trực tiếp đến Study OS, Thiệt Chẩn, Trung Y Văn và 3D Atlas." },
-  { href: "#community", eyebrow: "Tin tức / Hoạt động", title: "Hành trình phát triển", body: "Theo dõi định hướng học thuật, cộng đồng và các sản phẩm đang xây dựng." },
-  { href: "#community", eyebrow: "Liên hệ", title: "Kết nối & đồng hành", body: "Trở lại cổng chung để tiếp tục khám phá và tham gia cộng đồng." },
+const hubMeta: Record<string, { icon: string; tone: string }> = {
+  "study-os": { icon: "▣", tone: "#9f1c3b" },
+  "atlas": { icon: "◎", tone: "#2a6d9a" },
+  "ai-thiet-chan": { icon: "◈", tone: "#537d4d" },
+  "trung-y-van": { icon: "冊", tone: "#9a6a32" },
+};
+
+const communityItems = [
+  { icon: "⚕", title: "Dược liệu theo công năng", meta: "120 bài học" },
+  { icon: "☯", title: "Bệnh học YHCT", meta: "95 bài học" },
+  { icon: "✦", title: "Châm cứu · Thủ pháp", meta: "68 bài học" },
+];
+
+const events = [
+  { day: "15", month: "Tháng 3", title: "Hội thảo ứng dụng AI trong học YHCT", meta: "Online · 200 người quan tâm" },
+  { day: "22", month: "Tháng 3", title: "Workshop nhận biết dược liệu qua Atlas", meta: "Trực tiếp · 150 lượt quan tâm" },
+  { day: "05", month: "Tháng 4", title: "Tọa đàm YHCT trong chăm sóc sức khỏe hiện đại", meta: "Online · Cộng đồng HIU" },
 ];
 
 export default function Home() {
-  const ecosystemApps = useHubRegistry();
-  const studyOsUrl = ecosystemApps.find((app) => app.slug === "study-os")?.currentUpstreamUrl ?? "/learn/";
-  const atlasUrl = ecosystemApps.find((app) => app.slug === "atlas")?.currentUpstreamUrl ?? "/ecosystem/atlas/";
+  const apps = useHubRegistry();
+  const studyOsUrl = apps.find((app) => app.slug === "study-os")?.currentUpstreamUrl ?? "/learn/";
+  const atlasUrl = apps.find((app) => app.slug === "atlas")?.currentUpstreamUrl ?? "/ecosystem/atlas/";
+
   return (
-    <main className="tmcHome">
-      <a className="skipLink" href="#ecosystem">Bỏ qua đến nội dung chính</a>
-
-      <section id="top" className="heritageMasthead approvedHero" aria-label="HIU Y học cổ truyền">
-        <div className="approvedHeroCopy">
-          <div className="approvedHeroBrand"><span className="approvedHeroDot" /> CÂU LẠC BỘ Y HỌC CỔ TRUYỀN HIU</div>
-          <h1>Học tinh hoa YHCT.<br /><em>Kết nối tương lai số.</em></h1>
-          <p>Một cổng chung để sinh viên khám phá không gian học tập, công cụ và học liệu của HIU YHCT.</p>
-          <div className="approvedHeroActions">
-            <a className="approvedHeroPrimary" href="#ecosystem">Khám phá ứng dụng <span aria-hidden="true">→</span></a>
-            <a className="approvedHeroLight" href={studyOsUrl}>Đăng nhập thành viên <span aria-hidden="true">↗</span></a>
-            <a className="approvedHeroOutline" href="#community">Kết nối CLB <span aria-hidden="true">↗</span></a>
-          </div>
-          <small className="approvedHeroNote">Dùng tài khoản HIU YHCT Study OS hiện có để đăng nhập thành viên.</small>
-        </div>
-        <div className="approvedHeroArt" aria-hidden="true">
-          <div className="heroOrbit heroOrbitOne" /><div className="heroOrbit heroOrbitTwo" />
-          <div className="heroSeal"><span>陰</span><i>☯</i><span>陽</span></div>
-          <div className="heroBotanical"><span>草木</span><b>本草 · 經絡 · 養生</b><small>TRI THỨC · THIÊN NHIÊN · CON NGƯỜI</small></div>
-          <span className="heroSpark heroSparkOne">✦</span><span className="heroSpark heroSparkTwo">✧</span>
-        </div>
-      </section>
-
-      <header className="heritageNav">
-        <a className="navBrand" href="#top">
-          <img className="navLeaf" src="/favicon.svg" width="38" height="38" alt="" />
-          <span>HIU TMC ECOSYSTEM</span>
+    <main className={styles.shell}>
+      <aside className={styles.sidebar} aria-label="Điều hướng hệ sinh thái">
+        <a className={styles.brand} href="#top">
+          <img src="/hiu-club-logo.webp" alt="HIU YHCT" width="44" height="44" />
+          <span><strong>HIU YHCT</strong><small>TMC ECOSYSTEM</small></span>
         </a>
-        <nav className="desktopNav" aria-label="Điều hướng chính">
-          <a href="#top">Trang chủ</a>
-          <a href="#ecosystem">Ứng dụng</a>
-          <a href="#about">Giới thiệu</a>
-          <a href="#community">Liên hệ</a>
-          <a href="/admin/">Admin Center</a>
+        <nav className={styles.nav}>
+          <a href="#top"><i>⌂</i>Trang chủ</a>
+          <a href={studyOsUrl}><i>▤</i>Học tập</a>
+          <a href={atlasUrl}><i>◎</i>Atlas 3D</a>
+          <a href="/ai/"><i>◈</i>AI YHCT</a>
+          <a href="/community/"><i>♧</i>Cộng đồng</a>
+          <a href="/discover/"><i>⌕</i>Khám phá</a>
         </nav>
-        <div className="heritageNavActions"><a className="heritageMemberLogin" href={studyOsUrl}>Đăng nhập thành viên ↗</a><DisplayModeToggle /><a className="communityBadge" href="#community">Vì sức khỏe cộng đồng</a></div>
-        <details className="mobileMenu">
-          <summary aria-label="Mở điều hướng">☰</summary>
-          <div className="mobileMenuPanel">
-            <a href="#top">Trang chủ</a>
-            <a href="#ecosystem">Ứng dụng</a>
-            <a href="#about">Giới thiệu</a>
-            <a href="#community">Liên hệ</a>
-            <a href="/admin/">Admin Center</a>
-          </div>
-        </details>
-      </header>
-
-      <section id="map" className="heritageHeroFrame">
-        <div className="heroTitleRow">
-          <span className="brushMark">✦</span>
-          <strong>BẢN ĐỒ HỆ SINH THÁI HIU Y HỌC CỔ TRUYỀN</strong>
-          <span className="heroWhisper">Bản đồ nhỏ, những giá trị lớn</span>
+        <div className={styles.sideBottom}>
+          <strong>TRI THỨC CỔ TRUYỀN</strong>
+          <span>Kiến tạo tương lai bằng một hệ sinh thái học tập liền mạch.</span>
         </div>
+      </aside>
 
-        <EcosystemMap />
-
-        <div className="portalCards" aria-label="Khám phá nhanh">
-          {portalCards.map((card, index) => (
-            <a className="portalCard" href={card.href} key={card.eyebrow}>
-              <span className={`portalThumb portalThumb${index}`} aria-hidden="true" />
-              <span>
-                <small>{card.eyebrow}</small>
-                <strong>{card.title}</strong>
-                <em>{card.body}</em>
-              </span>
-              <b aria-hidden="true">→</b>
+      <div className={styles.workspace}>
+        <header className={styles.topbar}>
+          <div className={styles.crumb}><b>Trang chủ</b><span>›</span><span>Tổng quan</span></div>
+          <a className={styles.search} href="/search/" aria-label="Tìm kiếm toàn hệ sinh thái">⌕ <span>Tìm kiếm bài học, vị thuốc, huyệt, hội chứng, tài liệu...</span></a>
+          <div className={styles.topActions}>
+            <a className={styles.bell} href="#missions" aria-label="Thông báo">♢</a>
+            <DisplayModeToggle />
+            <a className={styles.member} href={studyOsUrl}>
+              <i className={styles.memberAvatar}>HIU</i>
+              <span><strong>Thành viên YHCT</strong><small>Đăng nhập / tiếp tục học</small></span>
             </a>
-          ))}
-        </div>
-      </section>
+          </div>
+        </header>
 
-      <DailyMissions apps={ecosystemApps} />
+        <section id="top" className={styles.hero}>
+          <small>HIU YHCT DIGITAL CAMPUS</small>
+          <h1>Chào mừng trở lại, <span>người học YHCT!</span></h1>
+          <p>Một điểm vào thống nhất cho học tập, Atlas 3D, AI, Trung Y Văn và hoạt động học thuật của cộng đồng HIU.</p>
+          <div className={styles.heroMark}>Dưỡng Tâm<br />Học Thuật<br />Hành Y Đạo</div>
+        </section>
 
-      <section id="ecosystem" className="heritageSection">
-        <div className="sectionHeading">
-          <p className="sectionKicker">Bốn địa danh học tập</p>
-          <h2>Mỗi khu vực là một cánh cửa vào hệ sinh thái HIU TMC.</h2>
-        </div>
-        <div className="appGrid heritageAppGrid">
-          {ecosystemApps.map((app, index) => (
-            <article className="appCard heritageAppCard" key={app.slug}>
-              <div className={`districtThumbnail districtThumbnail${index}`} aria-hidden="true" />
-              <span>{app.status}</span>
-              <h3>{app.name}</h3>
-              <p>{app.description}</p>
-              <a href={app.currentUpstreamUrl}>Mở ứng dụng →</a>
+        <div className={styles.grid}>
+          <section className={styles.mainColumn}>
+            <article className={styles.continueCard}>
+              <div className={styles.lessonThumb} aria-hidden="true" />
+              <div className={styles.continueCopy}>
+                <small>TIẾP TỤC HỌC TẬP</small>
+                <h2>Bài 4: Tạng Phủ · Can Tạng</h2>
+                <p>YHCT cơ bản · còn khoảng 12 phút</p>
+                <div className={styles.progressLine}><i /></div>
+              </div>
+              <a className={styles.continueButton} href={studyOsUrl}>Tiếp tục →</a>
             </article>
-          ))}
-        </div>
-      </section>
 
-      <section id="about" className="heritageStory">
-        <div>
-          <p className="sectionKicker">Tinh thần chung</p>
-          <h2>Từ cội nguồn Y học dân tộc đến tương lai số.</h2>
-          <p>HIU TMC Ecosystem được xây như một “bản đồ học tập” để sinh viên nhìn thấy toàn cảnh trước khi đi sâu vào từng công cụ chuyên biệt.</p>
-        </div>
-        <ul className="principleList">
-          {ecosystemPrinciples.map((item) => <li key={item}>{item}</li>)}
-        </ul>
-      </section>
+            <section id="ecosystem" className={styles.panel}>
+              <header className={styles.panelHead}>
+                <span><small>Core Hubs</small><h2>Khám phá hệ sinh thái HIU YHCT</h2></span>
+                <a href="/discover/">Xem tất cả →</a>
+              </header>
+              <div className={styles.hubGrid}>
+                {apps.map((app) => {
+                  const meta = hubMeta[app.slug] ?? { icon: "✦", tone: app.accent };
+                  return (
+                    <a key={app.slug} className={styles.hub} href={app.currentUpstreamUrl} style={{ "--hub": meta.tone } as CSSProperties}>
+                      <span className={styles.hubIcon}>{meta.icon}</span>
+                      <strong>{app.shortName}</strong>
+                      <p>{app.tagline}</p>
+                      <b>Mở ứng dụng →</b>
+                    </a>
+                  );
+                })}
+              </div>
+            </section>
 
-      <section id="journey" className="heritageJourney">
-        <div className="sectionHeading">
-          <p className="sectionKicker">Hành trình học</p>
-          <h2>Học – quan sát – tra cứu – trực quan hóa.</h2>
-        </div>
-        <div className="journeyGrid heritageJourneyGrid">
-          {learningPaths.map((path, index) => (
-            <article className="journeyCard heritageJourneyCard" key={path.title}>
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              <h3>{path.title}</h3>
-              <p>{path.body}</p>
-            </article>
-          ))}
-        </div>
-      </section>
+            <div className={styles.lowerGrid}>
+              <section className={styles.panel}>
+                <header className={styles.panelHead}>
+                  <span><small>Học cùng cộng đồng</small><h2>Cộng đồng HIU YHCT</h2></span>
+                  <a href="/community/">Xem thêm →</a>
+                </header>
+                <div className={styles.communityGrid}>
+                  {communityItems.map((item) => (
+                    <article className={styles.communityItem} key={item.title}>
+                      <span>{item.icon}</span><strong>{item.title}</strong><small>{item.meta}</small>
+                    </article>
+                  ))}
+                </div>
+              </section>
 
-      <section id="community" className="heritageCommunity">
-        <div className="communitySeal">☯</div>
-        <p className="sectionKicker">Cộng đồng HIU YHCT</p>
-        <h2>Học cùng nhau. Chia sẻ kinh nghiệm. Cùng xây dựng.</h2>
-        <p className="communityLead">Chọn một cách tham gia phù hợp với bạn.</p>
-        <div className="communityActionGrid">
-          <a href={studyOsUrl}><small>01 · HỌC MỖI NGÀY</small><strong>Tiếp tục nhiệm vụ học tập</strong><span>Mở Study OS để vào học liệu và luyện tập.</span><b>Mở Study OS ↗</b></a>
-          <a href="mailto:clb.yhoccotruyen.hiu@gmail.com?subject=Trao%20%C4%91%E1%BB%95i%20h%E1%BB%8Dc%20thu%E1%BA%ADt%20YHCT"><small>02 · TRAO ĐỔI HỌC THUẬT</small><strong>Gửi đề xuất cho Câu lạc bộ</strong><span>Chia sẻ câu hỏi, chủ đề hoặc tài liệu với CLB.</span><b>clb.yhoccotruyen.hiu@gmail.com ↗</b></a>
-          <a href="https://www.tiktok.com/@hiu.clb.yhoccotruyen" target="_blank" rel="noreferrer"><small>03 · CẬP NHẬT HOẠT ĐỘNG</small><strong>Theo dõi kênh TikTok CLB</strong><span>Xem thông tin và nội dung hoạt động mới.</span><b>@hiu.clb.yhoccotruyen ↗</b></a>
+              <section className={styles.panel}>
+                <header className={styles.panelHead}>
+                  <span><small>Lịch học thuật</small><h2>Sự kiện & hoạt động</h2></span>
+                </header>
+                <div className={styles.events}>
+                  {events.map((event) => (
+                    <article className={styles.event} key={event.day + event.title}>
+                      <b>{event.day}<br />{event.month}</b>
+                      <span><strong>{event.title}</strong><small>{event.meta}</small></span>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            </div>
+          </section>
+
+          <aside className={styles.rightRail}>
+            <section className={styles.progressCard}>
+              <div className={styles.ring}><strong>65%</strong></div>
+              <div className={styles.progressText}><small>Tiến độ học tập</small><strong>32 / 49 bài hoàn thành</strong><span>5 chuyên đề đang học · 12 ngày học liên tiếp</span></div>
+            </section>
+
+            <section id="missions" className={styles.missionWrap}>
+              <DailyMissions apps={apps} />
+            </section>
+
+            <section className={styles.noticeCard}>
+              <h3>Thông báo gần đây</h3>
+              <ul>
+                <li><i>✓</i><span>Nhắc tiếp tục bài học đang dở trong Study OS.</span></li>
+                <li><i>◎</i><span>Khám phá một mô hình kinh lạc mới trong Atlas 3D.</span></li>
+                <li><i>✦</i><span>Linh thú sẽ gom nhắc học và hoạt động quan trọng vào một góc nhỏ.</span></li>
+              </ul>
+            </section>
+          </aside>
         </div>
-        <p className="clubLocation">CLB Y học cổ truyền · Trường Đại học Quốc tế Hồng Bàng (HIU) · 215 Điện Biên Phủ, phường Gia Định, Thành phố Hồ Chí Minh</p>
-        <a className="heroCta" href="#map">Trở lại bản đồ ↑</a>
-      </section>
 
-      <footer className="heritageFooter">
-        <strong>HIU TMC Ecosystem</strong>
-        <span>TRI THỨC CỔ TRUYỀN · CÔNG NGHỆ HIỆN ĐẠI · VÌ MỘT CỘNG ĐỒNG KHỎE MẠNH HƠN</span>
-      </footer>
+        <footer className={styles.footer}>
+          <strong>HIU YHCT Ecosystem</strong>
+          <span>Tri thức cổ truyền · Công nghệ hiện đại · Vì cộng đồng khỏe mạnh hơn</span>
+        </footer>
+      </div>
 
-      <nav className="approvedMobileTaskbar" aria-label="Điều hướng nhanh trên điện thoại">
-        <a href="#top"><span aria-hidden="true">⌂</span><small>Trang chủ</small></a>
-        <a href="#ecosystem"><span aria-hidden="true">▤</span><small>Ứng dụng</small></a>
-        <a href="#journey"><span aria-hidden="true">◇</span><small>Nhiệm vụ</small></a>
-        <a href={atlasUrl}><span aria-hidden="true">◎</span><small>Atlas 3D</small></a>
-        <a href="#community"><span aria-hidden="true">◉</span><small>Cộng đồng</small></a>
+      <nav className={styles.mobileDock} aria-label="Điều hướng nhanh trên điện thoại">
+        <a href="#top"><i>⌂</i><span>Trang chủ</span></a>
+        <a href={studyOsUrl}><i>▤</i><span>Học tập</span></a>
+        <a href={atlasUrl}><i>◎</i><span>Atlas</span></a>
+        <a href="/ai/"><i>◈</i><span>AI</span></a>
+        <a href="/community/"><i>♧</i><span>Cộng đồng</span></a>
       </nav>
-      <LearningAssistant apps={ecosystemApps} />
+
+      <SpiritCompanion />
     </main>
   );
 }
