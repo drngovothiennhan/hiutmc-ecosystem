@@ -128,8 +128,7 @@ export default function SpiritCompanion() {
             </div>
           </div>
           <p>{message}</p>
-          <div className={styles.affection}><span>Thân mật</span><b>80 / 100</b></div>
-          <div className={styles.bar}><i /></div>
+          <div className={styles.affection}><span>Tiến độ chăm sóc</span><b>Chưa đồng bộ</b></div>
           <div className={styles.actions}>
             <button type="button"><span>🔔</span>Thông báo</button>
             <button type="button"><span>🎁</span>Quà</button>
