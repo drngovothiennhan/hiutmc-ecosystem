@@ -3,6 +3,7 @@
 ## Source of truth
 - Public site: https://hiutmc.com
 - Admin Center: https://hiutmc.com/admin/
+- Mod Center: https://hiutmc.com/mod/
 - Repository: `drngovothiennhan/hiutmc-ecosystem`
 - Host: Cloudflare Workers Static Assets
 - Production branch: `production`; stable releases keep `main` and `production` aligned.
@@ -17,7 +18,8 @@
 - The floating Trợ lý học tập button opens the approved Study OS assistant and direct routes to all four registered Hubs; it does not simulate an AI chat inside the portal.
 - Daily missions rotate across the registered learning hubs. Personal completions, experience points, current streak, weekly challenge and badges are saved in the browser on that device only.
 - The local points are not grades and are not synced to member accounts. A class leaderboard stays unavailable until verified member data and shared storage are connected; the app must not fabricate names or scores.
-- The Admin Center provides local Hub content/link editing, Mod review UI, export/import and activity notes. Its settings are browser-local; the displayed roles are not server-enforced authentication or shared permissions.
+- Admin/Mod access is server-enforced by the Cloudflare Worker against the active Supabase member session and canonical `club_members.role`. `/admin/` requires `admin`; `/mod/` accepts `mod`, `super_mod`, or `admin`.
+- The Admin Center still provides local Hub content/link editing, Mod review UI, export/import and activity notes. Those content/settings drafts remain browser-local until a shared publishing backend is connected.
 - The HIU CLB logo is used in the academy map and PWA icons. Reduced-motion settings disable ambient animations.
 
 ## Integration boundaries
@@ -29,8 +31,8 @@
 ## Production release gates
 1. Repository boundary, release metadata and Hub registry validation.
 2. Map asset, PWA manifest/icons, Community contract and learning-progress validation.
-3. Static build, approved-home/Admin markers and required route checks.
-4. Wrangler dry-run in CI and Cloudflare deploy workflow.
-5. Production smoke against `https://hiutmc.com` after deployment.
+3. Staff authorization contract validation plus static build and approved dashboard markers.
+4. Wrangler dry-run validates Worker + static ASSETS binding.
+5. Production smoke confirms anonymous denial for `/admin/`, `/mod/` and `/api/staff/access`, then validates public routes.
 
 GitHub Actions records the exact source commit and run for each CI/deployment. Do not mark a change production-live until the deploy workflow and live smoke succeed.

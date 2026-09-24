@@ -6,7 +6,6 @@ const routes = [
   ["/community/", "HIU YHCT Community"],
   ["/discover/", "HIU YHCT Discover"],
   ["/search/", "Search Hub"],
-  ["/admin/", "Nội dung Hub"],
   ["/ecosystem/study-os/", "Study OS"],
   ["/ecosystem/ai-thiet-chan/", "A.I Thiệt Chẩn"],
   ["/ecosystem/trung-y-van/", "Trung Y Văn HIU"],
@@ -46,6 +45,35 @@ for (const [route, marker] of routes) {
   }
   console.log(`PASS ${response.status} ${url} (attempt ${attempt})`);
 }
+
+async function expectStaffRedirect(route, required) {
+  const url = new URL(route, base).toString();
+  const response = await fetch(url, {
+    redirect: "manual",
+    headers: { "user-agent": "HIU-YHCT-release-smoke/1.0" },
+  });
+  if (![301, 302, 303, 307, 308].includes(response.status)) {
+    throw new Error(`${url} must reject anonymous access with a redirect; got HTTP ${response.status}`);
+  }
+  const location = response.headers.get("location") || "";
+  if (!location.includes(`staff_required=${required}`)) {
+    throw new Error(`${url} redirected without the expected staff gate: ${location}`);
+  }
+  console.log(`PASS protected ${route} -> ${location}`);
+}
+
+await expectStaffRedirect("/admin/", "admin");
+await expectStaffRedirect("/mod/", "mod");
+
+const anonymousStaff = await fetch(new URL("/api/staff/access", base), {
+  redirect: "manual",
+  headers: { "user-agent": "HIU-YHCT-release-smoke/1.0" },
+});
+const anonymousStaffBody = await anonymousStaff.json().catch(() => ({}));
+if (anonymousStaff.status !== 401 || anonymousStaffBody.authorized !== false) {
+  throw new Error(`Anonymous staff API must return 401/authorized=false; got ${anonymousStaff.status}`);
+}
+console.log("PASS anonymous staff API denied");
 
 const home = await fetch(new URL("/", base), { redirect: "follow" });
 const requiredHeaders = [
@@ -112,4 +140,4 @@ for (const [path, marker] of [['/sw.js','hiutmc-offline-v1'],['/offline.html','B
   const { response, text } = await getWithRetry(new URL(path, base));
   if (!text.includes(marker) || !response.headers.get('cache-control')?.includes('no-cache')) throw new Error(`PWA asset/header check failed ${path}`);
 }
-console.log('PASS CP15 Digital Campus homepage, compact spirit companion, existing Hub destinations, Admin Center routes, PWA and offline worker.');
+console.log('PASS CP21 Digital Campus, server-protected Admin/Mod routes, existing Hub destinations, PWA and offline worker.');
