@@ -140,4 +140,32 @@ for (const [path, marker] of [['/sw.js','hiutmc-offline-v1'],['/offline.html','B
   const { response, text } = await getWithRetry(new URL(path, base));
   if (!text.includes(marker) || !response.headers.get('cache-control')?.includes('no-cache')) throw new Error(`PWA asset/header check failed ${path}`);
 }
-console.log('PASS CP21 Digital Campus, server-protected Admin/Mod routes, existing Hub destinations, PWA and offline worker.');
+
+const zaloPreview = await fetch(new URL("/", base), {
+  redirect: "follow",
+  headers: { "user-agent": "Zalo-LinkPreview/1.0" },
+});
+const zaloHtml = await zaloPreview.text();
+for (const marker of [
+  'property="og:title"',
+  'property="og:description"',
+  'property="og:image"',
+  'HIU YHCT Ecosystem – Cổng học tập Y học cổ truyền HIU',
+  'https://hiutmc.com/icons/icon-512.png?share=cp22',
+]) {
+  if (!zaloHtml.includes(marker)) throw new Error(`Zalo/social preview HTML missing marker: ${marker}`);
+}
+const socialImage = await fetch("https://hiutmc.com/icons/icon-512.png?share=cp22");
+const socialImageData = Buffer.from(await socialImage.arrayBuffer());
+if (!socialImage.ok || socialImageData.length < 24 || socialImageData.toString("hex",0,8) !== "89504e470d0a1a0a") {
+  throw new Error("Social preview PNG is not reachable or invalid.");
+}
+if (socialImageData.readUInt32BE(16) < 300 || socialImageData.readUInt32BE(20) < 300) {
+  throw new Error("Social preview image is too small.");
+}
+const robots = await fetch(new URL("/robots.txt", base));
+const robotsText = await robots.text();
+if (!robots.ok || !robotsText.includes("Allow: /")) throw new Error("robots.txt does not allow social crawlers.");
+console.log("PASS Zalo/social Open Graph preview metadata, summary and image.");
+
+console.log('PASS CP22 Digital Campus, server-protected Admin/Mod routes, Zalo link preview, existing Hub destinations, PWA and offline worker.');

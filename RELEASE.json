@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260924-08",
+  "release": "HIU-YHCT-ECOSYSTEM-20260924-09",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP21",
-  "base_checkpoint_sha": "15080a8e844de0b08843bd42abcd1e28ccd2afd1",
+  "checkpoint": "CP22",
+  "base_checkpoint_sha": "3ebe01e53e4d732eed12fa37810ce7c4ba355d48",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP21 adds Cloudflare server-side Admin/Mod route authorization backed by the shared Supabase member session and canonical club_members role. Admin requires role=admin; Mod Center accepts mod, super_mod, or admin. Staff session uses an HttpOnly Secure SameSite=Strict cookie, protected routes are denied anonymously, and CI, Wrangler dry-run, Cloudflare deployment and production smoke remain mandatory release gates."
+  "verification": "CP22 adds crawler-visible Open Graph metadata for Zalo/social link previews, including a concise Vietnamese title, summary and reachable 512x512 PNG preview image. robots.txt permits crawlers and production smoke verifies the metadata using a Zalo-like user agent while retaining CP21 server-side Admin/Mod authorization gates."
 }

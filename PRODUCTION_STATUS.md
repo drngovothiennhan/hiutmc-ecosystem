@@ -28,6 +28,13 @@
 - Canonical Hub subdomains remain separate routing work recorded in the registry; current links must not imply that those aliases are active.
 - No other app repository is modified by this project.
 
+## Social link preview
+- The homepage exports crawler-visible Open Graph metadata for Zalo and other social link previews.
+- Share title: `HIU YHCT Ecosystem – Cổng học tập Y học cổ truyền HIU`.
+- Share summary mentions Study OS, Atlas 3D, A.I Thiệt Chẩn, Trung Y Văn and the HIU YHCT academic community.
+- Preview image uses the public 512×512 PNG icon with a versioned query string to reduce stale image-cache reuse.
+- `robots.txt` allows link-preview crawlers.
+
 ## Production release gates
 1. Repository boundary, release metadata and Hub registry validation.
 2. Map asset, PWA manifest/icons, Community contract and learning-progress validation.
