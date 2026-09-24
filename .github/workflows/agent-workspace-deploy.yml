@@ -287,4 +287,4 @@ jobs:
 
           test "$RECORDED" = "1" || (echo "::error::Unable to record deployed source checkpoint after 3 attempts" && exit 1)
 
-# Deployment trigger source: ai-agent-workspace@64a1cea445700486140ad2ca134ed0aec1fd247e
+# Deployment trigger source: ai-agent-workspace@3eb8f3120d51069eeef892be444ec28799b08165
