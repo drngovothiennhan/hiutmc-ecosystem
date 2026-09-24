@@ -258,11 +258,33 @@ jobs:
           SOURCE_SHA: ${{ steps.latest.outputs.source_sha }}
         shell: bash
         run: |
-          printf '%s\n' "$SOURCE_SHA" > deploy/agent-workspace/LAST_DEPLOYED
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add deploy/agent-workspace/LAST_DEPLOYED
-          git commit -m "chore(agent): record deployed checkpoint $SOURCE_SHA"
-          git push origin HEAD:main
+
+          RECORDED=0
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git checkout --detach origin/main
+
+            printf '%s\n' "$SOURCE_SHA" > deploy/agent-workspace/LAST_DEPLOYED
+            git add deploy/agent-workspace/LAST_DEPLOYED
+
+            if git diff --cached --quiet; then
+              echo "Checkpoint $SOURCE_SHA already recorded on current main."
+              RECORDED=1
+              break
+            fi
+
+            git commit -m "chore(agent): record deployed checkpoint $SOURCE_SHA"
+            if git push origin HEAD:main; then
+              RECORDED=1
+              break
+            fi
+
+            echo "Checkpoint push attempt $attempt raced with main; retrying from latest origin/main."
+            sleep 2
+          done
+
+          test "$RECORDED" = "1" || (echo "::error::Unable to record deployed source checkpoint after 3 attempts" && exit 1)
 
 # Deployment trigger source: ai-agent-workspace@64a1cea445700486140ad2ca134ed0aec1fd247e
