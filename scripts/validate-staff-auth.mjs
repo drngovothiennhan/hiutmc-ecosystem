@@ -39,7 +39,7 @@ for (const marker of [
   if (!files.console.includes(marker)) errors.push(`staff console missing marker: ${marker}`);
 }
 
-for (const marker of ['"main": "./worker.mjs"', '"binding": "ASSETS"']) {
+for (const marker of ['"main": "./worker.mjs"', '"binding": "ASSETS"', '"run_worker_first": true']) {
   if (!files.wrangler.includes(marker)) errors.push(`wrangler missing worker/assets marker: ${marker}`);
 }
 
