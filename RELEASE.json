@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260924-05",
+  "release": "HIU-YHCT-ECOSYSTEM-20260924-06",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP18",
-  "base_checkpoint_sha": "ba6bb2ae733d23eef6a5cc83bcc48dfc4d519c49",
+  "checkpoint": "CP19",
+  "base_checkpoint_sha": "955dceff4a44a26c9bdc66dbcac129da7015c86c",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP18 fixes the mobile Continue CTA overflow and adds member authentication against the same Supabase member-login authority as Study OS, with first-party session handoff to Study OS via a transient URL fragment. Existing CP17 typography, CP16 dock palette, Digital Campus, spirit companion, PWA, CI, static export, Cloudflare deployment and production smoke remain mandatory release gates."
+  "verification": "CP19 keeps CP18 SSO and overflow fixes, displays canonical member avatar/name from the shared club_members authority, and remains compatible with the Study OS encrypted learning-sync and competition rollout. CI, static export, Cloudflare deploy and production smoke remain mandatory release gates."
 }
