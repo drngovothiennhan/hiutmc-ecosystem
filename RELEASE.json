@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260924-06",
+  "release": "HIU-YHCT-ECOSYSTEM-20260924-07",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP19",
-  "base_checkpoint_sha": "955dceff4a44a26c9bdc66dbcac129da7015c86c",
+  "checkpoint": "CP20",
+  "base_checkpoint_sha": "bae79ba0a4d6d7d13d2ac81b3582716a0ceb7533",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP19 keeps CP18 SSO and overflow fixes, displays canonical member avatar/name from the shared club_members authority, and remains compatible with the Study OS encrypted learning-sync and competition rollout. CI, static export, Cloudflare deploy and production smoke remain mandatory release gates."
+  "verification": "CP20 refreshes the canonical club_members profile on every restored ecosystem session, preventing stale name/avatar/title data across Study OS and the homepage. CP19 avatar display, CP18 SSO and overflow fixes, CI, static export, Cloudflare deployment and production smoke remain mandatory release gates."
 }
