@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260924-12",
+  "release": "HIU-YHCT-ECOSYSTEM-20260924-13",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP26",
-  "base_checkpoint_sha": "236120938778d995ce13315a8d2acfd026867aa4",
+  "checkpoint": "CP27",
+  "base_checkpoint_sha": "1ecbd6ac7bef9432b71c181b1c56cb23032d0ae8",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP26 is a narrow UI/data-identity hotfix on top of CP25. The homepage greeting now renders the authenticated member full_name already sourced from the same canonical club_members profile used by Study OS, removing the generic 'người học YHCT' label after login. The Mobile/PC toggle label is vertically and horizontally centered consistently in the top bar and member/profile dialog. No approved colors, cards, fonts, imagery, Hub routing, auth policy, learning-sync contract, Admin/Mod backend, or visual architecture are changed. CI, Cloudflare deployment and production smoke remain mandatory."
+  "verification": "CP27 is a narrow responsive typography hotfix on top of CP26. The authenticated Study OS member full name in the homepage hero is forced to remain on one visual line, with a small responsive size guard in true Mobile mode. No approved colors, cards, backgrounds, imagery, routing, SSO, learning-sync, Admin/Mod behavior, or application architecture are changed. CI, Cloudflare deployment and production smoke remain mandatory."
 }
