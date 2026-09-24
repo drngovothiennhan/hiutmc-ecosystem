@@ -15,15 +15,15 @@ const hubMeta: Record<string, { icon: string; tone: string }> = {
 };
 
 const communityItems = [
-  { icon: "⚕", title: "Dược liệu theo công năng", meta: "120 bài học" },
-  { icon: "☯", title: "Bệnh học YHCT", meta: "95 bài học" },
-  { icon: "✦", title: "Châm cứu · Thủ pháp", meta: "68 bài học" },
+  { icon: "⚕", title: "Dược liệu theo công năng", meta: "Mở kho nội dung đã được công bố" },
+  { icon: "☯", title: "Bệnh học YHCT", meta: "Học theo chủ đề trong hệ sinh thái" },
+  { icon: "✦", title: "Châm cứu · Thủ pháp", meta: "Kết nối Atlas và học liệu liên quan" },
 ];
 
 const events = [
-  { day: "15", month: "Tháng 3", title: "Hội thảo ứng dụng AI trong học YHCT", meta: "Online · 200 người quan tâm" },
-  { day: "22", month: "Tháng 3", title: "Workshop nhận biết dược liệu qua Atlas", meta: "Trực tiếp · 150 lượt quan tâm" },
-  { day: "05", month: "Tháng 4", title: "Tọa đàm YHCT trong chăm sóc sức khỏe hiện đại", meta: "Online · Cộng đồng HIU" },
+  { day: "—", month: "CLB", title: "Lịch hoạt động học thuật", meta: "Sẽ hiển thị khi dữ liệu CLB được kết nối và xác thực." },
+  { day: "—", month: "Học tập", title: "Lịch học & nhắc việc", meta: "Sẽ đồng bộ từ tài khoản thành viên sau khi được duyệt." },
+  { day: "—", month: "Cộng đồng", title: "Thông báo cộng đồng", meta: "Chỉ hiển thị nội dung đã được xác thực." },
 ];
 
 export default function Home() {
@@ -79,9 +79,8 @@ export default function Home() {
               <div className={styles.lessonThumb} aria-hidden="true" />
               <div className={styles.continueCopy}>
                 <small>TIẾP TỤC HỌC TẬP</small>
-                <h2>Bài 4: Tạng Phủ · Can Tạng</h2>
-                <p>YHCT cơ bản · còn khoảng 12 phút</p>
-                <div className={styles.progressLine}><i /></div>
+                <h2>Tiếp tục bài học gần nhất</h2>
+                <p>Mở Study OS để xem bài đang học và tiến độ thật của bạn.</p>
               </div>
               <a className={styles.continueButton} href={studyOsUrl}>Tiếp tục →</a>
             </article>
@@ -139,8 +138,8 @@ export default function Home() {
 
           <aside className={styles.rightRail}>
             <section className={styles.progressCard}>
-              <div className={styles.ring}><strong>65%</strong></div>
-              <div className={styles.progressText}><small>Tiến độ học tập</small><strong>32 / 49 bài hoàn thành</strong><span>5 chuyên đề đang học · 12 ngày học liên tiếp</span></div>
+              <div className={styles.ring}><strong>—</strong></div>
+              <div className={styles.progressText}><small>Tiến độ học tập</small><strong>Chưa đồng bộ</strong><span>Đăng nhập Study OS để sử dụng dữ liệu tiến độ đã xác thực.</span></div>
             </section>
 
             <section id="missions" className={styles.missionWrap}>
