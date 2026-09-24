@@ -204,3 +204,166 @@
 @media(max-width:820px){
   :global(html:not([data-display-mode="pc"])) .hero h1 span{font-size:clamp(18.5px,5.4vw,22.5px);white-space:nowrap}
 }
+
+
+/* ===== CP30 Homepage Typography System =====
+   Scope: homepage typography only. Consolidates titles, content and numerals without
+   changing approved colors, card geometry, icons, routes, auth, SSO or app logic. */
+.shell{
+  --home-font-title:Georgia,"Times New Roman",serif;
+  --home-font-content:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --home-font-number:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --home-title-hero:31.5px;
+  --home-title-section:22.5px;
+  --home-title-card:17.5px;
+  --home-title-brand:17px;
+  --home-title-side:13px;
+  --home-content-lead:13.5px;
+  --home-content-title:13px;
+  --home-content-body:11px;
+  --home-content-meta:10px;
+  --home-content-kicker:10.5px;
+  --home-content-action:10.5px;
+  --home-number-ring:20px;
+  --home-number-date:11px;
+  --home-number-index:12px;
+  --home-number-reward:9.5px;
+  --home-number-badge:8.5px;
+  font-family:var(--home-font-content);
+  font-variant-numeric:lining-nums tabular-nums;
+  font-feature-settings:"lnum" 1,"tnum" 1;
+}
+
+/* Title group */
+.brand strong,.sideBottom strong,.hero h1,.heroMark,.continueCopy h2,.panelHead h2,.hub strong,.noticeCard h3,
+.missionWrap :global(.missionHeader h2){
+  font-family:var(--home-font-title);
+}
+.brand strong{font-size:var(--home-title-brand);line-height:1.15}
+.sideBottom strong{font-size:var(--home-title-side);line-height:1.25}
+.hero h1{font-size:var(--home-title-hero);line-height:1.05}
+.panelHead h2,.missionWrap :global(.missionHeader h2){font-size:var(--home-title-section);line-height:1.18}
+.continueCopy h2,.hub strong,.noticeCard h3{font-size:var(--home-title-card);line-height:1.24}
+
+/* Content group */
+.search,.crumb,.nav a,.member strong,.member small,.hero small,.hero p,.continueCopy small,.continueCopy p,.continueButton,
+.panelHead small,.panelHead a,.hub p,.hub b,.communityItem strong,.communityItem small,.event strong,.event small,
+.progressText small,.progressText strong,.progressText span,.missionWrap :global(.missionNameRow h3),
+.missionWrap :global(.missionCopy>p),.missionWrap :global(.missionActions a),.missionWrap :global(.missionActions button),
+.missionWrap :global(.sectionKicker),.noticeCard li,.footer,.mobileDock a{
+  font-family:var(--home-font-content);
+}
+.hero p{font-size:var(--home-content-lead);line-height:1.62}
+.communityItem strong,.event strong,.progressText strong,.missionWrap :global(.missionNameRow h3){
+  font-size:var(--home-content-title);line-height:1.38;font-weight:750;
+}
+.continueCopy p,.hub p,.progressText span,.missionWrap :global(.missionCopy>p),.noticeCard li{
+  font-size:var(--home-content-body);line-height:1.5;
+}
+.member small,.communityItem small,.event small,.footer{
+  font-size:var(--home-content-meta);line-height:1.4;
+}
+.brand small,.hero small,.continueCopy small,.panelHead small,.progressText small,.missionWrap :global(.sectionKicker){
+  font-size:var(--home-content-kicker);line-height:1.25;
+}
+.panelHead a,.hub b,.continueButton,.missionWrap :global(.missionActions a),.missionWrap :global(.missionActions button){
+  font-size:var(--home-content-action);line-height:1.25;
+}
+.search,.crumb,.member strong{font-size:12.5px;line-height:1.35}
+.nav a{font-size:13.5px;line-height:1.25}
+.mobileDock a{font-size:10.5px;line-height:1.15}
+
+/* Numeral group */
+.bell:after,.event b,.ring strong,.missionWrap :global(.missionNumber),.missionWrap :global(.missionNameRow>span),
+.missionWrap :global(.missionStats strong),.missionWrap :global(.weeklyChallengeTop>span){
+  font-family:var(--home-font-number);
+  font-variant-numeric:tabular-nums lining-nums;
+  font-feature-settings:"tnum" 1,"lnum" 1;
+  letter-spacing:0;
+}
+.ring strong{font-size:var(--home-number-ring);font-weight:800;line-height:1}
+.event b{font-size:var(--home-number-date);font-weight:800;line-height:1.15}
+.bell:after{font-size:var(--home-number-badge);font-weight:900;line-height:1}
+.missionWrap :global(.missionNumber){font-size:var(--home-number-index);font-weight:800;line-height:1}
+.missionWrap :global(.missionNameRow>span){font-size:var(--home-number-reward);font-weight:900;line-height:1.15}
+
+/* Responsive typography tokens */
+@media(max-width:820px){
+  :global(html:not([data-display-mode="pc"])) .shell{
+    --home-title-hero:23.5px;
+    --home-title-section:18.5px;
+    --home-title-card:15.8px;
+    --home-content-lead:11px;
+    --home-content-title:12.5px;
+    --home-content-body:10.5px;
+    --home-content-meta:9.5px;
+    --home-content-kicker:9px;
+    --home-content-action:10px;
+    --home-number-ring:17px;
+    --home-number-date:10.5px;
+    --home-number-index:11.5px;
+    --home-number-reward:9.5px;
+    --home-number-badge:8px;
+  }
+  :global(html:not([data-display-mode="pc"])) .search{font-size:11px}
+  :global(html:not([data-display-mode="pc"])) .hero h1{font-size:var(--home-title-hero);line-height:1.08}
+  :global(html:not([data-display-mode="pc"])) .hero p{font-size:var(--home-content-lead);line-height:1.58}
+  :global(html:not([data-display-mode="pc"])) .continueCopy h2,
+  :global(html:not([data-display-mode="pc"])) .hub strong{font-size:var(--home-title-card)}
+  :global(html:not([data-display-mode="pc"])) .panelHead h2,
+  :global(html:not([data-display-mode="pc"])) .missionWrap :global(.missionHeader h2){font-size:var(--home-title-section)}
+  :global(html:not([data-display-mode="pc"])) .continueCopy p,
+  :global(html:not([data-display-mode="pc"])) .hub p,
+  :global(html:not([data-display-mode="pc"])) .progressText span,
+  :global(html:not([data-display-mode="pc"])) .missionWrap :global(.missionCopy>p){font-size:var(--home-content-body)}
+  :global(html:not([data-display-mode="pc"])) .panelHead small,
+  :global(html:not([data-display-mode="pc"])) .continueCopy small,
+  :global(html:not([data-display-mode="pc"])) .progressText small{font-size:var(--home-content-kicker)}
+  :global(html:not([data-display-mode="pc"])) .communityItem small,
+  :global(html:not([data-display-mode="pc"])) .event small,
+  :global(html:not([data-display-mode="pc"])) .footer{font-size:var(--home-content-meta)}
+  :global(html:not([data-display-mode="pc"])) .panelHead a,
+  :global(html:not([data-display-mode="pc"])) .hub b,
+  :global(html:not([data-display-mode="pc"])) .mobileDock a{font-size:var(--home-content-action)}
+  :global(html:not([data-display-mode="pc"])) .ring strong{font-size:var(--home-number-ring)}
+  :global(html:not([data-display-mode="pc"])) .event b{font-size:var(--home-number-date)}
+}
+
+/* PC mode keeps the same typography scale as desktop even when forced from a small device. */
+:global(html[data-display-mode="pc"]) .shell{
+  --home-title-hero:31.5px;
+  --home-title-section:22.5px;
+  --home-title-card:17.5px;
+  --home-content-lead:13.5px;
+  --home-content-title:13px;
+  --home-content-body:11px;
+  --home-content-meta:10px;
+  --home-content-kicker:10.5px;
+  --home-content-action:10.5px;
+  --home-number-ring:20px;
+  --home-number-date:11px;
+  --home-number-index:12px;
+  --home-number-reward:9.5px;
+  --home-number-badge:8.5px;
+}
+:global(html[data-display-mode="pc"]) .search{font-size:12.5px!important}
+:global(html[data-display-mode="pc"]) .hero small{font-size:var(--home-content-kicker)!important}
+:global(html[data-display-mode="pc"]) .hero h1{font-size:var(--home-title-hero)!important;line-height:1.05!important}
+:global(html[data-display-mode="pc"]) .hero p{font-size:var(--home-content-lead)!important;line-height:1.62!important}
+:global(html[data-display-mode="pc"]) .continueCopy small{font-size:var(--home-content-kicker)!important}
+:global(html[data-display-mode="pc"]) .continueCopy h2{font-size:var(--home-title-card)!important;line-height:1.24!important}
+:global(html[data-display-mode="pc"]) .continueCopy p{font-size:var(--home-content-body)!important;line-height:1.5!important}
+:global(html[data-display-mode="pc"]) .continueButton{font-size:var(--home-content-action)!important}
+:global(html[data-display-mode="pc"]) .panelHead small{font-size:var(--home-content-kicker)!important}
+:global(html[data-display-mode="pc"]) .panelHead h2{font-size:var(--home-title-section)!important;line-height:1.18!important}
+:global(html[data-display-mode="pc"]) .panelHead a{font-size:var(--home-content-action)!important}
+:global(html[data-display-mode="pc"]) .hub strong{font-size:var(--home-title-card)!important;line-height:1.24!important}
+:global(html[data-display-mode="pc"]) .hub p{font-size:var(--home-content-body)!important;line-height:1.5!important}
+:global(html[data-display-mode="pc"]) .hub b{font-size:var(--home-content-action)!important}
+:global(html[data-display-mode="pc"]) .ring strong{font-size:var(--home-number-ring)!important}
+:global(html[data-display-mode="pc"]) .missionWrap :global(.missionHeader h2){font-size:var(--home-title-section)!important}
+:global(html[data-display-mode="pc"]) .missionWrap :global(.missionNameRow h3){font-size:var(--home-content-title)!important}
+:global(html[data-display-mode="pc"]) .missionWrap :global(.missionCopy>p){font-size:var(--home-content-body)!important;line-height:1.5!important}
+:global(html[data-display-mode="pc"]) .missionWrap :global(.missionActions a),
+:global(html[data-display-mode="pc"]) .missionWrap :global(.missionActions button){font-size:var(--home-content-action)!important}
+:global(html[data-display-mode="pc"]) .footer{font-size:var(--home-content-meta)!important}
