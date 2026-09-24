@@ -57,6 +57,21 @@ for (const marker of [
   if (!staffConsole.includes(marker)) errors.push(`Staff Console source missing marker: ${marker}`);
 }
 
+
+const socialMarkers = [
+  'property="og:title"',
+  'property="og:description"',
+  'property="og:image"',
+  'name="twitter:card"',
+  'HIU YHCT Ecosystem – Cổng học tập Y học cổ truyền HIU',
+  'Study OS · Atlas 3D · A.I Thiệt Chẩn · Trung Y Văn',
+  'https://hiutmc.com/icons/icon-512.png?share=cp22',
+];
+for (const marker of socialMarkers) {
+  if (!home.includes(marker)) errors.push(`homepage missing social preview marker: ${marker}`);
+}
+if (!fs.existsSync("out/robots.txt")) errors.push("missing robots.txt for social crawlers");
+
 if (home.includes("Trợ lý học tập") || home.includes("assistantLauncher")) {
   errors.push("legacy learning assistant must not remain on the rebuilt homepage");
 }
