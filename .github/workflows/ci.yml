@@ -81,6 +81,9 @@ jobs:
       - name: Validate PC/mobile display mode isolation
         run: npm run validate:display-mode
 
+      - name: Validate profile display control and learning progress
+        run: npm run validate:profile-progress
+
       - name: Build static export
         run: npm run build
 
