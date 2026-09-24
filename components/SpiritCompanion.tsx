@@ -190,7 +190,11 @@ export default function SpiritCompanion() {
             <div>
               <small>Linh thú đồng hành · Preview</small>
               <strong>{pet.name}</strong>
-              <span>{pet.kind === "phoenix" ? `Lv.${petLevel} · ${chuTuocStageMeta.name}` : pet.title}</span>
+              <span>{pet.kind === "phoenix"
+                ? previewStage
+                  ? `Preview Bậc ${previewStage} · ${chuTuocStageMeta.name}`
+                  : `Lv.${petLevel} · ${chuTuocStageMeta.name}`
+                : pet.title}</span>
             </div>
           </div>
           <p>{message}</p>
@@ -221,6 +225,14 @@ export default function SpiritCompanion() {
               <div className={styles.evolutionHeader}>
                 <strong>Tiến hóa Chu Tước</strong>
                 <small>Chỉ xem trước artwork · không thay đổi cấp thật</small>
+              </div>
+              <div className={styles.evolutionHero}>
+                <span className={styles.evolutionHeroArt}><ChuTuocMascot stage={renderedChuTuocStage} /></span>
+                <div>
+                  <small>Bậc {renderedChuTuocStage} · Lv.{chuTuocStageMeta.min}–{chuTuocStageMeta.max}</small>
+                  <strong>{chuTuocStageMeta.name}</strong>
+                  <p>{chuTuocStageMeta.description}</p>
+                </div>
               </div>
               <div className={styles.evolutionStages}>
                 {chuTuocStages.map((item) => (
