@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260924-07",
+  "release": "HIU-YHCT-ECOSYSTEM-20260924-08",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP20",
-  "base_checkpoint_sha": "bae79ba0a4d6d7d13d2ac81b3582716a0ceb7533",
+  "checkpoint": "CP21",
+  "base_checkpoint_sha": "15080a8e844de0b08843bd42abcd1e28ccd2afd1",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP20 refreshes the canonical club_members profile on every restored ecosystem session, preventing stale name/avatar/title data across Study OS and the homepage. CP19 avatar display, CP18 SSO and overflow fixes, CI, static export, Cloudflare deployment and production smoke remain mandatory release gates."
+  "verification": "CP21 adds Cloudflare server-side Admin/Mod route authorization backed by the shared Supabase member session and canonical club_members role. Admin requires role=admin; Mod Center accepts mod, super_mod, or admin. Staff session uses an HttpOnly Secure SameSite=Strict cookie, protected routes are denied anonymously, and CI, Wrangler dry-run, Cloudflare deployment and production smoke remain mandatory release gates."
 }
