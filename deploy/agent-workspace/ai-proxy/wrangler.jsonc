@@ -6,5 +6,11 @@
   "preview_urls": true,
   "ai": {
     "binding": "AI"
-  }
+  },
+  "routes": [
+    {
+      "pattern": "agent-ai.hiutmc.com",
+      "custom_domain": true
+    }
+  ]
 }
