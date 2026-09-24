@@ -15,6 +15,7 @@ on:
       - "next.config.ts"
       - "tsconfig.json"
       - "wrangler.jsonc"
+      - "worker.mjs"
       - ".github/workflows/deploy-cloudflare.yml"
       - "RELEASE.json"
 
@@ -54,7 +55,7 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Validate release contracts
-        run: npm run validate:repo && npm run validate:release && npm run validate:registry && npm run validate:assets && npm run validate:pwa && npm run validate:community && npm run validate:learning
+        run: npm run validate:repo && npm run validate:release && npm run validate:registry && npm run validate:assets && npm run validate:pwa && npm run validate:community && npm run validate:learning && npm run validate:staff-auth
 
       - name: Build static export
         run: npm run build
@@ -71,6 +72,7 @@ jobs:
           test -f out/discover/index.html
           test -f out/search/index.html
           test -f out/admin/index.html
+          test -f out/mod/index.html
           test -f out/ecosystem/study-os/index.html
           test -f out/ecosystem/ai-thiet-chan/index.html
           test -f out/ecosystem/trung-y-van/index.html
