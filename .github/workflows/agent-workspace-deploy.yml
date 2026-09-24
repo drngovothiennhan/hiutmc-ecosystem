@@ -149,7 +149,7 @@ jobs:
               -X POST "$CF_AI_PROXY_URL/run" \
               -H "content-type: application/json" \
               -H "x-ai-proxy-token: $AI_PROXY_TOKEN" \
-              --data '{"model":"@cf/zai-org/glm-4.7-flash","prompt":"Reply with exactly AI_PROXY_OK and nothing else.","max_tokens":64}')"
+              --data '{"model":"@cf/zai-org/glm-4.7-flash","prompt":"Reply with exactly AI_PROXY_OK and nothing else.","max_tokens":512}')"
 
             if [ "$STATUS" = "200" ]; then
               OK=1
