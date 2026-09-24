@@ -53,7 +53,7 @@ for(const marker of [
   "Streak",
   "todayQuestions",
   "ringStyle",
-  "member.fullName",
+  "member?.fullName",
 ]){
   if(!page.includes(marker))errors.push(`homepage progress state missing: ${marker}`);
 }
