@@ -15,8 +15,8 @@ for (const marker of [
   "HttpOnly",
   "Secure",
   "SameSite=Strict",
-  'url.pathname === "/admin"',
-  'url.pathname === "/mod"',
+  'pathname === "/admin"',
+  'pathname === "/mod"',
 ]) {
   if (!files.worker.includes(marker)) errors.push(`worker missing staff authorization marker: ${marker}`);
 }
