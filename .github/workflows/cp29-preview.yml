@@ -60,14 +60,16 @@ jobs:
             test "$code" = "200" || (echo "::error::$path returned $code" && exit 1)
           done
 
-      - name: Install Chromium
-        run: npx --yes playwright@1.55.0 install --with-deps chromium
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save --no-audit --no-fund playwright@1.55.0
+          npx playwright install --with-deps chromium
 
       - name: Responsive screenshot smoke
         env:
           PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
         run: |
-          cat > /tmp/cp29-qa.mjs <<'EOF'
+          cat > ./cp29-qa.mjs <<'EOF'
           import { chromium } from "playwright";
           import fs from "node:fs";
           const url = process.env.PREVIEW_URL;
@@ -94,7 +96,7 @@ jobs:
           }
           await browser.close();
           EOF
-          npx --yes -p playwright@1.55.0 node /tmp/cp29-qa.mjs
+          node ./cp29-qa.mjs
 
       - name: Upload responsive screenshots
         uses: actions/upload-artifact@v4
