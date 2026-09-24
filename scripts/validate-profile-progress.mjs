@@ -36,7 +36,9 @@ for(const marker of [
 }
 
 for(const marker of [
-  'html:not([data-display-mode="pc"]) .topActions :global(.displayModeToggle){display:none!important}',
+  'html:not([data-display-mode="pc"])',
+  '.topActions :global(.displayModeToggle)',
+  'display:none!important',
   ".ringSyncPending",
   ".ringSyncedNoScore",
 ]){
