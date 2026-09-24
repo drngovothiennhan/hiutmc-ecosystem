@@ -35,6 +35,14 @@
 - [x] `robots.txt` allows crawlers.
 - [x] Production smoke verifies the metadata with a Zalo-like user-agent and validates the image bytes/dimensions.
 
+## CP23 shadow backend
+- [x] Additive tables exist for Hub drafts, moderation queue and audit log.
+- [x] RLS is enabled on all CP23 tables.
+- [x] Admin draft writes require Admin; moderation actions require Mod or higher.
+- [x] Shadow Worker endpoints are hidden behind the existing staff session.
+- [x] Homepage and Staff Console visible UI remain unchanged in CP23.
+- [ ] Production smoke must confirm anonymous denial for all CP23 shadow endpoints before Stage 2 starts.
+
 ## Required release checks
 - [x] Repository boundary, metadata, registry, asset, PWA and Community contract validators pass.
 - [x] Learning mission/streak/weekly challenge validator passes.
