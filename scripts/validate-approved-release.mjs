@@ -2,13 +2,22 @@ import fs from "node:fs";
 
 const homePath = "out/index.html";
 const adminPath = "out/admin/index.html";
+const modPath = "out/mod/index.html";
+const consoleSourcePath = "components/StaffConsole.tsx";
 const errors = [];
 
-if (!fs.existsSync(homePath)) errors.push("missing exported homepage");
-if (!fs.existsSync(adminPath)) errors.push("missing exported Admin Center route");
+for (const [path, label] of [
+  [homePath, "homepage"],
+  [adminPath, "Admin Center route"],
+  [modPath, "Mod Center route"],
+]) {
+  if (!fs.existsSync(path)) errors.push(`missing exported ${label}`);
+}
 
 const home = fs.existsSync(homePath) ? fs.readFileSync(homePath, "utf8") : "";
 const admin = fs.existsSync(adminPath) ? fs.readFileSync(adminPath, "utf8") : "";
+const mod = fs.existsSync(modPath) ? fs.readFileSync(modPath, "utf8") : "";
+const staffConsole = fs.existsSync(consoleSourcePath) ? fs.readFileSync(consoleSourcePath, "utf8") : "";
 
 for (const marker of [
   "HIU YHCT DIGITAL CAMPUS",
@@ -28,6 +37,12 @@ for (const marker of [
   if (!home.includes(marker)) errors.push(`homepage missing approved dashboard marker: ${marker}`);
 }
 
+for (const [html, route] of [[admin, "Admin"], [mod, "Mod"]]) {
+  for (const marker of ["HIU YHCT STAFF AUTH", "Đang xác minh quyền máy chủ"]) {
+    if (!html.includes(marker)) errors.push(`${route} route missing authorization gate marker: ${marker}`);
+  }
+}
+
 for (const marker of [
   "Tổng quan",
   "Nội dung Hub",
@@ -36,9 +51,10 @@ for (const marker of [
   "Thành viên &amp; vai trò",
   "Nhật ký",
   "Cấu hình",
-  "Chỉ lưu trên trình duyệt này",
+  "SERVER VERIFIED",
+  'mode: "admin" | "mod"',
 ]) {
-  if (!admin.includes(marker)) errors.push(`Admin Center missing marker: ${marker}`);
+  if (!staffConsole.includes(marker)) errors.push(`Staff Console source missing marker: ${marker}`);
 }
 
 if (home.includes("Trợ lý học tập") || home.includes("assistantLauncher")) {
@@ -71,4 +87,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Approved HIU YHCT Digital Campus dashboard, responsive shell, core hubs, compact spirit companion and Admin Center are present.");
+console.log("Approved HIU YHCT Digital Campus, protected Admin/Mod routes and staff console are present.");
