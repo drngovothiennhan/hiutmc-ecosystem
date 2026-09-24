@@ -108,16 +108,20 @@ async function fetchMember(accessToken: string): Promise<Member> {
 }
 
 async function refreshSession(current: StoredSession): Promise<StoredSession> {
-  if (current.expiresAt - Date.now() > 90_000) return current;
-  const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
-    method: "POST",
-    headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
-    body: JSON.stringify({ refresh_token: current.refreshToken }),
-  });
-  const body = (await response.json().catch(() => ({}))) as Record<string, unknown>;
-  if (!response.ok) throw new Error("Phiên đăng nhập đã hết hạn.");
-  const accessToken = String(body.access_token || "");
-  const refreshToken = String(body.refresh_token || current.refreshToken);
+  let accessToken=current.accessToken;
+  let refreshToken=current.refreshToken;
+  if (current.expiresAt - Date.now() <= 90_000) {
+    const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+      method: "POST",
+      headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh_token: current.refreshToken }),
+    });
+    const body = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+    if (!response.ok) throw new Error("Phiên đăng nhập đã hết hạn.");
+    accessToken=String(body.access_token || "");
+    refreshToken=String(body.refresh_token || current.refreshToken);
+  }
+  if(!accessToken)throw new Error("Phiên đăng nhập không hợp lệ.");
   const member = await fetchMember(accessToken);
   const next = { accessToken, refreshToken, expiresAt: tokenExpiry(accessToken), member };
   saveStored(next);
@@ -136,9 +140,7 @@ async function loginMember(studentCode: string, password: string): Promise<Store
   const accessToken = String(body.access_token || "");
   const refreshToken = String(body.refresh_token || "");
   if (!accessToken || !refreshToken) throw new Error("Máy chủ chưa trả về phiên đăng nhập hợp lệ.");
-  const member = body.member && typeof body.member === "object"
-    ? mapMember(body.member as Record<string, unknown>)
-    : await fetchMember(accessToken);
+  const member = await fetchMember(accessToken);
   const session = { accessToken, refreshToken, expiresAt: tokenExpiry(accessToken), member };
   saveStored(session);
   return session;
