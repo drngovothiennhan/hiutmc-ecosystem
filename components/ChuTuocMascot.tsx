@@ -109,16 +109,18 @@ function StageTwo({ id }: { id: string }) {
 
 function MatureWing({ side, id, sacred = false }: { side: "left" | "right"; id: string; sacred?: boolean }) {
   const flip = side === "right";
-  return <g className={flip ? styles.rightWing : styles.leftWing} transform={flip ? "translate(160 0) scale(-1 1)" : undefined}>
-    <path d={sacred
-      ? "M74 83C56 49 28 31 4 41c20 5 35 16 46 32-17-9-33-10-48-3 20 11 38 25 53 43-16-8-31-8-44-1 18 9 35 19 50 32Z"
-      : "M73 85C55 56 30 42 8 51c17 5 31 15 42 29-15-7-29-8-42-2 18 9 34 22 47 38-13-5-26-5-38 1 15 7 30 16 43 27Z"} fill={`url(#ct-wing-${id})`} />
-    <path d="M64 78C49 58 32 49 17 53c14 7 27 17 37 30Z" fill="#ffd86a" opacity=".92" />
-    <path d="M59 91C43 78 29 74 16 78c13 7 25 17 35 28Z" fill="#ff9b37" opacity=".88" />
-    {sacred && <>
-      <path d="M56 104C40 96 27 95 16 100c12 7 23 15 33 24Z" fill="#c3233e" opacity=".9" />
-      <path d="M39 55c7 2 13 6 18 11" fill="none" stroke="#ffe784" strokeWidth="2.3" strokeLinecap="round" />
-    </>}
+  return <g transform={flip ? "translate(160 0) scale(-1 1)" : undefined}>
+    <g className={flip ? styles.rightWing : styles.leftWing}>
+      <path d={sacred
+        ? "M74 83C56 49 28 31 4 41c20 5 35 16 46 32-17-9-33-10-48-3 20 11 38 25 53 43-16-8-31-8-44-1 18 9 35 19 50 32Z"
+        : "M73 85C55 56 30 42 8 51c17 5 31 15 42 29-15-7-29-8-42-2 18 9 34 22 47 38-13-5-26-5-38 1 15 7 30 16 43 27Z"} fill={`url(#ct-wing-${id})`} />
+      <path d="M64 78C49 58 32 49 17 53c14 7 27 17 37 30Z" fill="#ffd86a" opacity=".92" />
+      <path d="M59 91C43 78 29 74 16 78c13 7 25 17 35 28Z" fill="#ff9b37" opacity=".88" />
+      {sacred && <>
+        <path d="M56 104C40 96 27 95 16 100c12 7 23 15 33 24Z" fill="#c3233e" opacity=".9" />
+        <path d="M39 55c7 2 13 6 18 11" fill="none" stroke="#ffe784" strokeWidth="2.3" strokeLinecap="round" />
+      </>}
+    </g>
   </g>;
 }
 
