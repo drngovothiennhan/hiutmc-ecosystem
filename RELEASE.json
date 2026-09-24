@@ -7,5 +7,5 @@
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP23 introduces an additive Admin/Mod shared backend in shadow mode only. The approved homepage/UI, public Hub registry, member SSO, CP21 staff authorization and CP22 Zalo/social preview remain unchanged. New Supabase tables for Hub drafts, moderation queue and audit log use RLS and role-checked RPCs; hidden Cloudflare staff shadow APIs proxy only verified sessions. No Stage 2 UI cutover is included."
+  "verification": "CP23 introduces an additive Admin/Mod shared backend in shadow mode only. The approved homepage/UI, public Hub registry, member SSO, CP21 staff authorization and CP22 Zalo/social preview remain unchanged. New Supabase tables for Hub drafts, moderation queue and audit log use RLS and role-checked RPCs; hidden Cloudflare staff shadow APIs proxy only verified sessions. No Stage 2 UI cutover is included. CP23 promotion still requires production smoke for public routes, staff authorization, shadow API denial, PWA and social preview."
 }
