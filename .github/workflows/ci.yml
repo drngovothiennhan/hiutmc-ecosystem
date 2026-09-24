@@ -11,6 +11,7 @@ on:
       - "data/**"
       - "public/**"
       - "scripts/**"
+      - "supabase/**"
       - "package.json"
       - "next.config.ts"
       - "tsconfig.json"
@@ -73,6 +74,9 @@ jobs:
 
       - name: Validate server staff authorization
         run: npm run validate:staff-auth
+
+      - name: Validate Admin/Mod shadow backend
+        run: npm run validate:admin-shadow
 
       - name: Build static export
         run: npm run build

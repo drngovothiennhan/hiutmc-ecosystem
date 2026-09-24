@@ -75,6 +75,27 @@ if (anonymousStaff.status !== 401 || anonymousStaffBody.authorized !== false) {
 }
 console.log("PASS anonymous staff API denied");
 
+for (const [path, method] of [
+  ["/api/staff/shadow/snapshot", "GET"],
+  ["/api/staff/shadow/hub-draft", "POST"],
+  ["/api/staff/shadow/moderation", "POST"],
+]) {
+  const response = await fetch(new URL(path, base), {
+    method,
+    redirect: "manual",
+    headers: {
+      "user-agent": "HIU-YHCT-release-smoke/1.0",
+      ...(method === "POST" ? { "content-type": "application/json" } : {}),
+    },
+    ...(method === "POST" ? { body: JSON.stringify({}) } : {}),
+  });
+  const body = await response.json().catch(() => ({}));
+  if (response.status !== 401 || body.authorized !== false) {
+    throw new Error(`Anonymous CP23 shadow endpoint must return 401/authorized=false: ${path} got ${response.status}`);
+  }
+  console.log(`PASS CP23 shadow endpoint denied anonymous ${method} ${path}`);
+}
+
 const home = await fetch(new URL("/", base), { redirect: "follow" });
 const requiredHeaders = [
   ["x-content-type-options", "nosniff"],
@@ -168,4 +189,4 @@ const robotsText = await robots.text();
 if (!robots.ok || !robotsText.includes("Allow: /")) throw new Error("robots.txt does not allow social crawlers.");
 console.log("PASS Zalo/social Open Graph preview metadata, summary and image.");
 
-console.log('PASS CP22 Digital Campus, server-protected Admin/Mod routes, Zalo link preview, existing Hub destinations, PWA and offline worker.');
+console.log('PASS CP23 Digital Campus, server-protected Admin/Mod routes, shadow backend denial, Zalo link preview, existing Hub destinations, PWA and offline worker.');

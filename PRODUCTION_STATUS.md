@@ -35,6 +35,13 @@
 - Preview image uses the public 512×512 PNG icon with a versioned query string to reduce stale image-cache reuse.
 - `robots.txt` allows link-preview crawlers.
 
+## CP23 shadow backend
+- Additive Supabase storage exists for Hub drafts, moderation queue and audit log.
+- RLS is enabled and privileged writes are exposed only through role-checked RPCs.
+- Hidden Cloudflare staff APIs proxy verified Admin/Mod sessions to those RPCs.
+- The visible Admin/Mod UI still uses the existing browser-local source during CP23; no public Hub or graphical behavior is changed.
+- Stage 2 cutover is blocked until CP23 production smoke is complete.
+
 ## Production release gates
 1. Repository boundary, release metadata and Hub registry validation.
 2. Map asset, PWA manifest/icons, Community contract and learning-progress validation.
