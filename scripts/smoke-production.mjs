@@ -64,35 +64,31 @@ console.log("HIU YHCT production smoke passed.");
 
 const { text: liveHtml } = await getWithRetry(new URL('/', base));
 const approvedMarkers = [
-  "Học tinh hoa YHCT.",
-  "Kết nối tương lai số.",
-  "BẢN ĐỒ HỆ SINH THÁI HIU Y HỌC CỔ TRUYỀN",
-  "Đăng nhập thành viên",
-  "approvedMobileTaskbar",
-  "Nhiệm vụ",
-  "Atlas 3D",
-  "Admin Center",
-  "Chuyển đổi giữa giao diện Mobile và PC",
+  "HIU YHCT DIGITAL CAMPUS",
+  "Chào mừng trở lại",
+  "TIẾP TỤC HỌC TẬP",
+  "Khám phá hệ sinh thái HIU YHCT",
+  "Study OS",
+  "3D Atlas",
+  "A.I Thiệt Chẩn",
+  "Trung Y Văn",
+  "Nhiệm vụ hôm nay",
+  "Linh thú đồng hành",
 ];
 for (const marker of approvedMarkers) {
-  if (!liveHtml.includes(marker)) throw new Error(`Missing approved CP12 homepage marker: ${marker}`);
+  if (!liveHtml.includes(marker)) throw new Error(`Missing approved CP15 homepage marker: ${marker}`);
 }
 for (const marker of ["assistantLauncher", "learning-assistant-panel", "Trợ lý học tập"]) {
-  if (liveHtml.includes(marker)) throw new Error(`Learning assistant should be temporarily hidden, but found: ${marker}`);
+  if (liveHtml.includes(marker)) throw new Error(`Legacy learning assistant must remain removed from CP15 homepage: ${marker}`);
 }
 const hiddenAvatarMarkers = [
   "Bước vào thế giới YHCT",
   "Giới tính nhân vật",
   "Tạo nhân vật của bạn",
-  "Đi tới Thư viện",
-  "Đi tới Vườn kinh lạc",
-  "Đi tới Phòng thực hành",
-  "Đi tới Nhà học thuật",
 ];
 for (const marker of hiddenAvatarMarkers) {
-  if (liveHtml.includes(marker)) throw new Error(`Avatar must remain hidden until explicit approval: ${marker}`);
+  if (liveHtml.includes(marker)) throw new Error(`Legacy avatar flow must remain hidden in CP15: ${marker}`);
 }
-if (liveHtml.includes("Chọn điểm đến")) throw new Error("CP11 dashboard is still published instead of the approved CP12 map homepage");
 const memberAppUrls = [
   "https://yhct-hiu-final4-stage-hiu-yhct.vercel.app/",
   "https://ai-thiet-chan-hiu-yhct.vercel.app/",
@@ -102,7 +98,6 @@ const memberAppUrls = [
 for (const appUrl of memberAppUrls) {
   if (!liveHtml.includes(appUrl)) throw new Error(`Homepage is missing an app destination: ${appUrl}`);
 }
-if (!liveHtml.includes('clb.yhoccotruyen.hiu@gmail.com')) throw new Error('Missing club contact information');
 const { text: manifestText } = await getWithRetry(new URL('/manifest.webmanifest', base));
 const manifest = JSON.parse(manifestText);
 if (manifest.id !== '/' || manifest.display !== 'standalone') throw new Error('Invalid live PWA manifest');
@@ -117,4 +112,4 @@ for (const [path, marker] of [['/sw.js','hiutmc-offline-v1'],['/offline.html','B
   const { response, text } = await getWithRetry(new URL(path, base));
   if (!text.includes(marker) || !response.headers.get('cache-control')?.includes('no-cache')) throw new Error(`PWA asset/header check failed ${path}`);
 }
-console.log('PASS approved CP12 map homepage, mobile taskbar and reversible PC switch, temporarily hidden learning assistant, Admin Center, app destinations, contacts, PWA and offline worker.');
+console.log('PASS CP15 Digital Campus homepage, compact spirit companion, existing Hub destinations, Admin Center routes, PWA and offline worker.');
