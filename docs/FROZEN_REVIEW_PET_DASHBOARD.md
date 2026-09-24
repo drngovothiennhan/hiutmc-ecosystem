@@ -17,7 +17,7 @@ Các mục sau mới chỉ được phép hiển thị ở trạng thái khóa h
 - XP/thân mật riêng của linh thú.
 - Cho ăn/chăm sóc bằng vật phẩm.
 - Quà thưởng có giá trị.
-- Tiến hóa theo cấp.
+- Tiến hóa thật theo cấp/backend. Riêng Chu Tước được phép có **preview artwork 4 bậc** để thẩm định; preview không thay đổi cấp thật.
 - Đồng bộ pet với tài khoản thành viên.
 - Notification server/push.
 - Marketplace/vật phẩm/gacha bổ sung.
@@ -27,6 +27,8 @@ Các mục sau mới chỉ được phép hiển thị ở trạng thái khóa h
 - Nhận ngẫu nhiên đúng một linh thú trên thiết bị lần đầu.
 - Lưu loài pet bằng localStorage.
 - Idle animation khác nhau theo loài.
+- Chu Tước dùng SVG riêng: Ấu Điểu → Hỏa Vũ Điểu → Phượng Hoàng Linh → Chu Tước Thánh Điểu.
+- Cho phép xem trước 4 artwork Chu Tước trong panel, không ghi level/progress.
 - Đọc tiến độ nhiệm vụ cục bộ đã tồn tại.
 - Hiển thị số nhiệm vụ còn lại và gợi ý nhiệm vụ kế tiếp.
 - Điều hướng sang Nhiệm vụ/Cộng đồng.
