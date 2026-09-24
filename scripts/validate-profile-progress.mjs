@@ -37,6 +37,13 @@ for(const marker of [
 }
 
 for(const marker of [
+  ".hero h1 span",
+  "white-space:nowrap",
+]){
+  if(!dashboard.includes(marker))errors.push(`hero member-name nowrap missing: ${marker}`);
+}
+
+for(const marker of [
   'html:not([data-display-mode="pc"])',
   '.topActions :global(.displayModeToggle)',
   'display:none!important',
