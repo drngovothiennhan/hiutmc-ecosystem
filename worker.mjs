@@ -160,7 +160,7 @@ async function protectedAsset(request, env, requiredRole) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const pathname = url.pathname.length > 1 ? url.pathname.replace(/\\/+$/, "") : url.pathname;
+    const pathname = url.pathname.length > 1 ? url.pathname.replace(/\/+$/, "") : url.pathname;
 
     if (pathname === "/api/staff/session") {
       if (request.method === "DELETE") {
