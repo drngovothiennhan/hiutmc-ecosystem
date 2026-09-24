@@ -160,8 +160,9 @@ async function protectedAsset(request, env, requiredRole) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const pathname = url.pathname.length > 1 ? url.pathname.replace(/\\/+$/, "") : url.pathname;
 
-    if (url.pathname === "/api/staff/session") {
+    if (pathname === "/api/staff/session") {
       if (request.method === "DELETE") {
         return json({ ok: true }, 200, { "set-cookie": clearStaffCookie() });
       }
@@ -175,7 +176,7 @@ export default {
       return json(access, 200, { "set-cookie": staffCookie(token) });
     }
 
-    if (url.pathname === "/api/staff/access") {
+    if (pathname === "/api/staff/access") {
       if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
       const token = bearer(request) || readCookie(request, COOKIE_NAME);
       const access = await validateStaff(token);
@@ -183,7 +184,7 @@ export default {
     }
 
 
-    if (url.pathname === "/api/staff/shadow/snapshot") {
+    if (pathname === "/api/staff/shadow/snapshot") {
       if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
       const gate = await shadowStaffAccess(request, "mod");
       if (!gate.ok) return gate.response;
@@ -191,7 +192,7 @@ export default {
       return json({ shadow: "cp23", data: payload }, response.ok ? 200 : response.status);
     }
 
-    if (url.pathname === "/api/staff/shadow/hub-draft") {
+    if (pathname === "/api/staff/shadow/hub-draft") {
       if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
       if (!sameOriginMutation(request)) return json({ error: "Invalid origin" }, 403);
       const gate = await shadowStaffAccess(request, "admin");
@@ -206,7 +207,7 @@ export default {
       return json({ shadow: "cp23", data: payload }, response.ok ? 200 : response.status);
     }
 
-    if (url.pathname === "/api/staff/shadow/moderation") {
+    if (pathname === "/api/staff/shadow/moderation") {
       if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
       if (!sameOriginMutation(request)) return json({ error: "Invalid origin" }, 403);
       const gate = await shadowStaffAccess(request, "mod");
@@ -234,11 +235,11 @@ export default {
       return json({ error: "Unknown moderation action" }, 400);
     }
 
-    if (url.pathname === "/admin" || url.pathname === "/admin/") {
+    if (pathname === "/admin") {
       return protectedAsset(request, env, "admin");
     }
 
-    if (url.pathname === "/mod" || url.pathname === "/mod/") {
+    if (pathname === "/mod") {
       return protectedAsset(request, env, "mod");
     }
 
