@@ -123,8 +123,7 @@ jobs:
             2>&1 | tee /tmp/agent-ai-proxy.log
           popd >/dev/null
 
-          PROXY_URL="$(grep -Eo 'https://[^[:space:]]+\.workers\.dev' /tmp/agent-ai-proxy.log | tail -n 1 || true)"
-          test -n "$PROXY_URL" || (echo "::error::Unable to determine AI proxy URL" && exit 1)
+          PROXY_URL="https://agent-ai.hiutmc.com"
           echo "CF_AI_PROXY_URL=$PROXY_URL" >> "$GITHUB_ENV"
 
       - name: Protect AI proxy
@@ -139,7 +138,15 @@ jobs:
         if: steps.latest.outputs.skip != 'true'
         shell: bash
         run: |
-          curl --fail --silent --show-error --max-time 20 "$CF_AI_PROXY_URL/health" >/dev/null
+          HEALTH_OK=0
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            if curl --fail --silent --show-error --max-time 20 "$CF_AI_PROXY_URL/health" >/dev/null; then
+              HEALTH_OK=1
+              break
+            fi
+            sleep 3
+          done
+          test "$HEALTH_OK" = "1" || (echo "::error::Workers AI proxy health did not become ready" && exit 1)
 
           OK=0
           for i in 1 2 3 4 5 6 7 8 9 10; do
