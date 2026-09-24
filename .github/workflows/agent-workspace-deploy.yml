@@ -1,0 +1,223 @@
+name: Deploy AI Agent Workspace
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/agent-workspace-deploy.yml"
+      - "deploy/agent-workspace/ai-proxy/worker.mjs"
+      - "deploy/agent-workspace/ai-proxy/wrangler.jsonc"
+  schedule:
+    - cron: "7,22,37,52 * * * *"
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: agent-workspace-cloudflare-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      BRIDGE_BASE: https://gzmpnsrwqjpsbklyflqr.supabase.co/functions/v1/agent-artifact-bridge
+      SUPABASE_PUBLISHABLE_KEY: sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG
+
+    steps:
+      - name: Checkout deployment host
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Require existing Cloudflare credentials
+        shell: bash
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || (echo "::error::Missing CLOUDFLARE_API_TOKEN" && exit 1)
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo "::error::Missing CLOUDFLARE_ACCOUNT_ID" && exit 1)
+
+      - name: Request GitHub OIDC token
+        uses: actions/github-script@v7
+        id: oidc
+        with:
+          script: |
+            const token = await core.getIDToken('agent-artifact-bridge');
+            core.setSecret(token);
+            core.setOutput('token', token);
+
+      - name: Resolve latest private build
+        id: latest
+        env:
+          OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
+        shell: bash
+        run: |
+          LATEST="$(curl --fail --silent --show-error --max-time 30 \
+            "$BRIDGE_BASE/latest" \
+            -H "Authorization: Bearer $OIDC_TOKEN" \
+            -H "apikey: $SUPABASE_PUBLISHABLE_KEY")"
+
+          SOURCE_SHA="$(node -e '
+            const v = JSON.parse(process.argv[1]);
+            if (!/^[a-f0-9]{40}$/i.test(v.sha || "")) process.exit(2);
+            process.stdout.write(v.sha);
+          ' "$LATEST")"
+
+          echo "source_sha=$SOURCE_SHA" >> "$GITHUB_OUTPUT"
+
+          if [ -f deploy/agent-workspace/LAST_DEPLOYED ] &&
+             [ "$(tr -d '\r\n' < deploy/agent-workspace/LAST_DEPLOYED)" = "$SOURCE_SHA" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Source $SOURCE_SHA is already deployed."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download private build artifact
+        if: steps.latest.outputs.skip != 'true'
+        env:
+          OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
+          SOURCE_SHA: ${{ steps.latest.outputs.source_sha }}
+        shell: bash
+        run: |
+          curl --fail --silent --show-error --max-time 150 \
+            "$BRIDGE_BASE/download?sha=$SOURCE_SHA" \
+            -H "Authorization: Bearer $OIDC_TOKEN" \
+            -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+            -o /tmp/agent-workspace.zip
+
+          rm -rf /tmp/agent-dist
+          mkdir -p /tmp/agent-dist
+          unzip -q /tmp/agent-workspace.zip -d /tmp/agent-dist
+
+          test -f /tmp/agent-dist/server/wrangler.json
+          test -d /tmp/agent-dist/client
+          test -f /tmp/agent-dist/DEPLOYMENT.json
+
+      - name: Generate deployment-scoped runtime secrets
+        if: steps.latest.outputs.skip != 'true'
+        shell: bash
+        run: |
+          echo "AI_PROXY_TOKEN=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+          echo "AI_GATEWAY_INTERNAL_TOKEN=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+
+      - name: Deploy native Workers AI proxy
+        if: steps.latest.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -o pipefail
+          npx --yes wrangler@4.137.0 deploy \
+            --config deploy/agent-workspace/ai-proxy/wrangler.jsonc \
+            2>&1 | tee /tmp/agent-ai-proxy.log
+
+          PROXY_URL="$(grep -Eo 'https://[^[:space:]]+\.workers\.dev' /tmp/agent-ai-proxy.log | tail -n 1 || true)"
+          test -n "$PROXY_URL" || (echo "::error::Unable to determine AI proxy URL" && exit 1)
+          echo "CF_AI_PROXY_URL=$PROXY_URL" >> "$GITHUB_ENV"
+
+      - name: Protect AI proxy
+        if: steps.latest.outputs.skip != 'true'
+        shell: bash
+        run: |
+          printf %s "$AI_PROXY_TOKEN" | npx --yes wrangler@4.137.0 secret put AI_PROXY_TOKEN \
+            --config deploy/agent-workspace/ai-proxy/wrangler.jsonc
+
+      - name: Smoke Workers AI proxy
+        if: steps.latest.outputs.skip != 'true'
+        shell: bash
+        run: |
+          curl --fail --silent --show-error --max-time 20 "$CF_AI_PROXY_URL/health" >/dev/null
+
+          PROXY_RESPONSE="$(curl --fail --silent --show-error --max-time 45 \
+            -X POST "$CF_AI_PROXY_URL/run" \
+            -H "content-type: application/json" \
+            -H "x-ai-proxy-token: $AI_PROXY_TOKEN" \
+            --data '{"model":"@cf/zai-org/glm-4.7-flash","prompt":"Reply with exactly AI_PROXY_OK and nothing else.","max_tokens":64}')"
+
+          node -e '
+            const payload = JSON.parse(process.argv[1]);
+            if (payload.ok !== true) process.exit(1);
+            if (typeof payload.response !== "string" || !payload.response.includes("AI_PROXY_OK")) process.exit(2);
+          ' "$PROXY_RESPONSE"
+
+      - name: Deploy private app bundle
+        if: steps.latest.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -o pipefail
+          npx --yes wrangler@4.137.0 deploy \
+            --config /tmp/agent-dist/server/wrangler.json \
+            2>&1 | tee /tmp/agent-app.log
+
+          APP_URL="$(grep -Eo 'https://[^[:space:]]+\.workers\.dev' /tmp/agent-app.log | tail -n 1 || true)"
+          test -n "$APP_URL" || (echo "::error::Unable to determine app URL" && exit 1)
+          echo "AGENT_APP_URL=$APP_URL" >> "$GITHUB_ENV"
+
+      - name: Inject app runtime secrets
+        if: steps.latest.outputs.skip != 'true'
+        shell: bash
+        run: |
+          node <<'NODE' | npx --yes wrangler@4.137.0 secret bulk --config /tmp/agent-dist/server/wrangler.json
+          process.stdout.write(JSON.stringify({
+            CF_AI_PROXY_URL: process.env.CF_AI_PROXY_URL,
+            CF_AI_PROXY_TOKEN: process.env.AI_PROXY_TOKEN,
+            AI_GATEWAY_INTERNAL_TOKEN: process.env.AI_GATEWAY_INTERNAL_TOKEN,
+          }));
+          NODE
+
+      - name: Smoke Agent production
+        if: steps.latest.outputs.skip != 'true'
+        shell: bash
+        run: |
+          READY=0
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            if curl --fail --silent --max-time 20 "$AGENT_APP_URL/api/health" >/dev/null; then
+              STATUS="$(curl --fail --silent --show-error --max-time 20 "$AGENT_APP_URL/api/runtime/status" || true)"
+              if node -e '
+                const status = JSON.parse(process.argv[1] || "{}");
+                if (status.runtimeCore !== "ready") process.exit(1);
+                if (status.provider !== "configured") process.exit(2);
+                if (status.worker !== "user_scoped") process.exit(3);
+              ' "$STATUS"; then
+                READY=1
+                break
+              fi
+            fi
+            sleep 3
+          done
+
+          test "$READY" = "1" || (echo "::error::Agent runtime did not become ready" && exit 1)
+
+          AI_RESPONSE="$(curl --fail --silent --show-error --max-time 45 \
+            -X POST "$AGENT_APP_URL/api/ai/generate" \
+            -H "content-type: application/json" \
+            -H "x-agent-internal-token: $AI_GATEWAY_INTERNAL_TOKEN" \
+            --data '{"provider":"cloudflare","input":"Reply with exactly M3B_AI_OK and nothing else."}')"
+
+          node -e '
+            const payload = JSON.parse(process.argv[1]);
+            if (payload.provider !== "cloudflare") process.exit(1);
+            if (typeof payload.text !== "string" || !payload.text.includes("M3B_AI_OK")) process.exit(2);
+          ' "$AI_RESPONSE"
+
+          echo "Agent production ready at $AGENT_APP_URL"
+
+      - name: Record deployed source checkpoint
+        if: steps.latest.outputs.skip != 'true'
+        env:
+          SOURCE_SHA: ${{ steps.latest.outputs.source_sha }}
+        shell: bash
+        run: |
+          printf '%s\n' "$SOURCE_SHA" > deploy/agent-workspace/LAST_DEPLOYED
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add deploy/agent-workspace/LAST_DEPLOYED
+          git commit -m "chore(agent): record deployed checkpoint $SOURCE_SHA"
+          git push origin HEAD:main

@@ -1,0 +1,10 @@
+{
+  "name": "ai-agent-workspace-ai",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-09-24",
+  "workers_dev": true,
+  "preview_urls": true,
+  "ai": {
+    "binding": "AI"
+  }
+}
