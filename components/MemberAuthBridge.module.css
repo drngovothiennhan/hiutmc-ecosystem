@@ -15,7 +15,7 @@
 .displayModeSetting>span{display:grid;gap:2px;min-width:0}
 .displayModeSetting strong{color:#34464f;font-size:10px}
 .displayModeSetting small{color:#81776d;font-size:8.5px;line-height:1.35}
-.profileModeButton{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;z-index:auto!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto;min-width:116px!important;min-height:40px!important;margin:0!important;padding:0 12px!important}
+.profileModeButton{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;z-index:auto!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto;min-width:116px!important;min-height:40px!important;margin:0!important;padding:0 12px!important;line-height:1!important;text-align:center!important}
 .syncState{display:grid;gap:3px;margin-top:10px;padding:10px 11px;border:1px solid #d8e2d8;border-radius:12px;background:#f7fbf5}
 .syncState strong{color:#315846;font-size:10px}
 .syncState small{color:#68736d;font-size:8.5px;line-height:1.4}
