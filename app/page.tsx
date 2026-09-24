@@ -88,7 +88,7 @@ function HomeContent() {
 
         <section id="top" className={styles.hero}>
           <small>HIU YHCT DIGITAL CAMPUS</small>
-          <h1>Chào mừng trở lại, <span>người học YHCT!</span></h1>
+          <h1>{member ? <>Chào mừng trở lại, <span>{member.fullName}!</span></> : <>Chào mừng đến <span>HIU YHCT!</span></>}</h1>
           <p>Một điểm vào thống nhất cho học tập, Atlas 3D, AI, Trung Y Văn và hoạt động học thuật của cộng đồng HIU.</p>
           <div className={styles.heroMark}>Dưỡng Tâm<br />Học Thuật<br />Hành Y Đạo</div>
         </section>

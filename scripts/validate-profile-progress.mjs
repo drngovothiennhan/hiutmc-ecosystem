@@ -5,6 +5,7 @@ const auth=fs.readFileSync("components/MemberAuthBridge.tsx","utf8");
 const authCss=fs.readFileSync("components/MemberAuthBridge.module.css","utf8");
 const page=fs.readFileSync("app/page.tsx","utf8");
 const dashboard=fs.readFileSync("app/dashboard.module.css","utf8");
+const globals=fs.readFileSync("app/globals.css","utf8");
 const errors=[];
 
 for(const marker of [
@@ -52,12 +53,26 @@ for(const marker of [
   "Streak",
   "todayQuestions",
   "ringStyle",
+  "member.fullName",
 ]){
   if(!page.includes(marker))errors.push(`homepage progress state missing: ${marker}`);
 }
 
 if(page.includes("<strong>Chưa đồng bộ</strong>")){
   errors.push("homepage still contains the old hard-coded Chưa đồng bộ state");
+}
+
+if(page.includes("người học YHCT")){
+  errors.push("homepage still contains generic người học YHCT instead of the synced member name");
+}
+
+for(const marker of [
+  "button.displayModeToggle",
+  "align-items:center",
+  "justify-content:center",
+  "line-height:1!important",
+]){
+  if(!globals.includes(marker))errors.push(`global display-mode alignment missing: ${marker}`);
 }
 
 if(errors.length){

@@ -259,3 +259,7 @@ html[data-display-mode="pc"] .approvedMobileTaskbar{display:none}
   .approvedMobileTaskbar small{font-size:9px}
 }
 @media(prefers-reduced-motion:reduce){.approvedHeroActions a,.heritageCommunity .communityActionGrid>a{transition:none!important}}
+
+
+/* CP26: keep the Mobile/PC label optically centered in every surface. */
+button.displayModeToggle{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;line-height:1!important;text-align:center;vertical-align:middle}

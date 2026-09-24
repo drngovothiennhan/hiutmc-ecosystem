@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260924-11",
+  "release": "HIU-YHCT-ECOSYSTEM-20260924-12",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP25",
-  "base_checkpoint_sha": "2c0cf06bbef4d1e3e3529c47514c5043d6b9008d",
+  "checkpoint": "CP26",
+  "base_checkpoint_sha": "236120938778d995ce13315a8d2acfd026867aa4",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP25 is the stability checkpoint before Stage 2. It moves the Mobile/PC switch into the member/login profile dialog on mobile, synchronizes display-mode controls, and replaces the hard-coded learning-progress placeholder with authenticated Study OS progress from learning-sync. Study OS source e644c7d5c26df7f2248bf876aa877b96110969af fixes the learning-sync gzip backpressure deadlock that produced HTTP 546 resource-limit failures; Supabase learning-sync v2 is ACTIVE. No Admin/Mod Stage 2 cutover or approved visual redesign is included. CI, release-candidate CI, Cloudflare deployment and production smoke remain mandatory."
+  "verification": "CP26 is a narrow UI/data-identity hotfix on top of CP25. The homepage greeting now renders the authenticated member full_name already sourced from the same canonical club_members profile used by Study OS, removing the generic 'người học YHCT' label after login. The Mobile/PC toggle label is vertically and horizontally centered consistently in the top bar and member/profile dialog. No approved colors, cards, fonts, imagery, Hub routing, auth policy, learning-sync contract, Admin/Mod backend, or visual architecture are changed. CI, Cloudflare deployment and production smoke remain mandatory."
 }
