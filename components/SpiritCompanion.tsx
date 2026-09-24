@@ -7,6 +7,7 @@ import {
   selectMissionsForDay,
   type LearningProgress,
 } from "@/data/learning-progress";
+import ChuTuocMascot, { chuTuocStageFromLevel, chuTuocStages, type ChuTuocStage } from "./ChuTuocMascot";
 import styles from "./SpiritCompanion.module.css";
 
 type PetKind = "dragon" | "phoenix" | "sphinx" | "qilin" | "peacock" | "fox";
@@ -42,7 +43,7 @@ function readLocalProgress(): LearningProgress {
   }
 }
 
-function PetArt({ pet }: { pet: PetSpecies }) {
+function GenericPetArt({ pet }: { pet: PetSpecies }) {
   return (
     <svg viewBox="0 0 96 96" role="img" aria-label={pet.name} className={styles.petSvg}>
       <defs>
@@ -94,12 +95,22 @@ function PetArt({ pet }: { pet: PetSpecies }) {
   );
 }
 
+function PetArtwork({ pet, stage, compact = false }: { pet: PetSpecies; stage?: ChuTuocStage; compact?: boolean }) {
+  if (pet.kind === "phoenix") {
+    return <ChuTuocMascot stage={stage} compact={compact} />;
+  }
+  return <GenericPetArt pet={pet} />;
+}
+
 export default function SpiritCompanion() {
   const [pet, setPet] = useState<PetSpecies | null>(null);
   const [open, setOpen] = useState(false);
   const [isNew, setIsNew] = useState(false);
   const [progress, setProgress] = useState<LearningProgress>({ completions: [] });
   const [dayKey, setDayKey] = useState("");
+  const [showEvolution, setShowEvolution] = useState(false);
+  const [previewStage, setPreviewStage] = useState<ChuTuocStage | null>(null);
+  const petLevel = 1;
 
   useEffect(() => {
     setDayKey(localDayKey(new Date()));
@@ -153,6 +164,9 @@ export default function SpiritCompanion() {
 
   const theme = { "--pet-a": pet.primary, "--pet-b": pet.secondary } as CSSProperties;
   const badgeText = dayKey ? String(remaining) : "…";
+  const actualChuTuocStage = chuTuocStageFromLevel(petLevel);
+  const renderedChuTuocStage = previewStage ?? actualChuTuocStage;
+  const chuTuocStageMeta = chuTuocStages[renderedChuTuocStage - 1];
 
   return (
     <aside className={styles.wrap} style={theme} aria-label="Linh thú đồng hành">
@@ -160,11 +174,11 @@ export default function SpiritCompanion() {
         <section className={styles.panel}>
           <button className={styles.close} onClick={() => setOpen(false)} type="button" aria-label="Đóng">×</button>
           <div className={styles.panelTop}>
-            <div className={styles.avatarSmall}><PetArt pet={pet} /></div>
+            <div className={styles.avatarSmall}><PetArtwork pet={pet} stage={pet.kind === "phoenix" ? renderedChuTuocStage : undefined} /></div>
             <div>
               <small>Linh thú đồng hành · Preview</small>
               <strong>{pet.name}</strong>
-              <span>{pet.title}</span>
+              <span>{pet.kind === "phoenix" ? `Lv.${petLevel} · ${chuTuocStageMeta.name}` : pet.title}</span>
             </div>
           </div>
           <p>{message}</p>
@@ -177,14 +191,50 @@ export default function SpiritCompanion() {
           <div className={styles.actions}>
             <a href="#missions" onClick={() => setOpen(false)}><span>✓</span>Nhiệm vụ</a>
             <a href="/community/" onClick={() => setOpen(false)}><span>🔔</span>Cộng đồng</a>
-            <button type="button" disabled title="Đóng băng chờ thẩm định"><span>🔒</span>Tiến hóa</button>
+            <button
+              type="button"
+              disabled={pet.kind !== "phoenix"}
+              aria-pressed={showEvolution}
+              onClick={() => {
+                if (pet.kind !== "phoenix") return;
+                setShowEvolution((value) => !value);
+                setPreviewStage(null);
+              }}
+              title={pet.kind === "phoenix" ? "Xem trước 4 hình thái Chu Tước" : "Chưa thiết kế riêng cho linh thú này"}
+            ><span>✦</span>Xem tiến hóa</button>
           </div>
-          <small className={styles.note}>Dữ liệu nhiệm vụ chỉ đọc từ tiến độ cục bộ hiện có. Quà, thân mật, tiến hóa và đồng bộ tài khoản vẫn FROZEN/REVIEW.</small>
+
+          {pet.kind === "phoenix" && showEvolution && (
+            <section className={styles.evolutionPreview} aria-label="Xem trước tiến hóa Chu Tước">
+              <div className={styles.evolutionHeader}>
+                <strong>Tiến hóa Chu Tước</strong>
+                <small>Chỉ xem trước artwork · không thay đổi cấp thật</small>
+              </div>
+              <div className={styles.evolutionStages}>
+                {chuTuocStages.map((item) => (
+                  <button
+                    key={item.stage}
+                    type="button"
+                    className={renderedChuTuocStage === item.stage ? styles.stageActive : ""}
+                    onClick={() => setPreviewStage(item.stage)}
+                    aria-pressed={renderedChuTuocStage === item.stage}
+                  >
+                    <span className={styles.stageThumb}><ChuTuocMascot stage={item.stage} compact /></span>
+                    <b>Bậc {item.stage}</b>
+                    <small>{item.short}</small>
+                    <em>Lv.{item.min}–{item.max}</em>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <small className={styles.note}>Chu Tước đã dùng artwork SVG riêng theo 4 giai đoạn. Preview tiến hóa chỉ phục vụ thẩm định; cấp, thân mật, vật phẩm và đồng bộ tài khoản vẫn FROZEN/REVIEW.</small>
         </section>
       )}
       <button type="button" className={styles.launcher} onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-label={"Mở linh thú " + pet.name}>
         <span className={styles.bubble}>{remaining === 0 ? "Hoàn thành hôm nay!" : remaining + " việc đang chờ"}</span>
-        <span className={styles.petStage + " " + styles[pet.motion]}><PetArt pet={pet} /></span>
+        <span className={styles.petStage + " " + styles[pet.motion]}><PetArtwork pet={pet} stage={pet.kind === "phoenix" ? actualChuTuocStage : undefined} compact /></span>
         <span className={styles.level}>BẠN ĐỒNG HÀNH</span>
         <i className={styles.dot}>{badgeText}</i>
       </button>
