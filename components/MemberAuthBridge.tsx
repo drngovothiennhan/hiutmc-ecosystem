@@ -8,13 +8,27 @@ const SUPABASE_KEY = "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG";
 const STORAGE_KEY = "hiutmc-member-session-v1";
 const BRIDGE_FLAG = "ecosystem_sso";
 
-type Member = {
+export type Member = {
   id: string;
   studentCode?: string;
   fullName: string;
   role: string;
   title: string;
   avatarUrl?: string;
+};
+
+export type StaffAccess = {
+  authorized: boolean;
+  role?: string;
+  canAdmin?: boolean;
+  canModerate?: boolean;
+  member?: {
+    id?: string;
+    fullName?: string;
+    studentCode?: string;
+    title?: string;
+  };
+  reason?: string;
 };
 
 type StoredSession = {
@@ -26,10 +40,12 @@ type StoredSession = {
 
 type AuthContextValue = {
   member: Member | null;
+  staffAccess: StaffAccess | null;
   ready: boolean;
-  login: (studentCode: string, password: string) => Promise<void>;
+  login: (studentCode: string, password: string) => Promise<StaffAccess | null>;
   logout: () => Promise<void>;
   openStudyOs: (url: string) => Promise<void>;
+  openStaffConsole: () => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -107,9 +123,29 @@ async function fetchMember(accessToken: string): Promise<Member> {
   return mapMember(row);
 }
 
+async function syncStaffSession(accessToken: string): Promise<StaffAccess | null> {
+  try {
+    const response = await fetch("/api/staff/session", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    });
+    const body = (await response.json().catch(() => null)) as StaffAccess | null;
+    return body;
+  } catch {
+    return null;
+  }
+}
+
+async function clearStaffSession() {
+  try {
+    await fetch("/api/staff/session", { method: "DELETE", cache: "no-store", keepalive: true });
+  } catch {}
+}
+
 async function refreshSession(current: StoredSession): Promise<StoredSession> {
-  let accessToken=current.accessToken;
-  let refreshToken=current.refreshToken;
+  let accessToken = current.accessToken;
+  let refreshToken = current.refreshToken;
   if (current.expiresAt - Date.now() <= 90_000) {
     const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
       method: "POST",
@@ -118,10 +154,10 @@ async function refreshSession(current: StoredSession): Promise<StoredSession> {
     });
     const body = (await response.json().catch(() => ({}))) as Record<string, unknown>;
     if (!response.ok) throw new Error("Phiên đăng nhập đã hết hạn.");
-    accessToken=String(body.access_token || "");
-    refreshToken=String(body.refresh_token || current.refreshToken);
+    accessToken = String(body.access_token || "");
+    refreshToken = String(body.refresh_token || current.refreshToken);
   }
-  if(!accessToken)throw new Error("Phiên đăng nhập không hợp lệ.");
+  if (!accessToken) throw new Error("Phiên đăng nhập không hợp lệ.");
   const member = await fetchMember(accessToken);
   const next = { accessToken, refreshToken, expiresAt: tokenExpiry(accessToken), member };
   saveStored(next);
@@ -167,6 +203,7 @@ async function consumeIncomingBridge(): Promise<StoredSession | null> {
 
 export function MemberAuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<StoredSession | null>(null);
+  const [staffAccess, setStaffAccess] = useState<StaffAccess | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -175,16 +212,31 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       try {
         const bridged = await consumeIncomingBridge();
         if (bridged) {
-          if (live) setSession(bridged);
+          const access = await syncStaffSession(bridged.accessToken);
+          if (live) {
+            setSession(bridged);
+            setStaffAccess(access?.authorized ? access : null);
+          }
           return;
         }
         const cached = readStored();
-        if (!cached) return;
+        if (!cached) {
+          await clearStaffSession();
+          return;
+        }
         const refreshed = await refreshSession(cached);
-        if (live) setSession(refreshed);
+        const access = await syncStaffSession(refreshed.accessToken);
+        if (live) {
+          setSession(refreshed);
+          setStaffAccess(access?.authorized ? access : null);
+        }
       } catch {
         saveStored(null);
-        if (live) setSession(null);
+        await clearStaffSession();
+        if (live) {
+          setSession(null);
+          setStaffAccess(null);
+        }
       } finally {
         if (live) setReady(true);
       }
@@ -194,15 +246,21 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AuthContextValue>(() => ({
     member: session?.member ?? null,
+    staffAccess,
     ready,
     login: async (studentCode, password) => {
       const next = await loginMember(studentCode, password);
+      const access = await syncStaffSession(next.accessToken);
       setSession(next);
+      setStaffAccess(access?.authorized ? access : null);
+      return access;
     },
     logout: async () => {
       const accessToken = session?.accessToken;
       saveStored(null);
       setSession(null);
+      setStaffAccess(null);
+      await clearStaffSession();
       if (accessToken) {
         void fetch(`${SUPABASE_URL}/auth/v1/logout?scope=local`, {
           method: "POST",
@@ -221,7 +279,9 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       }
       try {
         const fresh = await refreshSession(session);
+        const access = await syncStaffSession(fresh.accessToken);
         setSession(fresh);
+        setStaffAccess(access?.authorized ? access : null);
         const fragment = new URLSearchParams({
           [BRIDGE_FLAG]: "1",
           access_token: fresh.accessToken,
@@ -231,11 +291,17 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
         window.location.assign(target.toString());
       } catch {
         saveStored(null);
+        await clearStaffSession();
         setSession(null);
+        setStaffAccess(null);
         window.location.assign(target.toString());
       }
     },
-  }), [ready, session]);
+    openStaffConsole: () => {
+      if (!staffAccess?.authorized) return;
+      window.location.assign(staffAccess.canAdmin ? "/admin/" : "/mod/");
+    },
+  }), [ready, session, staffAccess]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
@@ -266,7 +332,7 @@ export function StudyOsLink({
 }
 
 export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
-  const { member, ready, login, logout, openStudyOs } = useMemberAuth();
+  const { member, staffAccess, ready, login, logout, openStudyOs, openStaffConsole } = useMemberAuth();
   const [open, setOpen] = useState(false);
   const [studentCode, setStudentCode] = useState("");
   const [password, setPassword] = useState("");
@@ -279,9 +345,12 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
     setBusy(true);
     setError("");
     try {
-      await login(studentCode, password);
+      const access = await login(studentCode, password);
       setPassword("");
       setOpen(false);
+      if (access?.authorized) {
+        window.location.assign(access.canAdmin ? "/admin/" : "/mod/");
+      }
     } catch (cause) {
       setPassword("");
       setError(cause instanceof Error ? cause.message : "Không thể đăng nhập.");
@@ -291,10 +360,11 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
   };
 
   const initials = (member?.fullName || "HIU").split(/\s+/).filter(Boolean).slice(-2).map((part) => part[0]).join("").toUpperCase();
+  const staffLabel = staffAccess?.canAdmin ? "Admin Center" : "Mod Center";
 
   return <>
     <button className={styles.accountButton} type="button" onClick={() => setOpen(true)} aria-label={member ? `Tài khoản ${member.fullName}` : "Đăng nhập thành viên"}>
-      <i className={styles.avatar}>{member?.avatarUrl?<img src={member.avatarUrl} alt="" />:(initials || "HIU")}</i>
+      <i className={styles.avatar}>{member?.avatarUrl ? <img src={member.avatarUrl} alt="" /> : (initials || "HIU")}</i>
       <span>
         <strong>{member ? member.fullName : "Thành viên YHCT"}</strong>
         <small>{!ready ? "Đang kiểm tra phiên…" : member ? `${member.title} · Đã đồng bộ Study OS` : "Đăng nhập bằng tài khoản Study OS"}</small>
@@ -306,21 +376,22 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
         <button className={styles.close} type="button" onClick={() => setOpen(false)} aria-label="Đóng">×</button>
         {member ? <>
           <div className={styles.memberCard}>
-            <i className={styles.avatarLarge}>{member.avatarUrl?<img src={member.avatarUrl} alt="" />:initials}</i>
+            <i className={styles.avatarLarge}>{member.avatarUrl ? <img src={member.avatarUrl} alt="" /> : initials}</i>
             <span><small>THÀNH VIÊN ĐÃ ĐỒNG BỘ</small><strong>{member.fullName}</strong><em>{member.studentCode || "HIU YHCT"} · {member.title}</em></span>
           </div>
-          <p>Phiên đăng nhập trang chủ dùng cùng hệ tài khoản với Study OS. Khi mở Study OS từ đây, hệ thống chuyển phiên sang app và không yêu cầu nhập lại mật khẩu.</p>
+          <p>Phiên đăng nhập trang chủ dùng cùng hệ tài khoản với Study OS. Quyền Admin/Mod được xác minh lại tại máy chủ trước khi mở khu vực quản trị.</p>
+          {staffAccess?.authorized && <button className={styles.staff} type="button" onClick={openStaffConsole}>Mở {staffLabel} →</button>}
           <button className={styles.primary} type="button" onClick={() => void openStudyOs(studyOsUrl)}>Mở Study OS →</button>
           <button className={styles.secondary} type="button" onClick={() => void logout().then(() => setOpen(false))}>Đăng xuất</button>
         </> : <form onSubmit={submit}>
           <small className={styles.kicker}>HIU YHCT MEMBER SSO</small>
           <h2>Đăng nhập thành viên</h2>
-          <p>Dùng cùng MSSV và mật khẩu đang sử dụng tại Study OS.</p>
+          <p>Dùng cùng MSSV và mật khẩu đang sử dụng tại Study OS. Tài khoản Admin/Mod sẽ được máy chủ nhận diện và chuyển đúng khu vực sau khi xác thực.</p>
           <label>MSSV<input value={studentCode} onChange={(e) => setStudentCode(e.target.value)} autoComplete="username" inputMode="numeric" disabled={busy} /></label>
           <label>Mật khẩu<input value={password} onChange={(e) => { setPassword(e.target.value); if (error) setError(""); }} type="password" autoComplete="current-password" disabled={busy} /></label>
           {error && <div className={styles.error} role="alert">{error}</div>}
           <button className={styles.primary} type="submit" disabled={busy || !studentCode.trim() || !password}>{busy ? "Đang xác thực…" : "Đăng nhập"}</button>
-          <small className={styles.note}>Tài khoản và quyền thành viên được xác thực trực tiếp từ hệ thống Study OS.</small>
+          <small className={styles.note}>Tài khoản và quyền thành viên được xác thực trực tiếp từ hệ thống Study OS và hồ sơ club_members.</small>
         </form>}
       </section>
     </div>}
