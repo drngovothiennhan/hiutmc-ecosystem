@@ -106,17 +106,22 @@ jobs:
         if: steps.latest.outputs.skip != 'true'
         shell: bash
         run: |
-          echo "AI_PROXY_TOKEN=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
-          echo "AI_GATEWAY_INTERNAL_TOKEN=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+          AI_PROXY_TOKEN="$(openssl rand -hex 32)"
+          AI_GATEWAY_INTERNAL_TOKEN="$(openssl rand -hex 32)"
+          echo "::add-mask::$AI_PROXY_TOKEN"
+          echo "::add-mask::$AI_GATEWAY_INTERNAL_TOKEN"
+          echo "AI_PROXY_TOKEN=$AI_PROXY_TOKEN" >> "$GITHUB_ENV"
+          echo "AI_GATEWAY_INTERNAL_TOKEN=$AI_GATEWAY_INTERNAL_TOKEN" >> "$GITHUB_ENV"
 
       - name: Deploy native Workers AI proxy
         if: steps.latest.outputs.skip != 'true'
         shell: bash
         run: |
           set -o pipefail
-          npx --yes wrangler@4.137.0 deploy \
-            --config deploy/agent-workspace/ai-proxy/wrangler.jsonc \
+          pushd deploy/agent-workspace/ai-proxy >/dev/null
+          npx --yes wrangler@4.137.0 deploy --config wrangler.jsonc \
             2>&1 | tee /tmp/agent-ai-proxy.log
+          popd >/dev/null
 
           PROXY_URL="$(grep -Eo 'https://[^[:space:]]+\.workers\.dev' /tmp/agent-ai-proxy.log | tail -n 1 || true)"
           test -n "$PROXY_URL" || (echo "::error::Unable to determine AI proxy URL" && exit 1)
@@ -126,8 +131,9 @@ jobs:
         if: steps.latest.outputs.skip != 'true'
         shell: bash
         run: |
-          printf %s "$AI_PROXY_TOKEN" | npx --yes wrangler@4.137.0 secret put AI_PROXY_TOKEN \
-            --config deploy/agent-workspace/ai-proxy/wrangler.jsonc
+          pushd deploy/agent-workspace/ai-proxy >/dev/null
+          printf %s "$AI_PROXY_TOKEN" | npx --yes wrangler@4.137.0 secret put AI_PROXY_TOKEN --config wrangler.jsonc
+          popd >/dev/null
 
       - name: Smoke Workers AI proxy
         if: steps.latest.outputs.skip != 'true'
@@ -135,17 +141,33 @@ jobs:
         run: |
           curl --fail --silent --show-error --max-time 20 "$CF_AI_PROXY_URL/health" >/dev/null
 
-          PROXY_RESPONSE="$(curl --fail --silent --show-error --max-time 45 \
-            -X POST "$CF_AI_PROXY_URL/run" \
-            -H "content-type: application/json" \
-            -H "x-ai-proxy-token: $AI_PROXY_TOKEN" \
-            --data '{"model":"@cf/zai-org/glm-4.7-flash","prompt":"Reply with exactly AI_PROXY_OK and nothing else.","max_tokens":64}')"
+          OK=0
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            STATUS="$(curl --silent --show-error --max-time 45 \
+              -o /tmp/agent-proxy-response.json \
+              -w '%{http_code}' \
+              -X POST "$CF_AI_PROXY_URL/run" \
+              -H "content-type: application/json" \
+              -H "x-ai-proxy-token: $AI_PROXY_TOKEN" \
+              --data '{"model":"@cf/zai-org/glm-4.7-flash","prompt":"Reply with exactly AI_PROXY_OK and nothing else.","max_tokens":64}')"
+
+            if [ "$STATUS" = "200" ]; then
+              OK=1
+              break
+            fi
+
+            echo "Proxy smoke attempt $i returned HTTP $STATUS"
+            cat /tmp/agent-proxy-response.json || true
+            sleep 3
+          done
+
+          test "$OK" = "1" || (echo "::error::Workers AI proxy inference failed" && exit 1)
 
           node -e '
-            const payload = JSON.parse(process.argv[1]);
+            const payload = JSON.parse(require("fs").readFileSync("/tmp/agent-proxy-response.json", "utf8"));
             if (payload.ok !== true) process.exit(1);
             if (typeof payload.response !== "string" || !payload.response.includes("AI_PROXY_OK")) process.exit(2);
-          ' "$PROXY_RESPONSE"
+          '
 
       - name: Deploy private app bundle
         if: steps.latest.outputs.skip != 'true'
