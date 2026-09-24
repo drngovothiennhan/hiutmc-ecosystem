@@ -22,7 +22,7 @@ for (const marker of [
 
 for (const marker of [
   'html[data-display-mode="pc"]',
-  ".accountButton>span{display:grid!important}",
+  ".accountButton>span{display:grid!important;",
   ".avatar{width:36px!important;height:36px!important}",
 ]) {
   if (!member.includes(marker)) errors.push(`member account missing PC override: ${marker}`);
@@ -37,8 +37,9 @@ for (const marker of [
   if (!spirit.includes(marker)) errors.push(`spirit companion missing PC override: ${marker}`);
 }
 
+if (!dashboard.includes('academy-world.webp')) errors.push("approved hero background reference is missing");
+
 for (const marker of [
-  "academy-world.webp",
   "Khám phá hệ sinh thái HIU YHCT",
   "Cộng đồng HIU YHCT",
   "Sự kiện & hoạt động",
