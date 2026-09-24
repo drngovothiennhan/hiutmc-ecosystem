@@ -46,6 +46,7 @@ for (const marker of [
   "ecosystem_staff_snapshot",
   "ecosystem_admin_save_hub_draft",
   "sameOriginMutation",
+  "const pathname =",
   'shadow: "cp23"',
 ]) {
   if (!worker.includes(marker)) errors.push(`worker missing CP23 shadow marker: ${marker}`);
