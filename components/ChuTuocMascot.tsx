@@ -12,10 +12,10 @@ export function chuTuocStageFromLevel(level: number): ChuTuocStage {
 }
 
 export const chuTuocStages = [
-  { stage: 1 as const, min: 1, max: 10, name: "Chu Tước Ấu Điểu", short: "Ấu Điểu" },
-  { stage: 2 as const, min: 11, max: 30, name: "Hỏa Vũ Điểu", short: "Hỏa Vũ" },
-  { stage: 3 as const, min: 31, max: 60, name: "Phượng Hoàng Linh", short: "Phượng Linh" },
-  { stage: 4 as const, min: 61, max: 100, name: "Chu Tước Thánh Điểu", short: "Thánh Điểu" },
+  { stage: 1 as const, min: 1, max: 10, name: "Chu Tước Ấu Điểu", short: "Ấu Điểu", description: "Chim lửa non tròn nhỏ, cánh ngắn, mắt lớn và mào lửa vàng." },
+  { stage: 2 as const, min: 11, max: 30, name: "Hỏa Vũ Điểu", short: "Hỏa Vũ", description: "Thân thanh hơn, cánh mở rộng, đuôi hỏa vũ dài và aura ấm." },
+  { stage: 3 as const, min: 31, max: 60, name: "Phượng Hoàng Linh", short: "Phượng Linh", description: "Dáng phượng thanh thoát, sải cánh rộng, linh quang và vũ lửa rõ nét." },
+  { stage: 4 as const, min: 61, max: 100, name: "Chu Tước Thánh Điểu", short: "Thánh Điểu", description: "Thánh điểu uy nghi với cánh tầng, thần hỏa, kim sức và hào quang linh khí." },
 ];
 
 type Props = {
