@@ -1,6 +1,12 @@
 "use client";
 
 import { type CSSProperties, useEffect, useMemo, useState } from "react";
+import {
+  localDayKey,
+  normalizeProgress,
+  selectMissionsForDay,
+  type LearningProgress,
+} from "@/data/learning-progress";
 import styles from "./SpiritCompanion.module.css";
 
 type PetKind = "dragon" | "phoenix" | "sphinx" | "qilin" | "peacock" | "fox";
@@ -13,7 +19,9 @@ type PetSpecies = {
   motion: string;
 };
 
-const STORAGE_KEY = "hiutmc-spirit-pet-v1";
+const PET_STORAGE_KEY = "hiutmc-spirit-pet-v1";
+const PROGRESS_STORAGE_KEY = "hiutmc-learning-progress-v1";
+const PROGRESS_EVENT = "hiutmc:learning-progress-changed";
 
 const species: PetSpecies[] = [
   { kind: "dragon", name: "Thanh Long", title: "Rồng · Nghị lực", primary: "#2f8e8a", secondary: "#d5b260", motion: "float" },
@@ -23,6 +31,16 @@ const species: PetSpecies[] = [
   { kind: "peacock", name: "Khổng Tước", title: "Khổng Tước · Thanh cao", primary: "#237a77", secondary: "#73bfc5", motion: "sway" },
   { kind: "fox", name: "Hồ Ly", title: "Hồ Ly · Linh hoạt", primary: "#d97c64", secondary: "#f7ded0", motion: "bounce" },
 ];
+
+function readLocalProgress(): LearningProgress {
+  if (typeof window === "undefined") return { completions: [] };
+  try {
+    const raw = window.localStorage.getItem(PROGRESS_STORAGE_KEY);
+    return raw ? normalizeProgress(JSON.parse(raw)) : { completions: [] };
+  } catch {
+    return { completions: [] };
+  }
+}
 
 function PetArt({ pet }: { pet: PetSpecies }) {
   return (
@@ -57,9 +75,7 @@ function PetArt({ pet }: { pet: PetSpecies }) {
           <path d="M70 60c18-6 22 10 12 18-5 4-12 3-16 0" fill="none" stroke={pet.primary} strokeWidth="7" strokeLinecap="round" />
         </>
       )}
-      {pet.kind === "sphinx" && (
-        <path d="M27 34c2-18 40-18 42 0l-5 11H32Z" fill={pet.secondary} opacity=".72" />
-      )}
+      {pet.kind === "sphinx" && <path d="M27 34c2-18 40-18 42 0l-5 11H32Z" fill={pet.secondary} opacity=".72" />}
       {pet.kind === "qilin" && (
         <>
           <path d="M48 20 54 5l5 18" fill={pet.secondary} />
@@ -82,10 +98,15 @@ export default function SpiritCompanion() {
   const [pet, setPet] = useState<PetSpecies | null>(null);
   const [open, setOpen] = useState(false);
   const [isNew, setIsNew] = useState(false);
+  const [progress, setProgress] = useState<LearningProgress>({ completions: [] });
+  const [dayKey, setDayKey] = useState("");
 
   useEffect(() => {
+    setDayKey(localDayKey(new Date()));
+    setProgress(readLocalProgress());
+
     try {
-      const saved = window.localStorage.getItem(STORAGE_KEY);
+      const saved = window.localStorage.getItem(PET_STORAGE_KEY);
       if (saved) {
         const found = species.find((item) => item.kind === saved);
         if (found) {
@@ -94,7 +115,7 @@ export default function SpiritCompanion() {
         }
       }
       const next = species[Math.floor(Math.random() * species.length)];
-      window.localStorage.setItem(STORAGE_KEY, next.kind);
+      window.localStorage.setItem(PET_STORAGE_KEY, next.kind);
       setPet(next);
       setIsNew(true);
     } catch {
@@ -102,17 +123,36 @@ export default function SpiritCompanion() {
     }
   }, []);
 
-  const level = 1;
-  const message = useMemo(() => {
-    if (isNew) return "Bạn vừa gặp linh thú đồng hành đầu tiên. Hãy học đều mỗi ngày để cùng tiến hóa.";
-    return "Hôm nay mình ở đây để nhắc bài học, nhiệm vụ và hoạt động quan trọng của bạn.";
-  }, [isNew]);
+  useEffect(() => {
+    const sync = () => setProgress(readLocalProgress());
+    window.addEventListener("storage", sync);
+    window.addEventListener(PROGRESS_EVENT, sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener(PROGRESS_EVENT, sync);
+    };
+  }, []);
 
-  if (!pet) {
-    return <button className={styles.placeholder} aria-label="Linh thú đồng hành" type="button">✦</button>;
-  }
+  const missions = useMemo(() => selectMissionsForDay(dayKey), [dayKey]);
+  const completedToday = useMemo(
+    () => new Set(progress.completions.filter((item) => item.day === dayKey).map((item) => item.missionId)),
+    [progress, dayKey],
+  );
+  const remaining = Math.max(0, missions.length - completedToday.size);
+  const nextMission = missions.find((mission) => !completedToday.has(mission.id));
+
+  const message = useMemo(() => {
+    if (isNew) return "Bạn vừa gặp linh thú đồng hành đầu tiên. Mình sẽ nhắc các nhiệm vụ học tập đang lưu trên thiết bị này.";
+    if (!dayKey) return "Mình đang đồng bộ nhiệm vụ học tập trên thiết bị.";
+    if (remaining === 0) return "Ba nhiệm vụ hôm nay đã được đánh dấu hoàn thành. Tiến độ này hiện chỉ lưu trên thiết bị.";
+    if (nextMission) return `Bạn còn ${remaining} nhiệm vụ hôm nay. Gợi ý tiếp theo: ${nextMission.title}.`;
+    return "Mình ở đây để gom nhắc học và hoạt động quan trọng vào một góc nhỏ.";
+  }, [dayKey, isNew, nextMission, remaining]);
+
+  if (!pet) return <button className={styles.placeholder} aria-label="Linh thú đồng hành" type="button">✦</button>;
 
   const theme = { "--pet-a": pet.primary, "--pet-b": pet.secondary } as CSSProperties;
+  const badgeText = dayKey ? String(remaining) : "…";
 
   return (
     <aside className={styles.wrap} style={theme} aria-label="Linh thú đồng hành">
@@ -122,32 +162,31 @@ export default function SpiritCompanion() {
           <div className={styles.panelTop}>
             <div className={styles.avatarSmall}><PetArt pet={pet} /></div>
             <div>
-              <small>Linh thú đồng hành · Lv.{level}</small>
+              <small>Linh thú đồng hành · Preview</small>
               <strong>{pet.name}</strong>
               <span>{pet.title}</span>
             </div>
           </div>
           <p>{message}</p>
-          <div className={styles.affection}><span>Tiến độ chăm sóc</span><b>Chưa đồng bộ</b></div>
-          <div className={styles.actions}>
-            <button type="button"><span>🔔</span>Thông báo</button>
-            <button type="button"><span>🎁</span>Quà</button>
-            <button type="button"><span>✦</span>Tiến hóa</button>
+
+          <div className={styles.localState}>
+            <span>Nhiệm vụ hôm nay</span>
+            <b>{dayKey ? `${completedToday.size} / ${missions.length}` : "Đang tải"}</b>
           </div>
-          <small className={styles.note}>Giai đoạn preview: tiến hóa và đồng bộ tài khoản đang được khóa để thẩm định.</small>
+
+          <div className={styles.actions}>
+            <a href="#missions" onClick={() => setOpen(false)}><span>✓</span>Nhiệm vụ</a>
+            <a href="/community/" onClick={() => setOpen(false)}><span>🔔</span>Cộng đồng</a>
+            <button type="button" disabled title="Đóng băng chờ thẩm định"><span>🔒</span>Tiến hóa</button>
+          </div>
+          <small className={styles.note}>Dữ liệu nhiệm vụ chỉ đọc từ tiến độ cục bộ hiện có. Quà, thân mật, tiến hóa và đồng bộ tài khoản vẫn FROZEN/REVIEW.</small>
         </section>
       )}
-      <button
-        type="button"
-        className={styles.launcher}
-        onClick={() => setOpen((value) => !value)}
-        aria-expanded={open}
-        aria-label={"Mở linh thú " + pet.name}
-      >
-        <span className={styles.bubble}>Cố lên nhé!</span>
+      <button type="button" className={styles.launcher} onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-label={"Mở linh thú " + pet.name}>
+        <span className={styles.bubble}>{remaining === 0 ? "Hoàn thành hôm nay!" : remaining + " việc đang chờ"}</span>
         <span className={styles.petStage + " " + styles[pet.motion]}><PetArt pet={pet} /></span>
-        <span className={styles.level}>Lv.{level}</span>
-        <i className={styles.dot}>2</i>
+        <span className={styles.level}>BẠN ĐỒNG HÀNH</span>
+        <i className={styles.dot}>{badgeText}</i>
       </button>
     </aside>
   );
