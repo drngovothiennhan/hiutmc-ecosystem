@@ -57,6 +57,7 @@ export default function DailyMissions({ apps }: { apps: EcosystemApp[] }) {
     setProgress(next);
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      window.dispatchEvent(new CustomEvent("hiutmc:learning-progress-changed", { detail: next }));
       setSavedLocally(true);
     } catch {
       setSavedLocally(false);
