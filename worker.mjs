@@ -110,22 +110,11 @@ function redirectToHome(requiredRole) {
   return Response.redirect(`https://hiutmc.com/?staff_required=${suffix}`, 302);
 }
 
-async function protectedAsset(request, env, requiredRole, assetPath) {
+async function protectedAsset(request, env, requiredRole) {
   const token = readCookie(request, COOKIE_NAME);
   const access = await validateStaff(token);
   if (!access.authorized) return redirectToHome(requiredRole);
   if (requiredRole === "admin" && !access.canAdmin) return redirectToHome("admin");
-
-  if (assetPath) {
-    const target = new URL(request.url);
-    target.pathname = assetPath;
-    target.search = "";
-    const response = await env.ASSETS.fetch(new Request(target, request));
-    const headers = new Headers(response.headers);
-    headers.set("cache-control", "private, no-store");
-    headers.set("x-hiutmc-staff-role", access.role);
-    return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
-  }
 
   const response = await env.ASSETS.fetch(request);
   const headers = new Headers(response.headers);
@@ -164,7 +153,7 @@ export default {
     }
 
     if (url.pathname === "/mod" || url.pathname === "/mod/") {
-      return protectedAsset(request, env, "mod", "/admin/");
+      return protectedAsset(request, env, "mod");
     }
 
     return env.ASSETS.fetch(request);
