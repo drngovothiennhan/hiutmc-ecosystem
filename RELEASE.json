@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260924-03",
+  "release": "HIU-YHCT-ECOSYSTEM-20260924-04",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP16",
-  "base_checkpoint_sha": "d7e8bb66a9363878ac9f76d22ecdc4ca3d4d4de8",
+  "checkpoint": "CP17",
+  "base_checkpoint_sha": "6f9fff12fe7e2a7ad9122805ed3a80301c31539e",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP16 harmonized mobile dock color system with warm ivory, wine and gold app palette while preserving CP15 Digital Campus, compact spirit companion, Chu Tuoc artwork, responsive layout, Admin Center, existing Hubs, PWA, CI, static export, Cloudflare deployment and production smoke as mandatory release gates"
+  "verification": "CP17 typography clarity improves mobile and desktop legibility through stronger contrast, larger minimum text sizes, tuned line-height and font rendering while preserving CP16 dock palette, CP15 Digital Campus, compact spirit companion, Chu Tuoc artwork, responsive layout, Admin Center, existing Hubs, PWA, CI, static export, Cloudflare deployment and production smoke as mandatory release gates"
 }
