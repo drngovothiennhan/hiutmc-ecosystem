@@ -26,6 +26,7 @@ concurrency:
 
 env:
   NEXT_TELEMETRY_DISABLED: "1"
+  PREVIEW_URL: "https://hiutmc-ecosystem-pet-preview.dr-ngovothiennhan.workers.dev"
 
 jobs:
   preview:
@@ -48,3 +49,20 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: "4.136.2"
           command: deploy --config wrangler.preview.jsonc
+      - name: Verify preview responds
+        run: curl --retry 8 --retry-delay 2 --retry-all-errors -fsS "$PREVIEW_URL" -o /dev/null
+      - name: Install Chromium for visual QA
+        run: npx -y playwright@1.55.0 install --with-deps chromium
+      - name: Capture responsive visual QA
+        run: |
+          mkdir -p visual-qa
+          npx -y playwright@1.55.0 screenshot --browser=chromium --viewport-size="1440,900" "$PREVIEW_URL" visual-qa/desktop-1440x900.png
+          npx -y playwright@1.55.0 screenshot --browser=chromium --viewport-size="1024,768" "$PREVIEW_URL" visual-qa/tablet-1024x768.png
+          npx -y playwright@1.55.0 screenshot --browser=chromium --viewport-size="390,844" "$PREVIEW_URL" visual-qa/mobile-390x844.png
+      - name: Upload visual QA screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: pet-dashboard-visual-qa
+          path: visual-qa/*.png
+          if-no-files-found: error
+          retention-days: 14
