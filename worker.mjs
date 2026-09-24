@@ -105,6 +105,40 @@ async function validateStaff(token) {
   };
 }
 
+
+async function supabaseRpc(token, name, body = {}) {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_KEY,
+      authorization: `Bearer ${token}`,
+      "content-type": "application/json",
+      accept: "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  const payload = await response.json().catch(async () => ({ error: await response.text().catch(() => "") }));
+  return { response, payload };
+}
+
+function sameOriginMutation(request) {
+  const origin = request.headers.get("origin");
+  return !origin || origin === "https://hiutmc.com";
+}
+
+async function shadowStaffAccess(request, requiredRole = "mod") {
+  const token = bearer(request) || readCookie(request, COOKIE_NAME);
+  const access = await validateStaff(token);
+  if (!access.authorized) return { ok: false, response: json(access, 401), token: "" };
+  if (requiredRole === "admin" && !access.canAdmin) {
+    return { ok: false, response: json({ authorized: false, reason: "admin_required" }, 403), token: "" };
+  }
+  if (requiredRole === "mod" && !access.canModerate) {
+    return { ok: false, response: json({ authorized: false, reason: "mod_required" }, 403), token: "" };
+  }
+  return { ok: true, access, token };
+}
+
 function redirectToHome(requiredRole) {
   const suffix = requiredRole === "admin" ? "admin" : "mod";
   return Response.redirect(`https://hiutmc.com/?staff_required=${suffix}`, 302);
@@ -146,6 +180,58 @@ export default {
       const token = bearer(request) || readCookie(request, COOKIE_NAME);
       const access = await validateStaff(token);
       return json(access, access.authorized ? 200 : 401);
+    }
+
+
+    if (url.pathname === "/api/staff/shadow/snapshot") {
+      if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+      const gate = await shadowStaffAccess(request, "mod");
+      if (!gate.ok) return gate.response;
+      const { response, payload } = await supabaseRpc(gate.token, "ecosystem_staff_snapshot");
+      return json({ shadow: "cp23", data: payload }, response.ok ? 200 : response.status);
+    }
+
+    if (url.pathname === "/api/staff/shadow/hub-draft") {
+      if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+      if (!sameOriginMutation(request)) return json({ error: "Invalid origin" }, 403);
+      const gate = await shadowStaffAccess(request, "admin");
+      if (!gate.ok) return gate.response;
+      const body = await request.json().catch(() => null);
+      if (!body || typeof body !== "object") return json({ error: "Invalid JSON" }, 400);
+      const { response, payload } = await supabaseRpc(gate.token, "ecosystem_admin_save_hub_draft", {
+        p_hub_slug: String(body.hubSlug || ""),
+        p_draft: body.draft && typeof body.draft === "object" ? body.draft : {},
+        p_expected_revision: body.expectedRevision === null || body.expectedRevision === undefined ? null : Number(body.expectedRevision),
+      });
+      return json({ shadow: "cp23", data: payload }, response.ok ? 200 : response.status);
+    }
+
+    if (url.pathname === "/api/staff/shadow/moderation") {
+      if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+      if (!sameOriginMutation(request)) return json({ error: "Invalid origin" }, 403);
+      const gate = await shadowStaffAccess(request, "mod");
+      if (!gate.ok) return gate.response;
+      const body = await request.json().catch(() => null);
+      if (!body || typeof body !== "object") return json({ error: "Invalid JSON" }, 400);
+
+      if (body.action === "submit") {
+        const { response, payload } = await supabaseRpc(gate.token, "ecosystem_mod_submit_queue", {
+          p_item_type: String(body.itemType || "other"),
+          p_hub_slug: body.hubSlug ? String(body.hubSlug) : null,
+          p_payload: body.payload && typeof body.payload === "object" ? body.payload : {},
+        });
+        return json({ shadow: "cp23", data: payload }, response.ok ? 200 : response.status);
+      }
+
+      if (body.action === "review") {
+        const { response, payload } = await supabaseRpc(gate.token, "ecosystem_mod_review_queue", {
+          p_id: String(body.id || ""),
+          p_status: String(body.status || ""),
+        });
+        return json({ shadow: "cp23", data: payload }, response.ok ? 200 : response.status);
+      }
+
+      return json({ error: "Unknown moderation action" }, 400);
     }
 
     if (url.pathname === "/admin" || url.pathname === "/admin/") {
