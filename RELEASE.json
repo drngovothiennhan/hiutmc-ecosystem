@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260924-09",
+  "release": "HIU-YHCT-ECOSYSTEM-20260924-10",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP22",
-  "base_checkpoint_sha": "3ebe01e53e4d732eed12fa37810ce7c4ba355d48",
+  "checkpoint": "CP23",
+  "base_checkpoint_sha": "9230f6d3a485c73e638e33e69bc6890d992d3729",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP22 adds crawler-visible Open Graph metadata for Zalo/social link previews, including a concise Vietnamese title, summary and reachable 512x512 PNG preview image. robots.txt permits crawlers and production smoke verifies the metadata using a Zalo-like user agent while retaining CP21 server-side Admin/Mod authorization gates."
+  "verification": "CP23 introduces an additive Admin/Mod shared backend in shadow mode only. The approved homepage/UI, public Hub registry, member SSO, CP21 staff authorization and CP22 Zalo/social preview remain unchanged. New Supabase tables for Hub drafts, moderation queue and audit log use RLS and role-checked RPCs; hidden Cloudflare staff shadow APIs proxy only verified sessions. No Stage 2 UI cutover is included."
 }
