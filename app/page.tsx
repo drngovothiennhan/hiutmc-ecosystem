@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import HomeIcon, { type HomeIconName } from "@/components/HomeIcon";
 import DailyMissions from "@/components/DailyMissions";
 import DisplayModeToggle from "@/components/DisplayModeToggle";
 import SpiritCompanion from "@/components/SpiritCompanion";
@@ -8,17 +9,17 @@ import { MemberAccount, MemberAuthProvider, StudyOsLink, useMemberAuth } from "@
 import { useHubRegistry } from "@/components/hub-registry";
 import styles from "./dashboard.module.css";
 
-const hubMeta: Record<string, { icon: string; tone: string }> = {
-  "study-os": { icon: "▣", tone: "#9f1c3b" },
-  "atlas": { icon: "◎", tone: "#2a6d9a" },
-  "ai-thiet-chan": { icon: "◈", tone: "#537d4d" },
-  "trung-y-van": { icon: "冊", tone: "#9a6a32" },
+const hubMeta: Record<string, { icon: HomeIconName; tone: string }> = {
+  "study-os": { icon: "study-os", tone: "#9f1c3b" },
+  "atlas": { icon: "atlas-3d", tone: "#2a6d9a" },
+  "ai-thiet-chan": { icon: "ai-tongue", tone: "#537d4d" },
+  "trung-y-van": { icon: "trung-y-van", tone: "#9a6a32" },
 };
 
-const communityItems = [
-  { icon: "⚕", title: "Dược liệu theo công năng", meta: "Mở kho nội dung đã được công bố" },
-  { icon: "☯", title: "Bệnh học YHCT", meta: "Học theo chủ đề trong hệ sinh thái" },
-  { icon: "✦", title: "Châm cứu · Thủ pháp", meta: "Kết nối Atlas và học liệu liên quan" },
+const communityItems: Array<{ icon: HomeIconName; title: string; meta: string }> = [
+  { icon: "herbal-function", title: "Dược liệu theo công năng", meta: "Mở kho nội dung đã được công bố" },
+  { icon: "pathology-yhct", title: "Bệnh học YHCT", meta: "Học theo chủ đề trong hệ sinh thái" },
+  { icon: "acupuncture", title: "Châm cứu · Thủ pháp", meta: "Kết nối Atlas và học liệu liên quan" },
 ];
 
 const events = [
@@ -112,10 +113,10 @@ function HomeContent() {
               </header>
               <div className={styles.hubGrid}>
                 {apps.map((app) => {
-                  const meta = hubMeta[app.slug] ?? { icon: "✦", tone: app.accent };
+                  const meta = hubMeta[app.slug] ?? { icon: "nav-ai", tone: app.accent };
                   return (
                     <a key={app.slug} className={styles.hub} href={app.currentUpstreamUrl} onClick={app.slug === "study-os" ? (event) => { event.preventDefault(); void openStudyOs(app.currentUpstreamUrl); } : undefined} style={{ "--hub": meta.tone } as CSSProperties}>
-                      <span className={styles.hubIcon}>{meta.icon}</span>
+                      <span className={styles.hubIcon}><HomeIcon name={meta.icon} /></span>
                       <strong>{app.shortName}</strong>
                       <p>{app.tagline}</p>
                       <b>Mở ứng dụng →</b>
@@ -134,7 +135,7 @@ function HomeContent() {
                 <div className={styles.communityGrid}>
                   {communityItems.map((item) => (
                     <article className={styles.communityItem} key={item.title}>
-                      <span>{item.icon}</span><strong>{item.title}</strong><small>{item.meta}</small>
+                      <span className={styles.communityIcon}><HomeIcon name={item.icon} /></span><strong>{item.title}</strong><small>{item.meta}</small>
                     </article>
                   ))}
                 </div>
@@ -184,11 +185,11 @@ function HomeContent() {
       </div>
 
       <nav className={styles.mobileDock} aria-label="Điều hướng nhanh trên điện thoại">
-        <a href="#top"><i>⌂</i><span>Trang chủ</span></a>
-        <StudyOsLink href={studyOsUrl}><i>▤</i><span>Học tập</span></StudyOsLink>
-        <a href={atlasUrl}><i>◎</i><span>Atlas</span></a>
-        <a href="/ai/"><i>◈</i><span>AI</span></a>
-        <a href="/community/"><i>♧</i><span>Cộng đồng</span></a>
+        <a href="#top"><i><HomeIcon name="nav-home" /></i><span>Trang chủ</span></a>
+        <StudyOsLink href={studyOsUrl}><i><HomeIcon name="nav-study" /></i><span>Học tập</span></StudyOsLink>
+        <a href={atlasUrl}><i><HomeIcon name="nav-atlas" /></i><span>Atlas</span></a>
+        <a href="/ai/"><i><HomeIcon name="nav-ai" /></i><span>AI</span></a>
+        <a href="/community/"><i><HomeIcon name="nav-community" /></i><span>Cộng đồng</span></a>
       </nav>
 
       <SpiritCompanion />
