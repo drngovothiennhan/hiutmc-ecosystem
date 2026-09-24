@@ -29,6 +29,12 @@
 - Hub SSO and access rules are owned by each upstream service. The main site cannot change A.I Thiệt Chẩn's Vercel SSO setting.
 - Canonical Hub subdomains are not implied to be live unless verified in the registry and deployed separately.
 
+## Social link preview
+- [x] Open Graph title, description and PNG image are present in the static homepage HTML.
+- [x] Twitter summary metadata mirrors the same share card.
+- [x] `robots.txt` allows crawlers.
+- [x] Production smoke verifies the metadata with a Zalo-like user-agent and validates the image bytes/dimensions.
+
 ## Required release checks
 - [x] Repository boundary, metadata, registry, asset, PWA and Community contract validators pass.
 - [x] Learning mission/streak/weekly challenge validator passes.
