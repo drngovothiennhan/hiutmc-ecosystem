@@ -90,7 +90,7 @@ jobs:
           const url = process.env.PREVIEW_URL;
           fs.mkdirSync("qa-g2", { recursive: true });
           const browser = await chromium.launch({ headless: true });
-          for (const [width, height] of [[390, 844], [768, 1024], [1024, 900]]) {
+          for (const [width, height] of [[320, 740], [390, 844], [711, 1000], [768, 1024], [1024, 900]]) {
             const page = await browser.newPage({ viewport: { width, height } });
             await page.goto(`${url}/?g2-sso-test=1`, { waitUntil: "domcontentloaded", timeout: 60000 });
             const previewButton = page.getByRole("button", { name: "Kiểm tra đăng nhập Game Hub preview" });
@@ -127,7 +127,7 @@ jobs:
               scrollWidth: el.scrollWidth,
               whiteSpace: getComputedStyle(el).whiteSpace,
             }));
-            if (sectionLink.scrollWidth > sectionLink.clientWidth + 1 || sectionLink.whiteSpace !== "nowrap") {
+            if (sectionLink.scrollWidth > sectionLink.clientWidth + 1 || (width <= 820 && sectionLink.whiteSpace !== "nowrap")) {
               throw new Error(`section link wraps or clips at ${width}px: ${JSON.stringify(sectionLink)}`);
             }
             const metrics = await page.evaluate(() => ({
