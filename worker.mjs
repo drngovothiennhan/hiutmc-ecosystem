@@ -2,6 +2,7 @@ const SUPABASE_URL = "https://gzmpnsrwqjpsbklyflqr.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG";
 const COOKIE_NAME = "hiutmc_staff_session";
 const STAFF_ROLES = new Set(["mod", "super_mod", "admin"]);
+const G2_PREVIEW_HOST = /^(?:[a-f0-9]+-|hiutmc-ecosystem-g2-sso-pr-[a-z0-9]+-)?hiutmc-ecosystem-g2-sso-preview\\.dr-ngovothiennhan\\.workers\\.dev$/i;
 
 function json(body, status = 200, headers = {}) {
   return new Response(JSON.stringify(body), {
@@ -163,7 +164,7 @@ export default {
     const pathname = url.pathname.length > 1 ? url.pathname.replace(/\/+$/, "") : url.pathname;
 
     if (pathname === "/api/g2-member-login") {
-      if (env.G2_SSO_PREVIEW !== "1") return json({ error: "Not found" }, 404);
+      if (!G2_PREVIEW_HOST.test(url.hostname)) return json({ error: "Not found" }, 404);
       if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
       if (request.headers.get("origin") !== url.origin) return json({ error: "Invalid origin" }, 403);
       if (!(request.headers.get("content-type") || "").toLowerCase().startsWith("application/json")) {
