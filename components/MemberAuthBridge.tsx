@@ -429,7 +429,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       }
     },
     openGameHubPreview: async () => {
-      const target = new URL("https://c796c1e2.hiutmc-game-hub.pages.dev/");
+      const target = new URL("https://game-hub-intro-ux.hiutmc-game-hub.pages.dev/");
       if (!session) {
         window.location.assign(target.toString());
         return;
