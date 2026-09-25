@@ -7,6 +7,10 @@ const page = fs.readFileSync("app/page.tsx", "utf8");
 
 const errors = [];
 
+const displayToggle = fs.readFileSync("components/DisplayModeToggle.tsx", "utf8");
+if (!displayToggle.includes("onModeChange?.(nextMode)")) errors.push("display-mode toggle must notify consumers when mode changes");
+if (!member.includes('if (next === "pc") setOpen(false);')) errors.push("member dialog must close automatically when switching to PC mode");
+
 for (const marker of [
   "CP24 Display Mode Isolation",
   'html:not([data-display-mode="pc"])',
