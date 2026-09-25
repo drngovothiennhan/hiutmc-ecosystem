@@ -11,11 +11,13 @@
 
 
 /* CP25: display-mode control lives inside the member/profile dialog on mobile. */
-.displayModeSetting{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding:10px 11px;border:1px solid #e1d6c4;border-radius:12px;background:#fffaf2}
+.displayModeSetting{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;margin-top:12px;padding:10px 11px;border:1px solid #e1d6c4;border-radius:12px;background:#fffaf2;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.displayModeSetting:hover{border-color:#c8b78f;background:#fffdf8}
+.displayModeSetting:focus-visible{outline:3px solid #a3193a;outline-offset:3px}
 .displayModeSetting>span{display:grid;gap:2px;min-width:0}
 .displayModeSetting strong{color:#34464f;font-size:10.5px}
 .displayModeSetting small{color:#81776d;font-size:9px;line-height:1.35}
-.profileModeButton{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;z-index:auto!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto;min-width:116px!important;min-height:40px!important;margin:0!important;padding:0 12px!important;line-height:1!important;text-align:center!important}
+.profileModeButton{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-width:116px;min-height:40px;padding:0 12px;border:1px solid #b9a678;border-radius:999px;background:#fffaf0;color:#285541;font-size:10.5px;font-weight:800;line-height:1;text-align:center;white-space:nowrap}
 .syncState{display:grid;gap:3px;margin-top:10px;padding:10px 11px;border:1px solid #d8e2d8;border-radius:12px;background:#f7fbf5}
 .syncState strong{color:#315846;font-size:10.5px}
 .syncState small{color:#68736d;font-size:9px;line-height:1.4}

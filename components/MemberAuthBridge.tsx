@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
-import DisplayModeToggle from "./DisplayModeToggle";
+import { useDisplayMode } from "./DisplayModeToggle";
 import { transitionBeforeAppNavigation } from "./NavigationTransitions";
 import styles from "./MemberAuthBridge.module.css";
 
@@ -433,6 +433,25 @@ export function StudyOsLink({
   return <a href={href} className={className} onClick={onClick} {...rest}>{children}</a>;
 }
 
+function ProfileDisplayModeSetting() {
+  const { mode, setMode } = useDisplayMode();
+  const pcEnabled = mode === "pc";
+  const nextMode = pcEnabled ? "auto" : "pc";
+
+  return (
+    <button
+      className={styles.displayModeSetting}
+      type="button"
+      onClick={() => setMode(nextMode)}
+      aria-pressed={pcEnabled}
+      aria-label={pcEnabled ? "Đang bật chế độ PC. Nhấn để chuyển về Mobile." : "Đang dùng chế độ Mobile. Nhấn để chuyển sang PC."}
+    >
+      <span><strong>Chế độ hiển thị</strong><small>{pcEnabled ? "Đang dùng PC · Nhấn để chuyển về Mobile." : "Đang dùng Mobile · Nhấn để chuyển sang PC."}</small></span>
+      <span className={styles.profileModeButton}>{pcEnabled ? "PC đang bật" : "Bật chế độ PC →"}</span>
+    </button>
+  );
+}
+
 export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
   const { member, staffAccess, learningProgress, ready, login, logout, openStudyOs, openStaffConsole } = useMemberAuth();
   const [open, setOpen] = useState(false);
@@ -482,10 +501,7 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
             <span><small>THÀNH VIÊN ĐÃ ĐỒNG BỘ</small><strong>{member.fullName}</strong><em>{member.studentCode || "HIU YHCT"} · {member.title}</em></span>
           </div>
           <p>Phiên đăng nhập trang chủ dùng cùng hệ tài khoản với Study OS. Quyền Admin/Mod được xác minh lại tại máy chủ trước khi mở khu vực quản trị.</p>
-          <div className={styles.displayModeSetting}>
-            <span><strong>Chế độ hiển thị</strong><small>Chuyển Mobile/PC ngay trong hồ sơ thành viên.</small></span>
-            <DisplayModeToggle className={styles.profileModeButton} />
-          </div>
+          <ProfileDisplayModeSetting />
           <div className={styles.syncState}>
             <strong>{learningProgress?.hasSync ? "Tiến độ Study OS đã đồng bộ" : "Tiến độ Study OS chưa có bản đồng bộ thành công"}</strong>
             <small>{learningProgress?.hasSync ? `Streak ${learningProgress.streak} ngày · ${learningProgress.todayQuestions} câu hôm nay · ${learningProgress.xp} XP` : "Mở Study OS sau bản sửa để hệ thống gửi lại dữ liệu học tập lên máy chủ."}</small>
@@ -501,10 +517,7 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
           <label>Mật khẩu<input value={password} onChange={(e) => { setPassword(e.target.value); if (error) setError(""); }} type="password" autoComplete="current-password" disabled={busy} /></label>
           {error && <div className={styles.error} role="alert">{error}</div>}
           <button className={styles.primary} type="submit" disabled={busy || !studentCode.trim() || !password}>{busy ? "Đang xác thực…" : "Đăng nhập"}</button>
-          <div className={styles.displayModeSetting}>
-            <span><strong>Chế độ hiển thị</strong><small>Đổi Mobile/PC trước hoặc sau khi đăng nhập.</small></span>
-            <DisplayModeToggle className={styles.profileModeButton} />
-          </div>
+          <ProfileDisplayModeSetting />
           <small className={styles.note}>Tài khoản và quyền thành viên được xác thực trực tiếp từ hệ thống Study OS và hồ sơ club_members.</small>
         </form>}
       </section>
