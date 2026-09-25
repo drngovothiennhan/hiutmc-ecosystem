@@ -198,10 +198,10 @@ async function fetchLearningProgress(accessToken: string): Promise<LearningProgr
   }
 }
 
-async function refreshSession(current: StoredSession): Promise<StoredSession> {
+async function refreshSession(current: StoredSession, forceRefresh = false): Promise<StoredSession> {
   let accessToken = current.accessToken;
   let refreshToken = current.refreshToken;
-  if (current.expiresAt - Date.now() <= 90_000) {
+  if (forceRefresh || current.expiresAt - Date.now() <= 90_000) {
     const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
       method: "POST",
       headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
@@ -411,7 +411,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       try { target = new URL(rawUrl, window.location.href); } catch { return; }
       if (target.origin !== new URL(GAME_HUB_URL).origin) return;
       try {
-        const fresh = await refreshSession(session);
+        const fresh = await refreshSession(session, true);
         if (!canAccessGameHub(fresh.member.role)) return;
         setSession(fresh);
         const fragment = new URLSearchParams({
