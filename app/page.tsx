@@ -16,10 +16,10 @@ const hubMeta: Record<string, { icon: HomeIconName; tone: string }> = {
   "trung-y-van": { icon: "trung-y-van", tone: "#9a6a32" },
 };
 
-const communityItems: Array<{ icon: HomeIconName; title: string; meta: string }> = [
-  { icon: "herbal-function", title: "Dược liệu theo công năng", meta: "Mở kho nội dung đã được công bố" },
-  { icon: "pathology-yhct", title: "Bệnh học YHCT", meta: "Học theo chủ đề trong hệ sinh thái" },
-  { icon: "acupuncture", title: "Châm cứu · Thủ pháp", meta: "Kết nối Atlas và học liệu liên quan" },
+const communityItems: Array<{ icon: HomeIconName; title: string; meta: string; searchTerm: string }> = [
+  { icon: "herbal-function", title: "Dược liệu theo công năng", meta: "Mở kho nội dung đã được công bố", searchTerm: "dược liệu" },
+  { icon: "pathology-yhct", title: "Bệnh học YHCT", meta: "Học theo chủ đề trong hệ sinh thái", searchTerm: "nội khoa" },
+  { icon: "acupuncture", title: "Châm cứu · Thủ pháp", meta: "Kết nối Atlas và học liệu liên quan", searchTerm: "châm cứu" },
 ];
 
 const events = [
@@ -134,9 +134,9 @@ function HomeContent() {
                 </header>
                 <div className={styles.communityGrid}>
                   {communityItems.map((item) => (
-                    <article className={styles.communityItem} key={item.title}>
+                    <a className={styles.communityItem} key={item.title} href={"/search/?q=" + encodeURIComponent(item.searchTerm)} aria-label={"Tìm " + item.title + " trong Search Hub"}>
                       <span className={styles.communityIcon}><HomeIcon name={item.icon} /></span><strong>{item.title}</strong><small>{item.meta}</small>
-                    </article>
+                    </a>
                   ))}
                 </div>
               </section>
