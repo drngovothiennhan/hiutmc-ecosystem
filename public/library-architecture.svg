@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-labelledby="t d">
+<title id="t">Luồng thư viện HIU TMC Hub và StudyOS</title>
+<desc id="d">Hub tĩnh tìm metadata và mở PDF bằng canvas. StudyOS xác minh phiên, quyền và trạng thái xuất bản rồi cấp byte từ Drive qua API máy chủ. Định dạng khác mở StudyOS bằng SSO và resourceKey.</desc>
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#17182a"/><stop offset="1" stop-color="#29263f"/></linearGradient><style>
+text{font-family:Arial,"Noto Sans",sans-serif;fill:#252338}.w{fill:#fffaf0}.m{fill:#c5c2cf}.t{font:700 43px Georgia,serif}.h{font:700 27px Georgia,serif}.b{font-size:18px}.s{font-size:15px}.k{font-size:13px;font-weight:800;letter-spacing:1.5px}
+</style><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M1 1l8 4-8 4" fill="none" stroke="#d9b56b" stroke-width="2"/></marker></defs>
+<rect width="1400" height="900" fill="url(#bg)"/>
+<text x="64" y="65" class="k w">HIU TMC ECOSYSTEM · LUỒNG TRIỂN KHAI TRÊN PR</text>
+<text x="64" y="123" class="t w">Thư viện đọc online · Hub ↔ StudyOS</text>
+<text x="66" y="158" class="b m">Tra cứu metadata tại Hub · kiểm tra quyền và cấp nội dung tại StudyOS</text>
+
+<rect x="55" y="205" width="620" height="540" rx="26" fill="#f8f4e9"/>
+<rect x="82" y="230" width="130" height="28" rx="14" fill="#e8eee7"/><text x="98" y="250" class="k">HUB TĨNH</text>
+<text x="82" y="302" class="h">Tra cứu và đọc</text>
+<rect x="82" y="324" width="566" height="75" rx="14" fill="#fff" stroke="#e4ded1"/>
+<circle cx="107" cy="357" r="8" fill="none" stroke="#887f70" stroke-width="2"/><path d="M113 363l8 8" stroke="#887f70" stroke-width="2"/>
+<text x="140" y="354" class="b">Tìm metadata</text><text x="140" y="380" class="s">Nhan đề · tác giả · chủ đề · từ khóa</text>
+<rect x="82" y="414" width="566" height="65" rx="13" fill="#fff" stroke="#ece6da"/>
+<rect x="98" y="427" width="42" height="38" rx="8" fill="#f4e4c6"/>
+<path d="M108 436h23m-23 7h23m-23 7h18m-21-18h29v27h-29z" fill="none" stroke="#a67239" stroke-width="1.6"/>
+<text x="157" y="442" class="b">Chi tiết học liệu</text><text x="157" y="466" class="s">Metadata có thật · không tự điền trường trống</text>
+<text x="82" y="523" class="h">Trình đọc PDF</text>
+<rect x="82" y="540" width="566" height="183" rx="17" fill="#e9e4da"/>
+<rect x="96" y="554" width="538" height="40" rx="10" fill="#3c3543"/>
+<path d="M111 565q10-5 19 1v20q-9-5-19-1z m19 1q9-6 19-1v20q-10-4-19 1z" fill="none" stroke="#f0d18e" stroke-width="1.8"/>
+<text x="158" y="579" class="s w">Tên tài liệu</text><text x="336" y="579" class="s w">‹ Trang 1 / n ›</text><text x="495" y="579" class="s w">− 100% +</text>
+<rect x="100" y="605" width="530" height="103" rx="8" fill="#fffdf7"/>
+<path d="M365 612q4 40 0 88" stroke="#d0c7b7" stroke-width="3" fill="none"/>
+<path d="M120 628h215m-215 12h229m-229 12h218m-218 12h229m-229 12h185m74-48h210m-210 12h211m-211 12h199m-199 12h214m-214 12h190" stroke="#c7c0b5" stroke-width="2" stroke-linecap="round"/>
+<text x="82" y="734" class="s">Canvas viewer · không có nút tải / in</text>
+
+<rect x="725" y="205" width="620" height="540" rx="26" fill="#fffaf0"/>
+<rect x="752" y="230" width="165" height="28" rx="14" fill="#f4e7cd"/><text x="768" y="250" class="k">STUDYOS API</text>
+<text x="752" y="302" class="h">Nguồn chuẩn và quyền đọc</text>
+<rect x="752" y="324" width="566" height="74" rx="14" fill="#f7f0e2"/>
+<circle cx="777" cy="357" r="7" fill="#75a48e"/><text x="798" y="353" class="b">Kiểm tra thành viên mỗi lần gọi</text><text x="798" y="379" class="s">Published · audience members · quyền đọc</text>
+<rect x="752" y="413" width="566" height="74" rx="14" fill="#f7f0e2"/>
+<circle cx="777" cy="446" r="7" fill="#75a48e"/><text x="798" y="442" class="b">RPC máy chủ lấy locator riêng tư</text><text x="798" y="468" class="s">Danh mục chỉ trả metadata được cho phép</text>
+<rect x="752" y="502" width="270" height="92" rx="15" fill="#c3eadf"/>
+<text x="774" y="536" class="b">Google Drive</text><text x="774" y="561" class="s">Tệp riêng tư · byte/range</text><text x="774" y="581" class="s">qua máy chủ StudyOS</text>
+<rect x="1038" y="502" width="280" height="92" rx="15" fill="#e9e5f0"/>
+<text x="1060" y="536" class="b">Nghiên cứu sâu</text><text x="1060" y="561" class="s">/research?resourceKey=…</text><text x="1060" y="581" class="s">SSO hiện có</text>
+<text x="752" y="635" class="s">Hub không nhận URL Drive hoặc khóa máy chủ.</text>
+<text x="752" y="660" class="s">Định dạng khác mở StudyOS cùng resourceKey.</text>
+<text x="752" y="685" class="s">PDF.js v3.11.174 · trang/range có xác thực.</text>
+
+<path d="M675 360h47" fill="none" stroke="#d9b56b" stroke-width="3" marker-end="url(#a)"/>
+<path d="M725 550h-43" fill="none" stroke="#d9b56b" stroke-width="3" marker-end="url(#a)"/>
+
+<rect x="55" y="775" width="1290" height="80" rx="18" fill="#2b293e" stroke="#ffffff" stroke-opacity=".12"/>
+<text x="82" y="807" class="s w">Đã kiểm: Hub CI build xanh · StudyOS Web CI xanh · không tạo tài liệu mẫu.</text>
+<text x="82" y="835" class="s m">Còn chờ test: migration + credentials trong môi trường thử nghiệm + PDF thật đã xuất bản.</text>
+<text x="1310" y="882" class="s m" text-anchor="end">Không thể chặn tuyệt đối chụp màn hình hoặc trích xuất sau khi trình duyệt nhận nội dung.</text>
+</svg>
