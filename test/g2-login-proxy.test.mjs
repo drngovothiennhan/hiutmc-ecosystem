@@ -2,30 +2,32 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import worker from "../worker.mjs";
 
-const origin = "https://preview.example.workers.dev";
+const previewOrigin = "https://3f874a2d-hiutmc-ecosystem-g2-sso-preview.dr-ngovothiennhan.workers.dev";
 
-function request({ method = "POST", headers = {}, body = "" } = {}) {
-  return new Request(`${origin}/api/g2-member-login`, {
+function request({ origin = previewOrigin, method = "POST", headers = {}, body = "" } = {}) {
+  return new Request(`${previewOrigin}/api/g2-member-login`, {
     method,
     headers: { origin, "content-type": "application/json", ...headers },
     body: method === "GET" || method === "HEAD" ? undefined : body,
   });
 }
 
-test("preview login proxy stays disabled outside the isolated preview", async () => {
-  const response = await worker.fetch(request({ body: JSON.stringify({ studentCode: "test", password: "fake" }) }), {
-    G2_SSO_PREVIEW: "0",
+test("member login proxy is restricted to the dedicated G2 Workers preview host", async () => {
+  const productionRequest = new Request("https://hiutmc.com/api/g2-member-login", {
+    method: "GET",
+    headers: { origin: "https://hiutmc.com" },
   });
+  const response = await worker.fetch(productionRequest, {});
   assert.equal(response.status, 404);
 });
 
-test("preview login proxy rejects wrong origin and methods without forwarding", async () => {
+test("preview login proxy rejects wrong origins and methods without forwarding", async () => {
   const wrongOrigin = request({
-    headers: { origin: "https://attacker.example" },
+    origin: "https://attacker.example",
     body: JSON.stringify({ studentCode: "test", password: "fake" }),
   });
-  assert.equal((await worker.fetch(wrongOrigin, { G2_SSO_PREVIEW: "1" })).status, 403);
-  assert.equal((await worker.fetch(request({ method: "GET" }), { G2_SSO_PREVIEW: "1" })).status, 405);
+  assert.equal((await worker.fetch(wrongOrigin, {})).status, 403);
+  assert.equal((await worker.fetch(request({ method: "GET" }), {})).status, 405);
 });
 
 test("preview login proxy validates input and forwards only bounded credentials", async t => {
@@ -38,14 +40,14 @@ test("preview login proxy validates input and forwards only bounded credentials"
   t.after(() => { globalThis.fetch = originalFetch; });
 
   const invalid = request({ body: "{" });
-  assert.equal((await worker.fetch(invalid, { G2_SSO_PREVIEW: "1" })).status, 400);
+  assert.equal((await worker.fetch(invalid, {})).status, 400);
   assert.equal(calls.length, 0);
 
   const validRequest = request({
     headers: { "cf-connecting-ip": "203.0.113.7" },
     body: JSON.stringify({ studentCode: "  123456  ", password: "test-only-password", extra: "discard" }),
   });
-  const response = await worker.fetch(validRequest, { G2_SSO_PREVIEW: "1" });
+  const response = await worker.fetch(validRequest, {});
   assert.equal(response.status, 200);
   assert.deepEqual(calls.map(({ url }) => url), [
     "https://gzmpnsrwqjpsbklyflqr.supabase.co/functions/v1/member-login",
