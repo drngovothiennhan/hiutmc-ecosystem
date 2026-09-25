@@ -2,7 +2,7 @@ const SUPABASE_URL = "https://gzmpnsrwqjpsbklyflqr.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG";
 const COOKIE_NAME = "hiutmc_staff_session";
 const STAFF_ROLES = new Set(["mod", "super_mod", "admin"]);
-const G2_PREVIEW_HOST = /^(?:[a-f0-9]+-|hiutmc-ecosystem-g2-sso-pr-[a-z0-9]+-)?hiutmc-ecosystem-g2-sso-preview\\.dr-ngovothiennhan\\.workers\\.dev$/i;
+const G2_PREVIEW_HOST = /^(?:[a-f0-9]+-|hiutmc-ecosystem-g2-sso-pr-[a-z0-9]+-)?hiutmc-ecosystem-g2-sso-preview\.dr-ngovothiennhan\.workers\.dev$/i;
 
 function json(body, status = 200, headers = {}) {
   return new Response(JSON.stringify(body), {
