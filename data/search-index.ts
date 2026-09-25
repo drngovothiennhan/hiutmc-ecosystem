@@ -15,7 +15,7 @@ const appResources: SearchResource[] = ecosystemApps.map((app) => ({
   title: app.name,
   category: "Ứng dụng",
   description: app.description,
-  href: app.currentUpstreamUrl,
+  href: app.launchUrl,
   keywords: [app.name, app.shortName, app.tagline, app.slug],
   status: "Đang hoạt động"
 }));
@@ -45,7 +45,7 @@ export const searchResources: SearchResource[] = [
     title: "Kinh lạc – Huyệt học",
     category: "Chủ đề",
     description: "Đi từ Learning Center tới Atlas 3D và các công cụ học liên quan.",
-    href: "https://drngovothiennhan.github.io/human-atlas/",
+    href: "https://hiutmc.com/apps/atlas/",
     keywords: ["kinh lạc", "huyệt", "huyệt vị", "atlas", "châm cứu"],
     status: "Đang chuẩn hóa"
   },
@@ -81,7 +81,7 @@ export const searchResources: SearchResource[] = [
     title: "Thiệt chẩn",
     category: "Chủ đề",
     description: "Học kiến thức quan sát lưỡi và chuyển sang A.I Thiệt Chẩn khi cần.",
-    href: "https://ai-thiet-chan-hiu-yhct.vercel.app/",
+    href: "https://hiutmc.com/apps/thietchan/",
     keywords: ["thiệt chẩn", "lưỡi", "tongue", "ai"],
     status: "Đang hoạt động"
   },
