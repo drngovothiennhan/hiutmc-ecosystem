@@ -62,6 +62,7 @@ type AuthContextValue = {
   login: (studentCode: string, password: string) => Promise<StaffAccess | null>;
   logout: () => Promise<void>;
   openStudyOs: (url: string) => Promise<void>;
+  openGameHubPreview: () => Promise<void>;
   refreshLearningProgress: () => Promise<void>;
   openStaffConsole: () => void;
 };
@@ -390,6 +391,28 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
         await clearStaffSession();
         setSession(null);
         setStaffAccess(null);
+        window.location.assign(target.toString());
+      }
+    },
+    openGameHubPreview: async () => {
+      const target = new URL("https://c8637929.hiutmc-game-hub.pages.dev/");
+      if (!session) {
+        window.location.assign(target.toString());
+        return;
+      }
+      try {
+        const fresh = await refreshSession(session);
+        setSession(fresh);
+        const fragment = new URLSearchParams({
+          [BRIDGE_FLAG]: "1",
+          access_token: fresh.accessToken,
+          refresh_token: fresh.refreshToken,
+        });
+        target.hash = fragment.toString();
+        window.location.assign(target.toString());
+      } catch {
+        saveStored(null);
+        setSession(null);
         window.location.assign(target.toString());
       }
     },
