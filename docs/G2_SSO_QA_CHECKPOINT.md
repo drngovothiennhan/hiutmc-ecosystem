@@ -20,6 +20,16 @@
 - No credentials, tokens, cookies, account names, or member records were inspected or recorded.
 - No Garden gameplay, Supabase writes, schema changes, Study OS changes, production deployment, or DNS/domain changes occurred.
 
-## Next action
+## G3 SSO smoke — current preview (2026-09-25)
 
-G2 SSO is verified on isolated previews. Continue G3 by reading `GARDEN_V7_EXTRACTION_MAP.md` and the approved gameplay contracts; keep production data read-only until an isolated test environment or verified rollback is available.
+- QA branch commit: `7c56d01228c689963be033987bcd8b66c3300281`; retargets the opt-in handoff to the current Game Hub G3 preview.
+- Ecosystem CI run `36158267315` and isolated preview run `36158258910` passed.
+- Latest immutable Ecosystem QA preview: `https://9070e22e-hiutmc-ecosystem-g2-sso-preview.dr-ngovothiennhan.workers.dev/?g2-sso-test=1`.
+- The designated QA member signed in through the secure browser flow. The Game Hub receiver showed its signed-in state and the bridge fragment was cleared. The Garden continuation card was absent for this ordinary member account.
+- No planting, care, harvest, inventory, plot-unlock, or reload gameplay action was run.
+- The dedicated Supabase QA project still lacks the Garden plants, inventory, wallet, event, seed, and gameplay RPC schema. It cannot yet support the requested save/reload parity test.
+
+## Remaining G3 gate
+
+Use a fully isolated Garden schema and an authorized staff QA identity to test the gameplay sequence and persisted reload. Do not use a real production member save for those writes. The production beta remains role-restricted, and the previous isolated role-gate transaction remains the evidence for staff allowlisting.
+
