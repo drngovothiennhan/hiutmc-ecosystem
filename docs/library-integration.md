@@ -26,7 +26,7 @@ The browser does not receive a Drive URL or the service-role key. Responses are 
 - Apply `20260925115111_protected_learning_resource_reader.sql` in an isolated non-production test database first.
 - Configure `SUPABASE_SERVICE_ROLE_KEY` and `GOOGLE_SERVICE_ACCOUNT_JSON` in the StudyOS server environment. Never place either value in Hub variables or browser code.
 - Register and publish a real PDF with audience `members` in the test environment, then verify member, non-member, draft, archived, unsupported MIME, and byte-range cases.
-- Deploy the StudyOS backend before the Hub release. Hub CI run #192 and StudyOS Web CI run #1130 passed on the current implementation commits.
+- Deploy the StudyOS backend before the Hub release. Hub CI and StudyOS Web CI passed on the current implementation commits.
 - The connected production database was observed with zero learning-resource rows. No sample rows were created, no production migration was run, and no production deployment was made.
 
 ## Boundaries
