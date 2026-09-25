@@ -28,6 +28,10 @@ for (const marker of [
   "clearStaffSession",
   'window.location.assign(access.canAdmin ? "/admin/" : "/mod/")',
   "staffAccess",
+  'const GAME_HUB_ROLES = new Set(["member", "mod", "super_mod", "leader", "admin"]);',
+  "export function canAccessGameHub",
+  "openGameHub: async",
+  "if (!session || !canAccessGameHub(session.member.role)) return;",
 ]) {
   if (!files.auth.includes(marker)) errors.push(`member auth bridge missing marker: ${marker}`);
 }
