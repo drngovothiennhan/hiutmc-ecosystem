@@ -367,9 +367,10 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     },
     openStudyOs: async (rawUrl) => {
       let target: URL;
-      try { target = new URL(rawUrl); } catch { window.location.assign(rawUrl); return; }
+      try { target = new URL(rawUrl, window.location.href); } catch { window.location.assign(rawUrl); return; }
       const allowed = new Set(["yhct-hiu-final4-stage-hiu-yhct.vercel.app", "study.hiutmc.com"]);
-      if (!allowed.has(target.hostname) || !session) {
+      const sameOriginGateway = target.hostname === "hiutmc.com" && (target.pathname === "/apps/study" || target.pathname.startsWith("/apps/study/"));
+      if ((!allowed.has(target.hostname) && !sameOriginGateway) || !session) {
         window.location.assign(target.toString());
         return;
       }
