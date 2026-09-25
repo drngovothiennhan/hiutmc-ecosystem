@@ -2,31 +2,31 @@ export const learningModes = [
   {
     title: "Học 15 phút",
     body: "Phiên học nhanh cho sinh viên muốn ôn một chủ đề trong thời gian ngắn.",
-    href: "https://yhct-hiu-final4-stage-hiu-yhct.vercel.app/",
+    href: "https://hiutmc.com/apps/study/",
     action: "Bắt đầu trên Study OS"
   },
   {
     title: "Quiz & Flashcard",
     body: "Luyện câu hỏi, ghi nhớ trọng tâm và quay lại nội dung chưa chắc.",
-    href: "https://yhct-hiu-final4-stage-hiu-yhct.vercel.app/",
+    href: "https://hiutmc.com/apps/study/",
     action: "Mở khu luyện tập"
   },
   {
     title: "Atlas 3D",
     body: "Quan sát kinh lạc, huyệt vị và liên hệ trực quan trên mô hình 3D.",
-    href: "https://drngovothiennhan.github.io/human-atlas/",
+    href: "https://hiutmc.com/apps/atlas/",
     action: "Mở Atlas"
   },
   {
     title: "Trung Y Văn",
     body: "Đọc và tra cứu học liệu, văn bản và nội dung học thuật Y học cổ truyền.",
-    href: "https://drngovothiennhan.github.io/trung-y-van-hiu/",
+    href: "https://hiutmc.com/apps/trungyvan/",
     action: "Mở thư viện"
   },
   {
     title: "A.I Thiệt Chẩn",
     body: "Công cụ chuyên biệt phục vụ học quan sát đặc điểm lưỡi trong bối cảnh giáo dục.",
-    href: "https://ai-thiet-chan-hiu-yhct.vercel.app/",
+    href: "https://hiutmc.com/apps/thietchan/",
     action: "Mở công cụ"
   }
 ];
