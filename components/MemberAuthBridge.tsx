@@ -212,10 +212,19 @@ async function refreshSession(current: StoredSession): Promise<StoredSession> {
   return next;
 }
 
+function useG2PreviewLoginProxy() {
+  const hostname = window.location.hostname;
+  const previewHost = /^(?:[a-f0-9]+-)?hiutmc-ecosystem-g2-sso-preview\\.dr-ngovothiennhan\\.workers\\.dev$/.test(hostname);
+  return previewHost && new URLSearchParams(window.location.search).get("g2-sso-test") === "1";
+}
+
 async function loginMember(studentCode: string, password: string): Promise<StoredSession> {
-  const response = await fetch(`${SUPABASE_URL}/functions/v1/member-login`, {
+  const endpoint = useG2PreviewLoginProxy()
+    ? "/api/g2-member-login"
+    : `${SUPABASE_URL}/functions/v1/member-login`;
+  const response = await fetch(endpoint, {
     method: "POST",
-    headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
+    headers: endpoint.startsWith("/") ? { "Content-Type": "application/json" } : { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
     body: JSON.stringify({ studentCode: studentCode.trim(), password }),
     cache: "no-store",
   });
