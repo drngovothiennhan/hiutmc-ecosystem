@@ -58,7 +58,7 @@ function LibraryReader({ resource, onClose }: { resource: Resource; onClose: () 
   const { getMemberAccessToken } = useMemberAuth();
   const frameRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [document, setDocument] = useState<PdfDocument | null>(null);
+  const [pdfDocument, setPdfDocument] = useState<PdfDocument | null>(null);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(0);
   const [zoom, setZoom] = useState(1);
@@ -72,7 +72,7 @@ function LibraryReader({ resource, onClose }: { resource: Resource; onClose: () 
     setBusy(true);
     setError("");
     setPage(1);
-    setDocument(null);
+    setPdfDocument(null);
     void (async () => {
       try {
         const token = await getMemberAccessToken();
@@ -90,7 +90,7 @@ function LibraryReader({ resource, onClose }: { resource: Resource; onClose: () 
         });
         loaded = await (loadingTask as { promise: Promise<PdfDocument> }).promise;
         if (live) {
-          setDocument(loaded);
+          setPdfDocument(loaded);
           setPages(loaded.numPages);
         } else {
           await loaded.destroy();
@@ -109,12 +109,12 @@ function LibraryReader({ resource, onClose }: { resource: Resource; onClose: () 
   }, [resource.resourceKey, getMemberAccessToken]);
 
   useEffect(() => {
-    if (!document || !canvasRef.current) return;
+    if (!pdfDocument || !canvasRef.current) return;
     let live = true;
     let task: { promise: Promise<void>; cancel: () => void } | null = null;
     void (async () => {
       try {
-        const pdfPage = await document.getPage(page);
+        const pdfPage = await pdfDocument.getPage(page);
         if (!live || !canvasRef.current) return;
         const viewport = pdfPage.getViewport({ scale: zoom });
         const canvas = canvasRef.current;
@@ -135,11 +135,11 @@ function LibraryReader({ resource, onClose }: { resource: Resource; onClose: () 
       }
     })();
     return () => { live = false; task?.cancel(); };
-  }, [document, page, zoom]);
+  }, [pdfDocument, page, zoom]);
 
   const fullscreen = async () => {
     if (!frameRef.current) return;
-    if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
+    if (window.document.fullscreenElement) await window.document.exitFullscreen().catch(() => {});
     else await frameRef.current.requestFullscreen?.().catch(() => {});
   };
 
