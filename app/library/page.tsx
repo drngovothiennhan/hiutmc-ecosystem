@@ -25,9 +25,10 @@ type PdfDocument = {
   }>;
   destroy: () => Promise<void>;
 };
+type PdfLoadingTask = { promise: Promise<PdfDocument>; destroy: () => void };
 type PdfJs = {
   GlobalWorkerOptions: { workerSrc: string };
-  getDocument: (options: Record<string, unknown>) => { promise: Promise<PdfDocument>; destroy: () => void };
+  getDocument: (options: Record<string, unknown>) => PdfLoadingTask;
 };
 declare global {
   interface Window { pdfjsLib?: PdfJs; }
@@ -67,7 +68,7 @@ function LibraryReader({ resource, onClose }: { resource: Resource; onClose: () 
 
   useEffect(() => {
     let live = true;
-    let loadingTask: { destroy: () => void } | null = null;
+    let loadingTask: PdfLoadingTask | null = null;
     let loaded: PdfDocument | null = null;
     setBusy(true);
     setError("");
@@ -88,7 +89,7 @@ function LibraryReader({ resource, onClose }: { resource: Resource; onClose: () 
           disableAutoFetch: true,
           rangeChunkSize: 65536,
         });
-        loaded = await (loadingTask as { promise: Promise<PdfDocument> }).promise;
+        loaded = await loadingTask.promise;
         if (live) {
           setPdfDocument(loaded);
           setPages(loaded.numPages);
