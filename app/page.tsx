@@ -97,7 +97,7 @@ function HomeContent() {
           <p>Một điểm vào thống nhất cho học tập, Atlas 3D, AI, Trung Y Văn và hoạt động học thuật của cộng đồng HIU.</p>
           <div className={styles.heroMark}>Dưỡng Tâm<br />Học Thuật<br />Hành Y Đạo</div>
           {showGameHubSsoPreview && (
-            <button type="button" className={styles.continueButton} onClick={() => void openGameHubPreview()}>
+            <button type="button" className={styles.g2PreviewButton} onClick={() => void openGameHubPreview()}>
               Kiểm tra đăng nhập Game Hub preview
             </button>
           )}
