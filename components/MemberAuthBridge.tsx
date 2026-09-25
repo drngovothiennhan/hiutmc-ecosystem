@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
 import DisplayModeToggle from "./DisplayModeToggle";
+import { launchSeamlessApp, requestSeamlessFullscreen } from "./SeamlessAppFrame";
 import styles from "./MemberAuthBridge.module.css";
 
 const SUPABASE_URL = "https://gzmpnsrwqjpsbklyflqr.supabase.co";
@@ -366,11 +367,16 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       }
     },
     openStudyOs: async (rawUrl) => {
+      void requestSeamlessFullscreen();
       let target: URL;
-      try { target = new URL(rawUrl); } catch { window.location.assign(rawUrl); return; }
+      try { target = new URL(rawUrl, window.location.href); } catch { window.location.assign(rawUrl); return; }
       const allowed = new Set(["yhct-hiu-final4-stage-hiu-yhct.vercel.app", "study.hiutmc.com"]);
-      if (!allowed.has(target.hostname) || !session) {
+      if (!allowed.has(target.hostname)) {
         window.location.assign(target.toString());
+        return;
+      }
+      if (!session) {
+        launchSeamlessApp(target.toString(), "Study OS");
         return;
       }
       try {
@@ -384,13 +390,13 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
           refresh_token: fresh.refreshToken,
         });
         target.hash = fragment.toString();
-        window.location.assign(target.toString());
+        launchSeamlessApp(target.toString(), "Study OS");
       } catch {
         saveStored(null);
         await clearStaffSession();
         setSession(null);
         setStaffAccess(null);
-        window.location.assign(target.toString());
+        launchSeamlessApp(target.toString(), "Study OS");
       }
     },
     refreshLearningProgress,
