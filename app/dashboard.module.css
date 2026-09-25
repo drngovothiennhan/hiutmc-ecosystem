@@ -367,3 +367,44 @@
 :global(html[data-display-mode="pc"]) .missionWrap :global(.missionActions a),
 :global(html[data-display-mode="pc"]) .missionWrap :global(.missionActions button){font-size:var(--home-content-action)!important}
 :global(html[data-display-mode="pc"]) .footer{font-size:var(--home-content-meta)!important}
+
+
+/* G2 preview CTA uses its own layout; the Study OS continue CTA becomes an icon on mobile. */
+.g2PreviewButton{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  align-self:flex-start;
+  max-width:min(100%,320px);
+  min-height:42px;
+  margin-top:12px;
+  padding:10px 16px;
+  border:1px solid rgba(116,21,41,.2);
+  border-radius:12px;
+  background:#9f1c3b;
+  color:#fff;
+  font:700 12px/1.35 inherit;
+  text-align:center;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  cursor:pointer;
+}
+.g2PreviewButton:hover{background:#741529}
+@media(max-width:820px){
+  :global(html:not([data-display-mode="pc"])) .hero h1{
+    max-width:100%;
+    overflow-wrap:anywhere;
+  }
+  :global(html:not([data-display-mode="pc"])) .hero h1 span{
+    white-space:normal;
+  }
+  :global(html:not([data-display-mode="pc"])) .hero p{
+    max-width:100%;
+    overflow-wrap:anywhere;
+  }
+  :global(html:not([data-display-mode="pc"])) .g2PreviewButton{
+    max-width:100%;
+    min-height:44px;
+    font-size:12px;
+  }
+}
