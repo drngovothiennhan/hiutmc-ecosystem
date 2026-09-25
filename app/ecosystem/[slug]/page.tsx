@@ -25,7 +25,7 @@ export default async function AppDetail({ params }: { params: Promise<{ slug: st
           <span><strong>Tên miền HIU TMC:</strong> {app.plannedCanonicalDomain.replace("https://", "").replace("/", "")}</span>
         </div>
         <div className="detailActions">
-          <a className="primaryBtn" href={app.currentUpstreamUrl}>Mở ứng dụng ↗</a>
+          <a className="primaryBtn" href={app.launchUrl}>Mở ứng dụng ↗</a>
           <a className="secondaryBtn" href="/">Khám phá ứng dụng khác</a>
         </div>
       </div>
