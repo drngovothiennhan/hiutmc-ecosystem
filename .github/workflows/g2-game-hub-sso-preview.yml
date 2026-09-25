@@ -104,6 +104,30 @@ jobs:
             if (buttonMetrics.scrollWidth > buttonMetrics.clientWidth + 1 || buttonMetrics.scrollHeight > buttonMetrics.clientHeight + 1) {
               throw new Error(`G2 preview button text is clipped at ${width}px: ${JSON.stringify(buttonMetrics)}`);
             }
+            const heroMetrics = await page.locator(".hero h1").evaluate((el) => ({
+              clientWidth: el.clientWidth,
+              scrollWidth: el.scrollWidth,
+              name: el.querySelector("span"),
+            }));
+            if (heroMetrics.scrollWidth > heroMetrics.clientWidth + 1) {
+              throw new Error(`hero title text is clipped at ${width}px: ${heroMetrics.scrollWidth}/${heroMetrics.clientWidth}`);
+            }
+            const introMetrics = await page.locator(".hero p").evaluate((el) => ({
+              clientWidth: el.clientWidth,
+              scrollWidth: el.scrollWidth,
+              whiteSpace: getComputedStyle(el).whiteSpace,
+            }));
+            if (introMetrics.scrollWidth > introMetrics.clientWidth + 1 || introMetrics.whiteSpace === "nowrap") {
+              throw new Error(`hero introduction text is clipped at ${width}px: ${JSON.stringify(introMetrics)}`);
+            }
+            const sectionLink = await page.locator(".panelHead a").first().evaluate((el) => ({
+              clientWidth: el.clientWidth,
+              scrollWidth: el.scrollWidth,
+              whiteSpace: getComputedStyle(el).whiteSpace,
+            }));
+            if (sectionLink.scrollWidth > sectionLink.clientWidth + 1 || sectionLink.whiteSpace !== "nowrap") {
+              throw new Error(`section link wraps or clips at ${width}px: ${JSON.stringify(sectionLink)}`);
+            }
             const metrics = await page.evaluate(() => ({
               scrollWidth: document.documentElement.scrollWidth,
               clientWidth: document.documentElement.clientWidth,
