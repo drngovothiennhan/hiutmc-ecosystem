@@ -267,3 +267,14 @@ button.displayModeToggle{display:inline-flex;align-items:center;justify-content:
 
 /* CP28 sans clarity: +0.5px text step across Inter/system UI, with slightly stronger inherited stroke weight. */
 body{font-weight:450;font-optical-sizing:auto}
+@view-transition{navigation:auto}
+:root{--hiu-navigation-duration:1200ms}
+::view-transition-old(root),::view-transition-new(root){animation-duration:var(--hiu-navigation-duration);animation-timing-function:cubic-bezier(.22,.72,.24,1)}
+::view-transition-old(root){animation-name:hiu-page-out}
+::view-transition-new(root){animation-name:hiu-page-in}
+@keyframes hiu-page-out{to{opacity:0;transform:translateX(-1.25%)}}
+@keyframes hiu-page-in{from{opacity:0;transform:translateX(1.25%)}}
+html.hiu-app-exit{overflow:hidden}
+html.hiu-app-exit::after{content:"";position:fixed;inset:0;z-index:2147483647;pointer-events:auto;background:#f3eddf;opacity:0;animation:hiu-app-exit var(--hiu-navigation-duration) cubic-bezier(.22,.72,.24,1) forwards}
+@keyframes hiu-app-exit{to{opacity:1}}
+@media(prefers-reduced-motion:reduce){:root{--hiu-navigation-duration:1ms}::view-transition-old(root),::view-transition-new(root){animation-duration:1ms!important}html.hiu-app-exit::after{animation-duration:1ms!important}}

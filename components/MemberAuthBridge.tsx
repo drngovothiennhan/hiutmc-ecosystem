@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
 import DisplayModeToggle from "./DisplayModeToggle";
+import { transitionBeforeAppNavigation } from "./NavigationTransitions";
 import styles from "./MemberAuthBridge.module.css";
 
 const SUPABASE_URL = "https://gzmpnsrwqjpsbklyflqr.supabase.co";
@@ -371,6 +372,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       const allowed = new Set(["yhct-hiu-final4-stage-hiu-yhct.vercel.app", "study.hiutmc.com"]);
       const sameOriginGateway = target.hostname === "hiutmc.com" && (target.pathname === "/apps/study" || target.pathname.startsWith("/apps/study/"));
       if ((!allowed.has(target.hostname) && !sameOriginGateway) || !session) {
+        await transitionBeforeAppNavigation(target.toString());
         window.location.assign(target.toString());
         return;
       }
@@ -385,12 +387,14 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
           refresh_token: fresh.refreshToken,
         });
         target.hash = fragment.toString();
+        await transitionBeforeAppNavigation(target.toString());
         window.location.assign(target.toString());
       } catch {
         saveStored(null);
         await clearStaffSession();
         setSession(null);
         setStaffAccess(null);
+        await transitionBeforeAppNavigation(target.toString());
         window.location.assign(target.toString());
       }
     },

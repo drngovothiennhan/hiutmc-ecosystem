@@ -115,7 +115,7 @@ function HomeContent() {
                 {apps.map((app) => {
                   const meta = hubMeta[app.slug] ?? { icon: "nav-ai", tone: app.accent };
                   return (
-                    <a key={app.slug} className={styles.hub} href={app.launchUrl} onClick={app.slug === "study-os" ? (event) => { event.preventDefault(); void openStudyOs(app.launchUrl); } : undefined} style={{ "--hub": meta.tone } as CSSProperties}>
+                    <a key={app.slug} className={styles.hub} href={app.launchUrl} data-app-transition={app.slug === "study-os" ? undefined : ""} onClick={app.slug === "study-os" ? (event) => { event.preventDefault(); void openStudyOs(app.launchUrl); } : undefined} style={{ "--hub": meta.tone } as CSSProperties}>
                       <span className={styles.hubIcon}><HomeIcon name={meta.icon} /></span>
                       <strong>{app.shortName}</strong>
                       <p>{app.tagline}</p>

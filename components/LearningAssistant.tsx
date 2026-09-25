@@ -32,7 +32,7 @@ export default function LearningAssistant({ apps }: { apps: EcosystemApp[] }) {
       <nav className="assistantLinks" aria-label="Lối vào trợ lý và học liệu">
         {assistantLinks.map((item) => {
           const app = apps.find((candidate) => candidate.slug === item.slug);
-          return app ? <a href={app.currentUpstreamUrl} key={item.slug}>
+          return app ? <a href={app.currentUpstreamUrl} data-app-transition key={item.slug}>
             <span aria-hidden="true">{item.slug === "study-os" ? "✦" : item.slug === "ai-thiet-chan" ? "◉" : item.slug === "atlas" ? "◎" : "▤"}</span>
             <span><strong>{item.title}</strong><small>{item.note}</small></span><b aria-hidden="true">↗</b>
           </a> : null;
