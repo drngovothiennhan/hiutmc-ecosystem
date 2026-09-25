@@ -5,7 +5,7 @@ import HomeIcon, { type HomeIconName } from "@/components/HomeIcon";
 import DailyMissions from "@/components/DailyMissions";
 import DisplayModeToggle from "@/components/DisplayModeToggle";
 import SpiritCompanion from "@/components/SpiritCompanion";
-import { MemberAccount, MemberAuthProvider, StudyOsLink, useMemberAuth } from "@/components/MemberAuthBridge";
+import { canAccessGameHub, GameHubLink, MemberAccount, MemberAuthProvider, StudyOsLink, useMemberAuth } from "@/components/MemberAuthBridge";
 import { useHubRegistry } from "@/components/hub-registry";
 import styles from "./dashboard.module.css";
 
@@ -33,6 +33,7 @@ function HomeContent() {
   const { openStudyOs, member, learningProgress, learningProgressReady } = useMemberAuth();
   const studyOsUrl = apps.find((app) => app.slug === "study-os")?.launchUrl ?? "/learn/";
   const atlasUrl = apps.find((app) => app.slug === "atlas")?.launchUrl ?? "/ecosystem/atlas/";
+  const gameHubUrl = "https://hiutmc-game-hub.pages.dev/";
   const synced = Boolean(member && learningProgressReady && learningProgress?.hasSync);
   const latestScore = synced ? learningProgress?.lastExamScore ?? null : null;
   const ringLabel = !member ? "—" : !learningProgressReady ? "…" : synced ? (latestScore !== null ? `${latestScore}%` : "✓") : "—";
@@ -65,6 +66,7 @@ function HomeContent() {
         <nav className={styles.nav}>
           <a href="#top"><i>⌂</i>Trang chủ</a>
           <StudyOsLink href={studyOsUrl}><i>▤</i>Học tập</StudyOsLink>
+          <GameHubLink href={gameHubUrl}><i>♧</i>Game Hub</GameHubLink>
           <a href={atlasUrl}><i>◎</i>Atlas 3D</a>
           <a href="/ai/"><i>◈</i>AI YHCT</a>
           <a href="/community/"><i>♧</i>Cộng đồng</a>
@@ -123,6 +125,14 @@ function HomeContent() {
                     </a>
                   );
                 })}
+                {canAccessGameHub(member?.role) && (
+                  <GameHubLink href={gameHubUrl} className={styles.hub} style={{ "--hub": "#4d704c" } as CSSProperties}>
+                    <span className={styles.hubIcon}><HomeIcon name="herbal-function" /></span>
+                    <strong>Game Hub</strong>
+                    <p>Trải nghiệm game học thuật HIU TMC.</p>
+                    <b>Mở ứng dụng →</b>
+                  </GameHubLink>
+                )}
               </div>
             </section>
 

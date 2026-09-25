@@ -9,6 +9,12 @@ const SUPABASE_URL = "https://gzmpnsrwqjpsbklyflqr.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG";
 const STORAGE_KEY = "hiutmc-member-session-v1";
 const BRIDGE_FLAG = "ecosystem_sso";
+const GAME_HUB_URL = "https://hiutmc-game-hub.pages.dev/";
+const GAME_HUB_ROLES = new Set(["admin", "mod", "super_mod"]);
+
+export function canAccessGameHub(role?: string | null) {
+  return GAME_HUB_ROLES.has(String(role || "").trim().toLowerCase());
+}
 
 export type Member = {
   id: string;
@@ -63,6 +69,7 @@ type AuthContextValue = {
   login: (studentCode: string, password: string) => Promise<StaffAccess | null>;
   logout: () => Promise<void>;
   openStudyOs: (url: string) => Promise<void>;
+  openGameHub: (url: string) => Promise<void>;
   refreshLearningProgress: () => Promise<void>;
   openStaffConsole: () => void;
 };
@@ -398,6 +405,27 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
         window.location.assign(target.toString());
       }
     },
+    openGameHub: async (rawUrl) => {
+      if (!session || !canAccessGameHub(session.member.role)) return;
+      let target: URL;
+      try { target = new URL(rawUrl, window.location.href); } catch { return; }
+      if (target.origin !== new URL(GAME_HUB_URL).origin) return;
+      try {
+        const fresh = await refreshSession(session);
+        if (!canAccessGameHub(fresh.member.role)) return;
+        setSession(fresh);
+        const fragment = new URLSearchParams({
+          [BRIDGE_FLAG]: "1",
+          access_token: fresh.accessToken,
+          refresh_token: fresh.refreshToken,
+        });
+        target.hash = fragment.toString();
+        await transitionBeforeAppNavigation(target.toString());
+        window.location.assign(target.toString());
+      } catch {
+        // Keep the member on the ecosystem if the staff session cannot be refreshed.
+      }
+    },
     refreshLearningProgress,
     openStaffConsole: () => {
       if (!staffAccess?.authorized) return;
@@ -431,6 +459,26 @@ export function StudyOsLink({
     void openStudyOs(href);
   };
   return <a href={href} className={className} onClick={onClick} {...rest}>{children}</a>;
+}
+
+export function GameHubLink({
+  href,
+  className,
+  children,
+  ...rest
+}: {
+  href: string;
+  className?: string;
+  children: ReactNode;
+  [key: string]: unknown;
+}) {
+  const { member, openGameHub } = useMemberAuth();
+  if (!member || !canAccessGameHub(member.role)) return null;
+  const onClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    void openGameHub(href);
+  };
+  return <a href={href} className={className} {...rest} onClick={onClick}>{children}</a>;
 }
 
 function ProfileDisplayModeSetting({ onModeChange }: { onModeChange?: (mode: DisplayMode) => void }) {
