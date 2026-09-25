@@ -52,9 +52,13 @@ export function useDisplayMode() {
   return { mode, setMode };
 }
 
-export default function DisplayModeToggle({ className = "" }: { className?: string }) {
+export default function DisplayModeToggle({ className = "", onModeChange }: { className?: string; onModeChange?: (mode: DisplayMode) => void }) {
   const { mode, setMode } = useDisplayMode();
-  const toggle = () => setMode(mode === "pc" ? "auto" : "pc");
+  const toggle = () => {
+    const nextMode: DisplayMode = mode === "pc" ? "auto" : "pc";
+    setMode(nextMode);
+    onModeChange?.(nextMode);
+  };
   const currentMode = mode === "pc" ? "PC" : "Mobile";
   const nextMode = mode === "pc" ? "Mobile" : "PC";
   const label = mode === "pc" ? "PC → Mobile" : "Mobile → PC";
