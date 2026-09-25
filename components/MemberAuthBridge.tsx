@@ -62,6 +62,7 @@ type AuthContextValue = {
   login: (studentCode: string, password: string) => Promise<StaffAccess | null>;
   logout: () => Promise<void>;
   openStudyOs: (url: string) => Promise<void>;
+  openGameHub: () => Promise<void>;
   refreshLearningProgress: () => Promise<void>;
   openStaffConsole: () => void;
 };
@@ -363,6 +364,33 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
           headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` },
           keepalive: true,
         }).catch(() => {});
+      }
+    },
+    openGameHub: async () => {
+      const hubUrl = "https://hiutmc-game-hub.pages.dev/";
+      if (!session) {
+        window.location.assign(hubUrl);
+        return;
+      }
+      try {
+        const fresh = await refreshSession(session);
+        const access = await syncStaffSession(fresh.accessToken);
+        setSession(fresh);
+        setStaffAccess(access?.authorized ? access : null);
+        const fragment = new URLSearchParams({
+          [BRIDGE_FLAG]: "1",
+          access_token: fresh.accessToken,
+          refresh_token: fresh.refreshToken,
+        });
+        const target = new URL(hubUrl);
+        target.hash = fragment.toString();
+        window.location.assign(target.toString());
+      } catch {
+        saveStored(null);
+        await clearStaffSession();
+        setSession(null);
+        setStaffAccess(null);
+        window.location.assign(hubUrl);
       }
     },
     openStudyOs: async (rawUrl) => {
