@@ -214,7 +214,7 @@ async function refreshSession(current: StoredSession): Promise<StoredSession> {
 
 function useG2PreviewLoginProxy() {
   const hostname = window.location.hostname;
-  const previewHost = /^(?:[a-f0-9]+-)?hiutmc-ecosystem-g2-sso-preview\.dr-ngovothiennhan\.workers\.dev$/.test(hostname);
+  const previewHost = /^(?:[a-f0-9]+-|hiutmc-ecosystem-g2-sso-pr-[a-z0-9]+-)?hiutmc-ecosystem-g2-sso-preview\\.dr-ngovothiennhan\\.workers\\.dev$/i.test(hostname);
   return previewHost && new URLSearchParams(window.location.search).get("g2-sso-test") === "1";
 }
 
