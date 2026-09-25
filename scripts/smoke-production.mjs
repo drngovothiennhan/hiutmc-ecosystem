@@ -193,13 +193,21 @@ for (const marker of hiddenAvatarMarkers) {
   if (liveHtml.includes(marker)) throw new Error(`Legacy avatar flow must remain hidden in CP15: ${marker}`);
 }
 const memberAppUrls = [
+  "https://hiutmc.com/apps/study/",
+  "https://hiutmc.com/apps/thietchan/",
+  "https://hiutmc.com/apps/trungyvan/",
+  "https://hiutmc.com/apps/atlas/",
+];
+for (const appUrl of memberAppUrls) {
+  if (!liveHtml.includes(appUrl)) throw new Error(`Homepage is missing an app destination: ${appUrl}`);
+}
+for (const rawUpstream of [
   "https://yhct-hiu-final4-stage-hiu-yhct.vercel.app/",
   "https://ai-thiet-chan-hiu-yhct.vercel.app/",
   "https://drngovothiennhan.github.io/trung-y-van-hiu/",
   "https://drngovothiennhan.github.io/human-atlas/",
-];
-for (const appUrl of memberAppUrls) {
-  if (!liveHtml.includes(appUrl)) throw new Error(`Homepage is missing an app destination: ${appUrl}`);
+]) {
+  if (liveHtml.includes(`href="${rawUpstream}`)) throw new Error(`Homepage still exposes raw upstream navigation: ${rawUpstream}`);
 }
 const { text: manifestText } = await getWithRetry(new URL('/manifest.webmanifest', base));
 const manifest = JSON.parse(manifestText);
