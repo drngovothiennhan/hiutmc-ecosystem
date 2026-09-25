@@ -80,7 +80,7 @@ function LibraryReader({ resource, onClose }: { resource: Resource; onClose: () 
         if (!token) throw new Error("Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại để tiếp tục đọc.");
         const pdfjs = await loadPdfJs();
         pdfjs.GlobalWorkerOptions.workerSrc = PDFJS_WORKER;
-        const url = `${STUDYOS_API}/reader?key=${encodeURIComponent(resource.resourceKey)}`;
+        const url = `${STUDYOS_API}/resources?action=reader&key=${encodeURIComponent(resource.resourceKey)}`;
         loadingTask = pdfjs.getDocument({
           url,
           httpHeaders: { Authorization: `Bearer ${token}` },
@@ -200,7 +200,7 @@ function LibraryGateway() {
       try {
         const token = await getMemberAccessToken();
         if (!token) throw new Error("Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.");
-        const response = await fetch(`${STUDYOS_API}/resources-hub?limit=100`, {
+        const response = await fetch(`${STUDYOS_API}/resources?limit=100`, {
           headers: { Authorization: `Bearer ${token}` },
           cache: "no-store",
           signal: controller.signal,
