@@ -62,6 +62,7 @@ type AuthContextValue = {
   login: (studentCode: string, password: string) => Promise<StaffAccess | null>;
   logout: () => Promise<void>;
   openStudyOs: (url: string) => Promise<void>;
+  getMemberAccessToken: () => Promise<string | null>;
   refreshLearningProgress: () => Promise<void>;
   openStaffConsole: () => void;
 };
@@ -392,6 +393,20 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
         setSession(null);
         setStaffAccess(null);
         window.location.assign(target.toString());
+      }
+    },
+    getMemberAccessToken: async () => {
+      if (!session) return null;
+      try {
+        const fresh = await refreshSession(session);
+        setSession(fresh);
+        return fresh.accessToken;
+      } catch {
+        saveStored(null);
+        setSession(null);
+        setStaffAccess(null);
+        await clearStaffSession();
+        return null;
       }
     },
     refreshLearningProgress,
