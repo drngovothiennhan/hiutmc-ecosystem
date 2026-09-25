@@ -107,7 +107,7 @@ function LibraryReader({ resource, apiBase, onClose }: { resource: Resource; api
       loadingTask?.destroy();
       if (loaded) void loaded.destroy();
     };
-  }, [resource.resourceKey, getMemberAccessToken]);
+  }, [resource.resourceKey, apiBase, getMemberAccessToken]);
 
   useEffect(() => {
     if (!pdfDocument || !canvasRef.current) return;
@@ -219,7 +219,7 @@ function LibraryGateway() {
       }
     })();
     return () => { live = false; controller.abort(); };
-  }, [member?.id, getMemberAccessToken, revision]);
+  }, [member?.id, apiBase, getMemberAccessToken, revision]);
 
   const visible = useMemo(() => items.filter(item => item.title.toLocaleLowerCase("vi").includes(query.trim().toLocaleLowerCase("vi"))), [items, query]);
 
