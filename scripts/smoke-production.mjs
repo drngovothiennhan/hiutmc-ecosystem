@@ -83,7 +83,7 @@ for (const [route, marker] of sameOriginAppRoutes) {
 }
 
 const sameOriginDeepRoutes = [
-  ["/apps/study/feed", "YHCT HIU 4.0"],
+  ["/apps/study/ai", "YHCT HIU 4.0"],
   ["/apps/study/api/manifest", null],
   ["/apps/thietchan/open-source.html", "Nguồn mở"],
   ["/apps/trungyvan/manifest.webmanifest", null],
