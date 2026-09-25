@@ -30,7 +30,7 @@ const events = [
 
 function HomeContent() {
   const apps = useHubRegistry();
-  const { openStudyOs, member, learningProgress, learningProgressReady } = useMemberAuth();
+  const { openStudyOs, openGameHub, member, learningProgress, learningProgressReady } = useMemberAuth();
   const studyOsUrl = apps.find((app) => app.slug === "study-os")?.launchUrl ?? "/learn/";
   const atlasUrl = apps.find((app) => app.slug === "atlas")?.launchUrl ?? "/ecosystem/atlas/";
   const synced = Boolean(member && learningProgressReady && learningProgress?.hasSync);
@@ -65,6 +65,7 @@ function HomeContent() {
         <nav className={styles.nav}>
           <a href="#top"><i>⌂</i>Trang chủ</a>
           <StudyOsLink href={studyOsUrl}><i>▤</i>Học tập</StudyOsLink>
+          {member && <a href="https://hiutmc-game-hub.pages.dev/" onClick={(event) => { event.preventDefault(); void openGameHub(); }}><i>♧</i>Game Hub</a>}
           <a href={atlasUrl}><i>◎</i>Atlas 3D</a>
           <a href="/ai/"><i>◈</i>AI YHCT</a>
           <a href="/community/"><i>♧</i>Cộng đồng</a>
@@ -123,6 +124,14 @@ function HomeContent() {
                     </a>
                   );
                 })}
+                {member && (
+                  <a className={styles.hub} href="https://hiutmc-game-hub.pages.dev/" onClick={(event) => { event.preventDefault(); void openGameHub(); }} style={{ "--hub": "#48785a" } as CSSProperties}>
+                    <span className={styles.hubIcon}><HomeIcon name="herbal-function" /></span>
+                    <strong>HIU TMC Game Hub</strong>
+                    <p>Tiếp tục hành trình Gia Viên Dược Thảo bằng tài khoản Study OS.</p>
+                    <b>Mở Game Hub →</b>
+                  </a>
+                )}
               </div>
             </section>
 
