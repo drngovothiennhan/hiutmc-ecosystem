@@ -10,7 +10,7 @@ const SUPABASE_KEY = "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG";
 const STORAGE_KEY = "hiutmc-member-session-v1";
 const BRIDGE_FLAG = "ecosystem_sso";
 const GAME_HUB_URL = "https://hiutmc-game-hub.pages.dev/";
-const GAME_HUB_ROLES = new Set(["admin", "mod", "super_mod"]);
+const GAME_HUB_ROLES = new Set(["member", "mod", "super_mod", "leader", "admin"]);
 
 export function canAccessGameHub(role?: string | null) {
   return GAME_HUB_ROLES.has(String(role || "").trim().toLowerCase());
