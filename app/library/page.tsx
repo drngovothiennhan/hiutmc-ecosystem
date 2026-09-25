@@ -5,7 +5,7 @@ import { MemberAccount, MemberAuthProvider, useMemberAuth } from "@/components/M
 import { useHubRegistry } from "@/components/hub-registry";
 import styles from "./library.module.css";
 
-const STUDYOS_API = "https://study.hiutmc.com/api/knowledge";
+const DEFAULT_STUDYOS_API = "https://study.hiutmc.com/api/knowledge";
 const PDFJS_VERSION = "3.11.174";
 const PDFJS_SCRIPT = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSION}/pdf.min.js`;
 const PDFJS_WORKER = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSION}/pdf.worker.min.js`;
@@ -55,7 +55,7 @@ function loadPdfJs(): Promise<PdfJs> {
   return pdfJsLoad;
 }
 
-function LibraryReader({ resource, onClose }: { resource: Resource; onClose: () => void }) {
+function LibraryReader({ resource, apiBase, onClose }: { resource: Resource; apiBase: string; onClose: () => void }) {
   const { getMemberAccessToken } = useMemberAuth();
   const frameRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -80,7 +80,7 @@ function LibraryReader({ resource, onClose }: { resource: Resource; onClose: () 
         if (!token) throw new Error("Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại để tiếp tục đọc.");
         const pdfjs = await loadPdfJs();
         pdfjs.GlobalWorkerOptions.workerSrc = PDFJS_WORKER;
-        const url = `${STUDYOS_API}/resources?action=reader&key=${encodeURIComponent(resource.resourceKey)}`;
+        const url = `${apiBase}/resources?action=reader&key=${encodeURIComponent(resource.resourceKey)}`;
         loadingTask = pdfjs.getDocument({
           url,
           httpHeaders: { Authorization: `Bearer ${token}` },
@@ -249,7 +249,7 @@ function LibraryGateway() {
                 </li>
               ))}</ul>
             ) : <p>{items.length ? "Không tìm thấy tài liệu phù hợp." : "Chưa có tài liệu PDF được phát hành cho thành viên."}</p>}
-            {selected && <LibraryReader resource={selected} onClose={() => setSelected(null)} />}
+            {selected && <LibraryReader resource={selected} apiBase={apiBase} onClose={() => setSelected(null)} />}
           </>
         )}
       </section>
