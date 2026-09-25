@@ -83,7 +83,7 @@ export default function DailyMissions({ apps }: { apps: EcosystemApp[] }) {
         return <article className={`missionCard${done ? " isDone" : ""}`} key={mission.id}>
           <div className="missionNumber">0{index + 1}</div>
           <div className="missionCopy"><div className="missionNameRow"><h3>{mission.title}</h3><span>+{mission.points} XP</span></div><p>{mission.detail}</p><div className="missionActions">
-            <a href={app?.currentUpstreamUrl ?? "/ecosystem/"} target="_blank" rel="noreferrer">Mở {app?.shortName ?? "Hub"} ↗</a>
+            <a href={app?.launchUrl ?? "/ecosystem/"} target="_blank" rel="noreferrer">Mở {app?.shortName ?? "Hub"} ↗</a>
             <button type="button" onClick={() => toggleMission(mission.id)} disabled={!dayKey} aria-pressed={done}>{done ? "✓ Đã hoàn thành" : "Đánh dấu hoàn tất"}</button>
           </div></div>
         </article>;
