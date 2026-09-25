@@ -213,7 +213,11 @@ export class VisitCounter {
         await txn.put({ total: total + 1, [`day:${today}`]: visitsToday + 1 });
 
         if (await txn.get("lastPrunedDay") !== today) {
-          await txn.delete(`day:${previousDateKey(today, 31)}`);
+          const cutoff = previousDateKey(today, 30);
+          const dayEntries = await txn.list({ prefix: "day:" });
+          for (const key of dayEntries.keys()) {
+            if (key.slice(4) < cutoff) await txn.delete(key);
+          }
           await txn.put("lastPrunedDay", today);
         }
       });

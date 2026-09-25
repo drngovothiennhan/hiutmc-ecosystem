@@ -12,11 +12,15 @@ function makeStorage() {
       else values.set(keyOrValues, value);
     },
     async delete(key) { return values.delete(key); },
+    async list({ prefix = "" } = {}) {
+      return new Map([...values.entries()].filter(([key]) => key.startsWith(prefix)));
+    },
     async transaction(callback) {
       const tx = {
         get: async (key) => values.get(key),
         put: async (keyOrValues, value) => this.put(keyOrValues, value),
         delete: async (key) => this.delete(key),
+        list: async (options) => this.list(options),
       };
       return callback(tx);
     },
@@ -145,4 +149,19 @@ test("Durable Object atomically stores total and daily counts", async () => {
   assert.equal(stats.todayVisits, 3);
   assert.equal(stats.dailyVisits.length, 7);
   assert.equal(stats.dailyVisits.at(-1).visits, 3);
+});
+
+test("daily retention removes stale dates and keeps the 31-day window", async () => {
+  const storage = makeStorage();
+  const today = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh", year: "numeric", month: "2-digit", day: "2-digit",
+  }).format(new Date());
+  const [year, month, day] = today.split("-").map(Number);
+  const cutoff = new Date(Date.UTC(year, month - 1, day - 30)).toISOString().slice(0, 10);
+  storage.values.set("day:2000-01-01", 4);
+  storage.values.set(`day:${cutoff}`, 2);
+  const counter = new VisitCounter({ storage });
+  await counter.fetch(new Request("https://traffic.internal/visit", { method: "POST" }));
+  assert.equal(storage.values.has("day:2000-01-01"), false);
+  assert.equal(storage.values.get(`day:${cutoff}`), 2);
 });
