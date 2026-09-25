@@ -55,7 +55,10 @@
 ## CP32 shared Hub publishing
 - Supabase migration `ecosystem_hub_shared_publication_v1` is applied to the production project.
 - Admin-only publish RPC and anonymous read-only registry RPC privileges were verified; the publication table has no direct client grants.
-- Local build, release checks, staff authorization contracts, traffic tests and Wrangler dry-run pass. Cloudflare deployment and live smoke are pending the source update.
+- Cloudflare production serves `/api/hub-registry`; the live registry response is valid public JSON.
+- Production smoke passed for public routes, Admin/Mod access gates, anonymous staff API denials, shared registry, PWA assets, social preview and security headers.
+- Local release checks, staff authorization contracts, traffic tests, build and Wrangler dry-run also pass.
+- The smoke runner now keeps timeouts active while reading response bodies and reuses the first homepage response to avoid a redundant slow fetch.
 
 ## Production release gates
 1. Repository boundary, release metadata and Hub registry validation.
