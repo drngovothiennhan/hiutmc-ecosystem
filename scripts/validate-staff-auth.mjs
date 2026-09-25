@@ -32,6 +32,8 @@ for (const marker of [
   "export function canAccessGameHub",
   "openGameHub: async",
   "if (!session || !canAccessGameHub(session.member.role)) return;",
+  "async function refreshSession(current: StoredSession, forceRefresh = false)",
+  "const fresh = await refreshSession(session, true);",
 ]) {
   if (!files.auth.includes(marker)) errors.push(`member auth bridge missing marker: ${marker}`);
 }
