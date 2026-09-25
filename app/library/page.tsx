@@ -211,7 +211,7 @@ function LibraryGateway() {
         });
         const body = await response.json().catch(() => null) as { ok?: boolean; data?: Resource[]; error?: string } | null;
         if (!response.ok || !body?.ok || !Array.isArray(body.data)) throw new Error(body?.error || "Chưa tải được danh mục tài liệu.");
-        if (live) setItems(body.data.filter(row => row?.resourceType === "document" && row?.mimeType === "application/pdf"));
+        if (live) setItems(body.data);
       } catch (cause) {
         if (live && !controller.signal.aborted) setError(cause instanceof Error ? cause.message : "Chưa tải được danh mục tài liệu.");
       } finally {
@@ -232,7 +232,7 @@ function LibraryGateway() {
       <section className={styles.panel}>
         <span className={styles.kicker}>HIU TMC · STUDY OS</span>
         <h1>Thư viện học liệu</h1>
-        <p className={styles.lead}>Danh mục chỉ hiển thị tài liệu PDF đã phát hành cho thành viên. StudyOS kiểm tra phiên, quyền truy cập và trạng thái xuất bản mỗi lần mở tài liệu.</p>
+        <p className={styles.lead}>Danh mục học liệu đã phát hành cho thành viên. Hub mở PDF bằng trình đọc trực tuyến; định dạng khác được mở trong StudyOS. StudyOS kiểm tra quyền và trạng thái xuất bản mỗi lần tải.</p>
         {!member ? (
           <div className={styles.info}>
             <span aria-hidden="true">▤</span>
@@ -249,10 +249,14 @@ function LibraryGateway() {
               <ul className={styles.list}>{visible.map(item => (
                 <li key={item.resourceKey}>
                   <div><strong>{item.title}</strong><small>{item.mimeType}{item.updatedAt && !Number.isNaN(Date.parse(item.updatedAt)) ? ` · ${new Date(item.updatedAt).toLocaleDateString("vi-VN")}` : ""}</small></div>
-                  <button type="button" onClick={() => setSelected(item)}>Mở để xem</button>
+                  {item.mimeType === "application/pdf" ? (
+                    <button type="button" onClick={() => setSelected(item)}>Mở để xem</button>
+                  ) : (
+                    <button type="button" onClick={() => void openStudyOs(studyOsUrl)}>Mở trong StudyOS →</button>
+                  )}
                 </li>
               ))}</ul>
-            ) : <p>{items.length ? "Không tìm thấy tài liệu phù hợp." : "Chưa có tài liệu PDF được phát hành cho thành viên."}</p>}
+            ) : <p>{items.length ? "Không tìm thấy tài liệu phù hợp." : "Chưa có học liệu được phát hành cho thành viên."}</p>}
             {selected && <LibraryReader resource={selected} apiBase={apiBase} onClose={() => setSelected(null)} />}
           </>
         )}
