@@ -14,6 +14,14 @@ const routes = [
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const sameOriginAppRoutes = [
+  ["/apps/study/", "YHCT HIU 4.0"],
+  ["/apps/thietchan/", "A.I THIỆT CHẨN"],
+  ["/apps/trungyvan/", "Trung Y Văn HIU"],
+  ["/apps/atlas/", "Huyệt vị · Kinh lạc · Giải phẫu 3D"],
+];
+
+
 async function fetchBody(url, options = {}, kind = "text") {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15000);
@@ -63,6 +71,15 @@ for (const [route, marker] of routes) {
   }
   if (route === "/") liveHtmlFromRoute = text;
   console.log(`PASS ${response.status} ${url} (attempt ${attempt})`);
+}
+
+for (const [route, marker] of sameOriginAppRoutes) {
+  const url = new URL(route, base).toString();
+  const { response, text, attempt } = await getWithRetry(url);
+  if (!text.includes(marker)) throw new Error(`${url} gateway missing expected marker: ${marker}`);
+  if (!response.headers.get("x-hiutmc-app-gateway")) throw new Error(`${url} missing gateway header`);
+  if (!text.includes("<base href=")) throw new Error(`${url} missing same-origin base rewrite`);
+  console.log(`PASS same-origin gateway ${response.status} ${url} (attempt ${attempt})`);
 }
 
 async function expectStaffRedirect(route, required) {
