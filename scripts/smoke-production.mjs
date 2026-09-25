@@ -82,6 +82,22 @@ for (const [route, marker] of sameOriginAppRoutes) {
   console.log(`PASS same-origin gateway ${response.status} ${url} (attempt ${attempt})`);
 }
 
+const sameOriginDeepRoutes = [
+  ["/apps/study/feed", "YHCT HIU 4.0"],
+  ["/apps/study/api/manifest", null],
+  ["/apps/thietchan/open-source.html", "Nguồn mở"],
+  ["/apps/trungyvan/manifest.webmanifest", null],
+  ["/apps/atlas/data/meridians.json", null],
+  ["/apps/atlas/models/atlas.json", null],
+];
+for (const [route, marker] of sameOriginDeepRoutes) {
+  const url = new URL(route, base).toString();
+  const { response, text, attempt } = await getWithRetry(url);
+  if (!response.headers.get("x-hiutmc-app-gateway")) throw new Error(`${url} deep route missing gateway header`);
+  if (marker && !text.includes(marker)) throw new Error(`${url} deep route missing marker: ${marker}`);
+  console.log(`PASS deep same-origin route ${response.status} ${url} (attempt ${attempt})`);
+}
+
 async function expectStaffRedirect(route, required) {
   const url = new URL(route, base).toString();
   const response = await fetchHeaders(url, {
