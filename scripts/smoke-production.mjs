@@ -14,19 +14,36 @@ const routes = [
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+async function fetchBody(url, options = {}, kind = "text") {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    const body = kind === "bytes" ? Buffer.from(await response.arrayBuffer()) : await response.text();
+    return { response, body };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function fetchHeaders(url, options = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function getWithRetry(url, attempts = 12) {
   let last;
   for (let i = 1; i <= attempts; i += 1) {
     try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 15000);
-      const response = await fetch(url, {
+      const { response, body: text } = await fetchBody(url, {
         redirect: "follow",
-        signal: controller.signal,
         headers: { "user-agent": "HIU-YHCT-release-smoke/1.0" },
       });
-      clearTimeout(timer);
-      const text = await response.text();
       if (response.ok) return { response, text, attempt: i };
       last = new Error(`${url} returned HTTP ${response.status}`);
     } catch (error) {
@@ -37,18 +54,20 @@ async function getWithRetry(url, attempts = 12) {
   throw last || new Error(`Unable to fetch ${url}`);
 }
 
+let liveHtmlFromRoute = "";
 for (const [route, marker] of routes) {
   const url = new URL(route, base).toString();
   const { response, text, attempt } = await getWithRetry(url);
   if (!text.includes(marker)) {
     throw new Error(`${url} is reachable but missing expected marker: ${marker}`);
   }
+  if (route === "/") liveHtmlFromRoute = text;
   console.log(`PASS ${response.status} ${url} (attempt ${attempt})`);
 }
 
 async function expectStaffRedirect(route, required) {
   const url = new URL(route, base).toString();
-  const response = await fetch(url, {
+  const response = await fetchHeaders(url, {
     redirect: "manual",
     headers: { "user-agent": "HIU-YHCT-release-smoke/1.0" },
   });
@@ -65,28 +84,28 @@ async function expectStaffRedirect(route, required) {
 await expectStaffRedirect("/admin/", "admin");
 await expectStaffRedirect("/mod/", "mod");
 
-const anonymousStaff = await fetch(new URL("/api/staff/access", base), {
+const { response: anonymousStaff, body: anonymousStaffText } = await fetchBody(new URL("/api/staff/access", base), {
   redirect: "manual",
   headers: { "user-agent": "HIU-YHCT-release-smoke/1.0" },
 });
-const anonymousStaffBody = await anonymousStaff.json().catch(() => ({}));
+const anonymousStaffBody = JSON.parse(anonymousStaffText || "{}");
 if (anonymousStaff.status !== 401 || anonymousStaffBody.authorized !== false) {
   throw new Error(`Anonymous staff API must return 401/authorized=false; got ${anonymousStaff.status}`);
 }
 console.log("PASS anonymous staff API denied");
 
-const anonymousTraffic = await fetch(new URL("/api/admin/traffic", base), {
+const { response: anonymousTraffic, body: anonymousTrafficText } = await fetchBody(new URL("/api/admin/traffic", base), {
   redirect: "manual",
   headers: { "user-agent": "HIU-YHCT-release-smoke/1.0" },
 });
-const anonymousTrafficBody = await anonymousTraffic.json().catch(() => ({}));
+const anonymousTrafficBody = JSON.parse(anonymousTrafficText || "{}");
 if (anonymousTraffic.status !== 401 || anonymousTrafficBody.authorized !== false) {
   throw new Error(`Anonymous traffic API must return 401/authorized=false; got ${anonymousTraffic.status}`);
 }
 console.log("PASS anonymous Admin traffic API denied");
 
-const publicHubsResponse = await fetch(new URL("/api/hub-registry", base), { redirect: "manual" });
-const publicHubs = await publicHubsResponse.json().catch(() => null);
+const { response: publicHubsResponse, body: publicHubsText } = await fetchBody(new URL("/api/hub-registry", base), { redirect: "manual" });
+const publicHubs = JSON.parse(publicHubsText || "null");
 if (publicHubsResponse.status !== 200 || !Array.isArray(publicHubs?.hubs)) {
   throw new Error(`Published Hub registry must be public JSON; got ${publicHubsResponse.status}`);
 }
@@ -98,7 +117,7 @@ for (const [path, method] of [
   ["/api/staff/shadow/publish", "POST"],
   ["/api/staff/shadow/moderation", "POST"],
 ]) {
-  const response = await fetch(new URL(path, base), {
+  const { response, body: responseText } = await fetchBody(new URL(path, base), {
     method,
     redirect: "manual",
     headers: {
@@ -107,14 +126,14 @@ for (const [path, method] of [
     },
     ...(method === "POST" ? { body: JSON.stringify({}) } : {}),
   });
-  const body = await response.json().catch(() => ({}));
+  const body = JSON.parse(responseText || "{}");
   if (response.status !== 401 || body.authorized !== false) {
     throw new Error(`Anonymous staff endpoint must return 401/authorized=false: ${path} got ${response.status}`);
   }
   console.log(`PASS staff endpoint denied anonymous ${method} ${path}`);
 }
 
-const home = await fetch(new URL("/", base), { redirect: "follow" });
+const home = await fetchHeaders(new URL("/", base), { redirect: "follow" });
 const requiredHeaders = [
   ["x-content-type-options", "nosniff"],
   ["referrer-policy", "strict-origin-when-cross-origin"],
@@ -129,7 +148,7 @@ for (const [name, expected] of requiredHeaders) {
 
 console.log("HIU YHCT production smoke passed.");
 
-const { text: liveHtml } = await getWithRetry(new URL('/', base));
+const liveHtml = liveHtmlFromRoute;
 const approvedMarkers = [
   "HIU YHCT DIGITAL CAMPUS",
   "Chào mừng trở lại",
@@ -171,8 +190,7 @@ if (manifest.id !== '/' || manifest.display !== 'standalone') throw new Error('I
 for (const size of [192, 512]) {
   const icon = manifest.icons.find(icon => icon.sizes === `${size}x${size}` && icon.type === 'image/png');
   if (!icon) throw new Error(`Missing live PWA icon ${size}`);
-  const response = await fetch(new URL(icon.src, base));
-  const data = Buffer.from(await response.arrayBuffer());
+  const { response, body: data } = await fetchBody(new URL(icon.src, base), {}, "bytes");
   if (!response.ok || data.length < 24 || data.toString('hex',0,8) !== '89504e470d0a1a0a' || data.readUInt32BE(16) !== size || data.readUInt32BE(20) !== size) throw new Error(`Invalid live PNG ${size}`);
 }
 for (const [path, marker] of [['/sw.js','hiutmc-offline-v1'],['/offline.html','Bạn đang ngoại tuyến']]) {
@@ -180,11 +198,10 @@ for (const [path, marker] of [['/sw.js','hiutmc-offline-v1'],['/offline.html','B
   if (!text.includes(marker) || !response.headers.get('cache-control')?.includes('no-cache')) throw new Error(`PWA asset/header check failed ${path}`);
 }
 
-const zaloPreview = await fetch(new URL("/", base), {
+const { body: zaloHtml } = await fetchBody(new URL("/", base), {
   redirect: "follow",
   headers: { "user-agent": "Zalo-LinkPreview/1.0" },
 });
-const zaloHtml = await zaloPreview.text();
 for (const marker of [
   'property="og:title"',
   'property="og:description"',
@@ -194,16 +211,14 @@ for (const marker of [
 ]) {
   if (!zaloHtml.includes(marker)) throw new Error(`Zalo/social preview HTML missing marker: ${marker}`);
 }
-const socialImage = await fetch("https://hiutmc.com/icons/icon-512.png?share=cp22");
-const socialImageData = Buffer.from(await socialImage.arrayBuffer());
+const { response: socialImage, body: socialImageData } = await fetchBody("https://hiutmc.com/icons/icon-512.png?share=cp22", {}, "bytes");
 if (!socialImage.ok || socialImageData.length < 24 || socialImageData.toString("hex",0,8) !== "89504e470d0a1a0a") {
   throw new Error("Social preview PNG is not reachable or invalid.");
 }
 if (socialImageData.readUInt32BE(16) < 300 || socialImageData.readUInt32BE(20) < 300) {
   throw new Error("Social preview image is too small.");
 }
-const robots = await fetch(new URL("/robots.txt", base));
-const robotsText = await robots.text();
+const { response: robots, body: robotsText } = await fetchBody(new URL("/robots.txt", base));
 if (!robots.ok || !robotsText.includes("Allow: /")) throw new Error("robots.txt does not allow social crawlers.");
 console.log("PASS Zalo/social Open Graph preview metadata, summary and image.");
 
