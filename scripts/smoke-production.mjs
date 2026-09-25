@@ -75,6 +75,16 @@ if (anonymousStaff.status !== 401 || anonymousStaffBody.authorized !== false) {
 }
 console.log("PASS anonymous staff API denied");
 
+const anonymousTraffic = await fetch(new URL("/api/admin/traffic", base), {
+  redirect: "manual",
+  headers: { "user-agent": "HIU-YHCT-release-smoke/1.0" },
+});
+const anonymousTrafficBody = await anonymousTraffic.json().catch(() => ({}));
+if (anonymousTraffic.status !== 401 || anonymousTrafficBody.authorized !== false) {
+  throw new Error(`Anonymous traffic API must return 401/authorized=false; got ${anonymousTraffic.status}`);
+}
+console.log("PASS anonymous Admin traffic API denied");
+
 for (const [path, method] of [
   ["/api/staff/shadow/snapshot", "GET"],
   ["/api/staff/shadow/hub-draft", "POST"],

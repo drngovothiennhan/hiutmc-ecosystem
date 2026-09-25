@@ -5,7 +5,7 @@ import { ecosystemApps } from "@/data/apps";
 import { mergeHubDrafts, readHubDrafts, writeHubDrafts, type HubDrafts } from "@/components/hub-registry";
 import styles from "@/app/admin/admin.module.css";
 
-type Tab = "overview" | "content" | "links" | "moderation" | "roles" | "audit" | "settings";
+type Tab = "overview" | "traffic" | "content" | "links" | "moderation" | "roles" | "audit" | "settings";
 type QueueItem = { id: string; text: string; date: string; status: string };
 type LogItem = { id: string; text: string; date: string };
 type Stored = { queue: QueueItem[]; logs: LogItem[] };
@@ -16,9 +16,10 @@ type StaffAccess = {
   canModerate?: boolean;
   member?: { fullName?: string; studentCode?: string; title?: string };
 };
+type TrafficStats = { totalVisits: number; todayVisits: number; dailyVisits: { date: string; visits: number }[] };
 const STORE_KEY = "hiutmc-admin-panel-v1";
 const tabList: { id: Tab; title: string; icon: string }[] = [
-  { id: "overview", title: "Tổng quan", icon: "◫" }, { id: "content", title: "Nội dung Hub", icon: "▤" },
+  { id: "overview", title: "Tổng quan", icon: "◫" }, { id: "traffic", title: "Lượt truy cập", icon: "↗" }, { id: "content", title: "Nội dung Hub", icon: "▤" },
   { id: "links", title: "Liên kết", icon: "↗" }, { id: "moderation", title: "Duyệt của Mod", icon: "✓" },
   { id: "roles", title: "Thành viên & vai trò", icon: "◎" }, { id: "audit", title: "Nhật ký", icon: "≋" },
   { id: "settings", title: "Cấu hình", icon: "⚙" },
@@ -42,6 +43,9 @@ export default function StaffConsole({ mode }: { mode: "admin" | "mod" }) {
   const [authReady, setAuthReady] = useState(false);
   const [notice, setNotice] = useState("");
   const [request, setRequest] = useState("");
+  const [traffic, setTraffic] = useState<TrafficStats | null>(null);
+  const [trafficError, setTrafficError] = useState("");
+  const [trafficRefresh, setTrafficRefresh] = useState(0);
   const apps = useMemo(() => mergeHubDrafts(drafts), [drafts]);
   const visibleTabs = useMemo(
     () => mode === "admin" ? tabList : tabList.filter((item) => ["overview", "moderation", "audit"].includes(item.id)),
@@ -72,6 +76,21 @@ export default function StaffConsole({ mode }: { mode: "admin" | "mod" }) {
 
   useEffect(() => { setDrafts(readHubDrafts()); setStored(readStored()); setReady(true); }, []);
   useEffect(() => { if (ready) localStorage.setItem(STORE_KEY, JSON.stringify(stored)); }, [stored, ready]);
+  useEffect(() => {
+    if (!authReady || mode !== "admin" || tab !== "traffic") return;
+    let live = true;
+    setTrafficError("");
+    void fetch("/api/admin/traffic", { cache: "no-store" })
+      .then(async (response) => {
+        const data = await response.json().catch(() => null) as TrafficStats | { error?: string } | null;
+        if (!response.ok || !data || !("totalVisits" in data)) throw new Error("Không tải được số liệu lượt truy cập.");
+        if (live) setTraffic(data);
+      })
+      .catch((error: unknown) => {
+        if (live) setTrafficError(error instanceof Error ? error.message : "Không tải được số liệu lượt truy cập.");
+      });
+    return () => { live = false; };
+  }, [authReady, mode, tab, trafficRefresh]);
   const log = (text: string) => setStored((s) => ({ ...s, logs: [{ id: id(), text, date: new Date().toLocaleString("vi-VN") }, ...s.logs].slice(0, 100) }));
   const edit = (slug: string, field: string, value: string) => setDrafts((s) => ({ ...s, [slug]: { ...s[slug], [field]: value } }));
   const save = () => {
@@ -126,6 +145,22 @@ export default function StaffConsole({ mode }: { mode: "admin" | "mod" }) {
       {notice && <p className={styles.statusMessage} role="status">{notice}</p>}
 
       {tab === "overview" && <div className={styles.content}><div className={styles.metrics}><article><small>HUB</small><strong>{ecosystemApps.length}</strong><span>4 điểm đến trong registry</span></article><article><small>BẢN NHÁP ĐÃ SỬA</small><strong>{Object.keys(drafts).length}</strong><span>Thiết bị hiện tại</span></article><article><small>MỤC CHỜ DUYỆT</small><strong>{stored.queue.filter((x) => x.status === "Chờ duyệt").length}</strong><span>Hàng chờ cục bộ</span></article><article><small>NHẬT KÝ</small><strong>{stored.logs.length}</strong><span>Trên trình duyệt</span></article></div><section className={styles.panel}><h2>Quản lý lối vào hệ sinh thái</h2><p>Chỉnh tên, mô tả, URL HTTPS; bản nháp áp dụng lên bản đồ, thẻ ứng dụng và các lối vào nhanh trên cùng trình duyệt.</p><button className={styles.primary} onClick={() => setTab(mode === "admin" ? "content" : "moderation")}>{mode === "admin" ? "Mở Nội dung Hub →" : "Mở hàng chờ duyệt →"}</button></section><section className={styles.panel}><h2>Quy trình duyệt</h2><p>Admin và Moderator dùng quyền thật từ hồ sơ club_members; trang hiện tại chỉ mở sau khi máy chủ xác minh phiên và vai trò.</p><button className={styles.secondary} onClick={() => setTab(mode === "admin" ? "roles" : "audit")}>{mode === "admin" ? "Xem vai trò & quyền" : "Xem nhật ký"}</button></section></div>}
+
+      {tab === "traffic" && mode === "admin" && <div className={styles.content}>
+        <div className={styles.intro}><h2>Thống kê lượt truy cập</h2><p>Chỉ Admin đã xác thực mới xem được. Bộ đếm ghi nhận lượt mở trang công khai, không lưu địa chỉ IP hoặc thông tin định danh thiết bị.</p></div>
+        {trafficError && <p className={styles.statusMessage} role="alert">{trafficError}</p>}
+        <div className={styles.metrics}>
+          <article><small>TỔNG LƯỢT TRUY CẬP</small><strong>{traffic ? traffic.totalVisits.toLocaleString("vi-VN") : "—"}</strong><span>Từ khi bật bộ đếm</span></article>
+          <article><small>HÔM NAY · GIỜ VIỆT NAM</small><strong>{traffic ? traffic.todayVisits.toLocaleString("vi-VN") : "—"}</strong><span>Lượt mở trang công khai</span></article>
+          <article><small>7 NGÀY GẦN NHẤT</small><strong>{traffic ? traffic.dailyVisits.reduce((sum, day) => sum + day.visits, 0).toLocaleString("vi-VN") : "—"}</strong><span>Tổng theo ngày</span></article>
+        </div>
+        <section className={styles.panel}><div className={styles.trafficHeader}><div><h2>Lượt truy cập theo ngày</h2><p>Số liệu theo múi giờ Việt Nam (UTC+7).</p></div><button className={styles.secondary} onClick={() => setTrafficRefresh((value) => value + 1)}>Làm mới</button></div>
+          {!traffic ? <p role="status">{trafficError ? "Chưa có số liệu mới." : "Đang tải số liệu…"}</p> : <div className={styles.trafficDays}>{traffic.dailyVisits.map((day) => {
+            const peak = Math.max(1, ...traffic.dailyVisits.map((item) => item.visits));
+            return <div className={styles.trafficDay} key={day.date}><time dateTime={day.date}>{new Date(`${day.date}T12:00:00+07:00`).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" })}</time><div className={styles.trafficBarTrack}><span className={styles.trafficBar} style={{ width: `${Math.max(day.visits > 0 ? 4 : 0, (day.visits / peak) * 100)}%` }} /></div><strong>{day.visits.toLocaleString("vi-VN")}</strong></div>;
+          })}</div>}
+        </section>
+      </div>}
 
       {tab === "content" && <div className={styles.content}><div className={styles.intro}><h2>Nội dung từng Hub</h2><p>URL bản nháp nhận HTTPS. Khi lưu, bản đồ và các thẻ ở trang chính trên thiết bị này dùng giá trị mới.</p></div>{apps.map((app) => <article className={styles.editor} key={app.slug}><div className={styles.editorTitle}><span className={styles.appIcon}>{app.shortName.slice(0, 1)}</span><div><h3>{app.name}</h3><small>{app.slug} · {app.hosting}</small></div><span className={styles.statusPill}>{app.status}</span></div><div className={styles.fields}><label>Tên hiển thị<input value={app.name} onChange={(e) => edit(app.slug, "name", e.target.value)} /></label><label>Tên ngắn<input value={app.shortName} onChange={(e) => edit(app.slug, "shortName", e.target.value)} /></label><label>Mô tả ngắn<input value={app.tagline} onChange={(e) => edit(app.slug, "tagline", e.target.value)} /></label><label>URL HTTPS<input type="url" value={app.currentUpstreamUrl} onChange={(e) => edit(app.slug, "currentUpstreamUrl", e.target.value)} /></label><label className={styles.full}>Mô tả Hub<textarea rows={3} value={app.description} onChange={(e) => edit(app.slug, "description", e.target.value)} /></label></div></article>)}<button className={styles.primary} onClick={save}>Lưu bản nháp trên thiết bị</button></div>}
 

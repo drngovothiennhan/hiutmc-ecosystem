@@ -157,8 +157,85 @@ async function protectedAsset(request, env, requiredRole) {
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }
 
+function vietnamDateKey(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function previousDateKey(dateKey, daysAgo) {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day - daysAgo));
+  return date.toISOString().slice(0, 10);
+}
+
+function shouldCountPageView(request, url) {
+  if (request.method !== "GET" || !request.headers.get("accept")?.includes("text/html")) return false;
+  if (/prefetch/i.test(`${request.headers.get("purpose") || ""} ${request.headers.get("sec-purpose") || ""}`)) return false;
+  const destination = request.headers.get("sec-fetch-dest");
+  if (destination && destination !== "document") return false;
+  if (!/(^|\.)hiutmc\.com$/i.test(url.hostname)) return false;
+  if (/^\/(api|admin|mod)(\/|$)/.test(url.pathname)) return false;
+  return true;
+}
+
+async function recordPageView(env) {
+  if (!env.VISITS) return;
+  const stub = env.VISITS.get(env.VISITS.idFromName("hiutmc-public-pages-v1"));
+  await stub.fetch("https://traffic.internal/visit", { method: "POST" });
+}
+
+async function getTrafficStats(env) {
+  if (!env.VISITS) return null;
+  const stub = env.VISITS.get(env.VISITS.idFromName("hiutmc-public-pages-v1"));
+  const response = await stub.fetch("https://traffic.internal/stats", { method: "GET" });
+  if (!response.ok) return null;
+  return response.json();
+}
+
+export class VisitCounter {
+  constructor(ctx) {
+    this.ctx = ctx;
+  }
+
+  async fetch(request) {
+    const url = new URL(request.url);
+    if (url.pathname === "/visit" && request.method === "POST") {
+      const today = vietnamDateKey();
+      await this.ctx.storage.transaction(async (txn) => {
+        const total = Number(await txn.get("total") || 0);
+        const visitsToday = Number(await txn.get(`day:${today}`) || 0);
+        await txn.put({ total: total + 1, [`day:${today}`]: visitsToday + 1 });
+
+        if (await txn.get("lastPrunedDay") !== today) {
+          await txn.delete(`day:${previousDateKey(today, 31)}`);
+          await txn.put("lastPrunedDay", today);
+        }
+      });
+      return json({ ok: true }, 202);
+    }
+
+    if (url.pathname === "/stats" && request.method === "GET") {
+      const today = vietnamDateKey();
+      const daily = [];
+      for (let offset = 6; offset >= 0; offset -= 1) {
+        const date = previousDateKey(today, offset);
+        daily.push({ date, visits: Number(await this.ctx.storage.get(`day:${date}`) || 0) });
+      }
+      return json({ totalVisits: Number(await this.ctx.storage.get("total") || 0), todayVisits: daily.at(-1)?.visits || 0, dailyVisits: daily });
+    }
+
+    return json({ error: "Not found" }, 404);
+  }
+}
+
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const pathname = url.pathname.length > 1 ? url.pathname.replace(/\/+$/, "") : url.pathname;
 
@@ -181,6 +258,15 @@ export default {
       const token = bearer(request) || readCookie(request, COOKIE_NAME);
       const access = await validateStaff(token);
       return json(access, access.authorized ? 200 : 401);
+    }
+
+    if (pathname === "/api/admin/traffic") {
+      if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+      const gate = await shadowStaffAccess(request, "admin");
+      if (!gate.ok) return gate.response;
+      const stats = await getTrafficStats(env);
+      if (!stats) return json({ error: "Traffic counter unavailable" }, 503);
+      return json(stats);
     }
 
 
@@ -241,6 +327,10 @@ export default {
 
     if (pathname === "/mod") {
       return protectedAsset(request, env, "mod");
+    }
+
+    if (shouldCountPageView(request, url) && ctx?.waitUntil) {
+      ctx.waitUntil(recordPageView(env).catch(() => undefined));
     }
 
     return env.ASSETS.fetch(request);

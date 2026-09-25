@@ -56,7 +56,7 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Validate release contracts
-        run: npm run validate:repo && npm run validate:release && npm run validate:registry && npm run validate:assets && npm run validate:pwa && npm run validate:community && npm run validate:learning && npm run validate:staff-auth && npm run validate:admin-shadow && npm run validate:display-mode && npm run validate:profile-progress
+        run: npm run validate:repo && npm run validate:release && npm run validate:registry && npm run validate:assets && npm run validate:pwa && npm run validate:community && npm run validate:learning && npm run validate:staff-auth && npm run validate:admin-shadow && npm run validate:display-mode && npm run validate:profile-progress && npm run test:traffic
 
       - name: Build static export
         run: npm run build
@@ -79,6 +79,9 @@ jobs:
           test -f out/ecosystem/trung-y-van/index.html
           test -f out/ecosystem/atlas/index.html
           test -f out/_headers
+
+      - name: Validate Cloudflare Worker and Durable Object bundle
+        run: npx wrangler deploy --dry-run
 
       - name: Deploy static assets
         uses: cloudflare/wrangler-action@v4

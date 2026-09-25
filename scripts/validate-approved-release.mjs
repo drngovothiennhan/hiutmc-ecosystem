@@ -51,6 +51,8 @@ for (const marker of [
   "Thành viên & vai trò",
   "Nhật ký",
   "Cấu hình",
+  "Lượt truy cập",
+  "/api/admin/traffic",
   "SERVER VERIFIED",
   'mode: "admin" | "mod"',
 ]) {

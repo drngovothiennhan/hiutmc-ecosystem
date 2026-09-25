@@ -11,6 +11,8 @@ const errors = [];
 for (const marker of [
   "/api/staff/session",
   "/api/staff/access",
+  "/api/admin/traffic",
+  'shadowStaffAccess(request, "admin")',
   "validateStaff",
   "HttpOnly",
   "Secure",

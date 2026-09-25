@@ -84,6 +84,9 @@ jobs:
       - name: Validate profile display control and learning progress
         run: npm run validate:profile-progress
 
+      - name: Test admin-only traffic counter
+        run: npm run test:traffic
+
       - name: Build static export
         run: npm run build
 

@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260924-14",
+  "release": "HIU-YHCT-ECOSYSTEM-20260925-01",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP28",
-  "base_checkpoint_sha": "58c6e88adb53d4cc0f254242b34288fbb0965d1f",
+  "checkpoint": "CP31",
+  "base_checkpoint_sha": "5ccb76683f8de06fe56bcaef00d8bd881a4ed5f0",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP28 is a typography clarity hotfix on top of CP27. Across the app, text that inherits the Inter/system UI sans stack is increased by 0.5px where an explicit px font-size is defined, while Georgia/serif display typography and icon-like glyph rules are preserved. The global sans body gains a slightly stronger inherited weight (450) and font optical sizing for clearer rendering. The approved visual hierarchy, colors, imagery, routing, SSO, learning-sync, Admin/Mod behavior, and application architecture are unchanged. CI, Cloudflare deployment and production smoke remain mandatory."
+  "verification": "CP31 adds a persistent page-view counter in the existing Admin Center. Only GET requests for public HTML pages on hiutmc.com are counted; Admin and Mod pages, APIs, assets, writes, and other origins are excluded. Cloudflare Durable Objects stores totals and a seven-day Vietnam-time series without IP or device identifiers. The traffic API verifies the existing Supabase staff session and admin role at the Worker before reading counts. Existing UI, SSO, routes, and Admin/Mod authorization remain intact. CI, Worker dry-run, Cloudflare deployment, anonymous-denial smoke, and production smoke are mandatory."
 }
