@@ -34,13 +34,13 @@ export default function EcosystemMap() {
         <span className="plazaLabel"><img src="/hiu-club-logo.webp" alt="Logo Câu lạc bộ Y học cổ truyền HIU" /></span>
         {ecosystemApps.map((app) => (
           <div className={`districtMarker district-${app.slug}`} key={app.slug} style={{left:`${app.x}%`,top:`${app.y}%`,["--accent" as string]:app.accent}}>
-            <a className="districtBanner" href={app.currentUpstreamUrl} aria-label={`Mở ${app.name}`}><strong>{app.name}</strong><small>{app.tagline}</small></a>
+            <a className="districtBanner" href={app.launchUrl} aria-label={`Mở ${app.name}`}><strong>{app.name}</strong><small>{app.tagline}</small></a>
           </div>
         ))}
         <div className="heroStatement"><p className="heroEyebrow">HỌC · HIỂU · KẾT NỐI</p><h1>Khám phá hệ sinh thái số của<br />Câu lạc bộ Y học cổ truyền HIU</h1><a className="heroCta" href="#ecosystem">Khám phá ngay →</a></div>
         <button className="motionToggle" onClick={()=>setPaused(!paused)} aria-pressed={paused}>{paused?"▷ Bật chuyển động":"Ⅱ Tạm dừng chuyển động"}</button>
       </div>
-      <nav className="quickDock heritageQuickDock" aria-label="Vào nhanh bốn ứng dụng">{ecosystemApps.map(app=><a href={app.currentUpstreamUrl} key={app.slug}>{app.shortName} <span aria-hidden="true">↗</span></a>)}</nav>
+      <nav className="quickDock heritageQuickDock" aria-label="Vào nhanh bốn ứng dụng">{ecosystemApps.map(app=><a href={app.launchUrl} key={app.slug}>{app.shortName} <span aria-hidden="true">↗</span></a>)}</nav>
     </div>
   );
 }
