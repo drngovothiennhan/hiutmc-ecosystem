@@ -181,6 +181,10 @@ function LibraryGateway() {
   const [details, setDetails] = useState<Resource | null>(null);
   const [selected, setSelected] = useState<Resource | null>(null);
   const [revision, setRevision] = useState(0);
+  const [incomingResourceKey] = useState(() => {
+    try { return new URLSearchParams(window.location.search).get("resourceKey") || ""; }
+    catch { return ""; }
+  });
   const studyOs = apps.find((app) => app.slug === "study-os");
   const apiBase = (() => {
     try { return new URL(studyOs?.currentUpstreamUrl || "https://study.hiutmc.com/").origin + "/api/knowledge"; }
@@ -235,6 +239,12 @@ function LibraryGateway() {
     })();
     return () => { live = false; controller.abort(); };
   }, [member?.id, apiBase, getMemberAccessToken, revision]);
+
+  useEffect(() => {
+    if (!/^hiu_res_[0-9a-f]{20}$/.test(incomingResourceKey) || busy) return;
+    const requested = items.find(item => item.resourceKey === incomingResourceKey);
+    if (requested) setDetails(requested);
+  }, [incomingResourceKey, items, busy]);
 
   const visible = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase("vi");
