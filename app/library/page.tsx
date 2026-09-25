@@ -5,7 +5,7 @@ import { MemberAccount, MemberAuthProvider, useMemberAuth } from "@/components/M
 import { useHubRegistry } from "@/components/hub-registry";
 import styles from "./library.module.css";
 
-const DEFAULT_apiBase = "https://study.hiutmc.com/api/knowledge";
+const DEFAULT_STUDYOS_API = "https://study.hiutmc.com/api/knowledge";
 const PDFJS_VERSION = "3.11.174";
 const PDFJS_SCRIPT = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSION}/pdf.min.js`;
 const PDFJS_WORKER = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSION}/pdf.worker.min.js`;
@@ -180,7 +180,7 @@ function LibraryGateway() {
   const studyOs = apps.find((app) => app.slug === "study-os");
   const apiBase = (() => {
     try { return new URL(studyOs?.currentUpstreamUrl || "https://study.hiutmc.com/").origin + "/api/knowledge"; }
-    catch { return DEFAULT_apiBase; }
+    catch { return DEFAULT_STUDYOS_API; }
   })();
   const studyOsUrl = (() => {
     try {
