@@ -1,0 +1,153 @@
+name: G2 Game Hub SSO Preview
+
+on:
+  push:
+    branches:
+      - g2/game-hub-sso-preview
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+
+concurrency:
+  group: g2-game-hub-sso-preview
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package.json
+
+      - name: Install
+        run: npm install --no-audit --no-fund
+
+      - name: Validate and build
+        run: npm run check
+
+      - name: Require Cloudflare credentials
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "$CF_TOKEN" || (echo "::error::Missing CLOUDFLARE_API_TOKEN repository secret" && exit 1)
+          test -n "$CF_ACCOUNT" || (echo "::error::Missing CLOUDFLARE_ACCOUNT_ID repository secret" && exit 1)
+
+      - name: Create isolated Cloudflare preview
+        id: preview
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          node -e 'const fs=require("fs");const cfg=JSON.parse(fs.readFileSync("wrangler.jsonc","utf8"));cfg.name="hiutmc-ecosystem-g2-sso-preview";cfg.routes=[];cfg.previews={};cfg.workers_dev=true;cfg.preview_urls=true;fs.writeFileSync("wrangler.g2.preview.jsonc",JSON.stringify(cfg,null,2));'
+          npx wrangler preview --config wrangler.g2.preview.jsonc --name hiutmc-ecosystem-g2-sso-preview --message "G2 Game Hub preview SSO handoff" --json > preview.json 2>&1
+          cat preview.json
+          PREVIEW_URL="$(grep -oE 'https://[^"[:space:]]+workers\.dev' preview.json | tail -n 1)"
+          test -n "$PREVIEW_URL"
+          echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+          echo "### Isolated G2 Ecosystem Preview" >> "$GITHUB_STEP_SUMMARY"
+          echo "$PREVIEW_URL" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Route smoke
+        env:
+          PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+        run: |
+          for path in / '/?g2-sso-test=1'; do
+            code="000"
+            for attempt in {1..15}; do
+              code="$(curl -L -sS --max-time 10 -o /tmp/body.html -w '%{http_code}' "$PREVIEW_URL$path" || true)"
+              test "$code" = "200" && break
+              sleep 2
+            done
+            test "$code" = "200" || (echo "::error::$path returned $code after retries" && exit 1)
+          done
+          proxy_status="$(curl -sS --max-time 10 -o /tmp/proxy-body -w '%{http_code}' -X GET "$PREVIEW_URL/api/g2-member-login" || true)"
+          test "$proxy_status" = "405" || (echo "::error::Preview login proxy route returned $proxy_status for a safe GET guard check" && exit 1)
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save --no-audit --no-fund playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Responsive and SSO-entry smoke
+        env:
+          PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+        run: |
+          cat > ./g2-preview-qa.mjs <<'EOF'
+          import { chromium } from "playwright";
+          import fs from "node:fs";
+          const url = process.env.PREVIEW_URL;
+          fs.mkdirSync("qa-g2", { recursive: true });
+          const browser = await chromium.launch({ headless: true });
+          for (const [width, height] of [[320, 740], [390, 844], [711, 1000], [768, 1024], [1024, 900]]) {
+            const page = await browser.newPage({ viewport: { width, height } });
+            await page.goto(`${url}/?g2-sso-test=1`, { waitUntil: "domcontentloaded", timeout: 60000 });
+            const previewButton = page.getByRole("button", { name: "Kiểm tra đăng nhập Game Hub preview" });
+            await previewButton.waitFor({ state: "visible", timeout: 15000 });
+            const buttonMetrics = await previewButton.evaluate((el) => ({
+              clientWidth: el.clientWidth,
+              scrollWidth: el.scrollWidth,
+              clientHeight: el.clientHeight,
+              scrollHeight: el.scrollHeight,
+            }));
+            if (buttonMetrics.scrollWidth > buttonMetrics.clientWidth + 1 || buttonMetrics.scrollHeight > buttonMetrics.clientHeight + 1) {
+              throw new Error(`G2 preview button text is clipped at ${width}px: ${JSON.stringify(buttonMetrics)}`);
+            }
+            const hero = previewButton.locator("xpath=ancestor::section[1]");
+            const heroTitle = hero.locator("h1");
+            await heroTitle.waitFor({ state: "visible", timeout: 10000 });
+            const heroMetrics = await heroTitle.evaluate((el) => ({
+              clientWidth: el.clientWidth,
+              scrollWidth: el.scrollWidth,
+            }));
+            if (heroMetrics.scrollWidth > heroMetrics.clientWidth + 1) {
+              throw new Error(`hero title text is clipped at ${width}px: ${heroMetrics.scrollWidth}/${heroMetrics.clientWidth}`);
+            }
+            const introMetrics = await hero.locator("p").evaluate((el) => ({
+              clientWidth: el.clientWidth,
+              scrollWidth: el.scrollWidth,
+              whiteSpace: getComputedStyle(el).whiteSpace,
+            }));
+            if (introMetrics.scrollWidth > introMetrics.clientWidth + 1 || introMetrics.whiteSpace === "nowrap") {
+              throw new Error(`hero introduction text is clipped at ${width}px: ${JSON.stringify(introMetrics)}`);
+            }
+            const sectionLink = await page.getByRole("link", { name: /Xem tất cả/i }).first().evaluate((el) => ({
+              clientWidth: el.clientWidth,
+              scrollWidth: el.scrollWidth,
+              whiteSpace: getComputedStyle(el).whiteSpace,
+            }));
+            if (sectionLink.scrollWidth > sectionLink.clientWidth + 1 || (width <= 820 && sectionLink.whiteSpace !== "nowrap")) {
+              throw new Error(`section link wraps or clips at ${width}px: ${JSON.stringify(sectionLink)}`);
+            }
+            const metrics = await page.evaluate(() => ({
+              scrollWidth: document.documentElement.scrollWidth,
+              clientWidth: document.documentElement.clientWidth,
+            }));
+            if (metrics.scrollWidth > metrics.clientWidth + 1) {
+              throw new Error(`horizontal overflow at ${width}px: ${JSON.stringify(metrics)}`);
+            }
+            await page.screenshot({ path: `qa-g2/home-${width}.png`, fullPage: true });
+            await page.close();
+          }
+          await browser.close();
+          EOF
+          node ./g2-preview-qa.mjs
+
+      - name: Upload preview screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: g2-ecosystem-preview-screenshots
+          path: qa-g2
+          if-no-files-found: error
+          retention-days: 7

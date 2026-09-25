@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import HomeIcon, { type HomeIconName } from "@/components/HomeIcon";
 import DailyMissions from "@/components/DailyMissions";
 import DisplayModeToggle from "@/components/DisplayModeToggle";
@@ -30,9 +30,13 @@ const events = [
 
 function HomeContent() {
   const apps = useHubRegistry();
-  const { openStudyOs, member, learningProgress, learningProgressReady } = useMemberAuth();
-  const studyOsUrl = apps.find((app) => app.slug === "study-os")?.launchUrl ?? "/learn/";
-  const atlasUrl = apps.find((app) => app.slug === "atlas")?.launchUrl ?? "/ecosystem/atlas/";
+  const { openStudyOs, openGameHubPreview, member, learningProgress, learningProgressReady } = useMemberAuth();
+  const [showGameHubSsoPreview, setShowGameHubSsoPreview] = useState(false);
+  useEffect(() => {
+    setShowGameHubSsoPreview(new URLSearchParams(window.location.search).get("g2-sso-test") === "1");
+  }, []);
+  const studyOsUrl = apps.find((app) => app.slug === "study-os")?.currentUpstreamUrl ?? "/learn/";
+  const atlasUrl = apps.find((app) => app.slug === "atlas")?.currentUpstreamUrl ?? "/ecosystem/atlas/";
   const synced = Boolean(member && learningProgressReady && learningProgress?.hasSync);
   const latestScore = synced ? learningProgress?.lastExamScore ?? null : null;
   const ringLabel = !member ? "—" : !learningProgressReady ? "…" : synced ? (latestScore !== null ? `${latestScore}%` : "✓") : "—";
@@ -92,6 +96,11 @@ function HomeContent() {
           <h1>Chào mừng trở lại, <span>{member?.fullName || "HIU YHCT"}!</span></h1>
           <p>Một điểm vào thống nhất cho học tập, Atlas 3D, AI, Trung Y Văn và hoạt động học thuật của cộng đồng HIU.</p>
           <div className={styles.heroMark}>Dưỡng Tâm<br />Học Thuật<br />Hành Y Đạo</div>
+          {showGameHubSsoPreview && (
+            <button type="button" className={styles.g2PreviewButton} onClick={() => void openGameHubPreview()}>
+              Kiểm tra đăng nhập Game Hub preview
+            </button>
+          )}
         </section>
 
         <div className={styles.grid}>

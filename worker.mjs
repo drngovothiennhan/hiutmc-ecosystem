@@ -2,6 +2,7 @@ const SUPABASE_URL = "https://gzmpnsrwqjpsbklyflqr.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG";
 const COOKIE_NAME = "hiutmc_staff_session";
 const STAFF_ROLES = new Set(["mod", "super_mod", "admin"]);
+const G2_PREVIEW_HOST = /^(?:[a-f0-9]+-|hiutmc-ecosystem-g2-sso-pr-[a-z0-9]+-)?hiutmc-ecosystem-g2-sso-preview\.dr-ngovothiennhan\.workers\.dev$/i;
 const APP_PROXY_CONFIG = Object.freeze({
   study: {
     prefix: "/apps/study",
@@ -24,7 +25,6 @@ const APP_PROXY_CONFIG = Object.freeze({
     upstreamBase: "/human-atlas",
   },
 });
-
 
 function json(body, status = 200, headers = {}) {
   return new Response(JSON.stringify(body), {
@@ -359,6 +359,46 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const pathname = url.pathname.length > 1 ? url.pathname.replace(/\/+$/, "") : url.pathname;
+
+    if (pathname === "/api/g2-member-login") {
+      if (!G2_PREVIEW_HOST.test(url.hostname)) return json({ error: "Not found" }, 404);
+      if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+      if (request.headers.get("origin") !== url.origin) return json({ error: "Invalid origin" }, 403);
+      if (!(request.headers.get("content-type") || "").toLowerCase().startsWith("application/json")) {
+        return json({ error: "Expected application/json" }, 415);
+      }
+
+      const rawBody = await request.text();
+      if (new TextEncoder().encode(rawBody).byteLength > 4096) return json({ error: "Request too large" }, 413);
+      let body;
+      try { body = JSON.parse(rawBody); } catch { return json({ error: "Invalid JSON" }, 400); }
+      const studentCode = typeof body?.studentCode === "string" ? body.studentCode.trim() : "";
+      const password = typeof body?.password === "string" ? body.password : "";
+      if (!studentCode || studentCode.length > 32 || !password || password.length > 256) {
+        return json({ error: "Thông tin đăng nhập không hợp lệ." }, 400);
+      }
+
+      let upstream;
+      try {
+        const headers = {
+          apikey: SUPABASE_KEY,
+          "content-type": "application/json",
+          accept: "application/json",
+        };
+        const clientIp = request.headers.get("cf-connecting-ip");
+        if (clientIp) headers["x-forwarded-for"] = clientIp;
+        upstream = await fetch(`${SUPABASE_URL}/functions/v1/member-login`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ studentCode, password }),
+          cache: "no-store",
+        });
+      } catch {
+        return json({ error: "Không thể kết nối máy chủ đăng nhập." }, 502);
+      }
+      const payload = await upstream.json().catch(() => ({ error: "Phản hồi đăng nhập không hợp lệ." }));
+      return json(payload, upstream.status);
+    }
 
     const directProxy = proxyConfigForPath(url.pathname);
     if (directProxy) {
