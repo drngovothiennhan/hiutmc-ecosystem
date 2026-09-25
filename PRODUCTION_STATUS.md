@@ -35,12 +35,14 @@
 - Preview image uses the public 512×512 PNG icon with a versioned query string to reduce stale image-cache reuse.
 - `robots.txt` allows link-preview crawlers.
 
-## CP23 shadow backend
+## CP23 shared staff backend
 - Additive Supabase storage exists for Hub drafts, moderation queue and audit log.
 - RLS is enabled and privileged writes are exposed only through role-checked RPCs.
 - Hidden Cloudflare staff APIs proxy verified Admin/Mod sessions to those RPCs.
-- The visible Admin/Mod UI still uses the existing browser-local source during CP23; no public Hub or graphical behavior is changed.
-- Stage 2 cutover is blocked until CP23 production smoke is complete.
+- Production Supabase migration `ecosystem_admin_backend_shadow_v1` is applied and the Admin/Mod UI now reads and writes its shared drafts, moderation queue and audit log.
+- Admin can publish each Hub revision through a separate role-checked RPC; only the publication table is exposed through a public read-only RPC.
+- The homepage and ecosystem map load published Hub values through `/api/hub-registry`; browser-local drafts are never used as public content.
+- Rollback is additive: reverting the UI/Worker restores the static registry while published rows remain available for a later release.
 
 ## CP31 Admin traffic counter
 - The Admin Center includes a server-protected traffic view; the Mod Center does not expose it.
@@ -49,6 +51,11 @@
 - The counter does not retain IP addresses, user agents, account identifiers or device identifiers. Values represent page views, not unique visitors.
 - Production deployment and smoke passed in GitHub Actions run #46: https://github.com/drngovothiennhan/hiutmc-ecosystem/actions/runs/36078439597.
 - Cloudflare Worker version: `8225f14e-757c-4f6e-9936-2c3435f184d8`.
+
+## CP32 shared Hub publishing
+- Supabase migration `ecosystem_hub_shared_publication_v1` is applied to the production project.
+- Admin-only publish RPC and anonymous read-only registry RPC privileges were verified; the publication table has no direct client grants.
+- Local build, release checks, staff authorization contracts, traffic tests and Wrangler dry-run pass. Cloudflare deployment and live smoke are pending the source update.
 
 ## Production release gates
 1. Repository boundary, release metadata and Hub registry validation.

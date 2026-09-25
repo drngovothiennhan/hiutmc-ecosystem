@@ -85,9 +85,17 @@ if (anonymousTraffic.status !== 401 || anonymousTrafficBody.authorized !== false
 }
 console.log("PASS anonymous Admin traffic API denied");
 
+const publicHubsResponse = await fetch(new URL("/api/hub-registry", base), { redirect: "manual" });
+const publicHubs = await publicHubsResponse.json().catch(() => null);
+if (publicHubsResponse.status !== 200 || !Array.isArray(publicHubs?.hubs)) {
+  throw new Error(`Published Hub registry must be public JSON; got ${publicHubsResponse.status}`);
+}
+console.log("PASS public published Hub registry API");
+
 for (const [path, method] of [
   ["/api/staff/shadow/snapshot", "GET"],
   ["/api/staff/shadow/hub-draft", "POST"],
+  ["/api/staff/shadow/publish", "POST"],
   ["/api/staff/shadow/moderation", "POST"],
 ]) {
   const response = await fetch(new URL(path, base), {
@@ -101,9 +109,9 @@ for (const [path, method] of [
   });
   const body = await response.json().catch(() => ({}));
   if (response.status !== 401 || body.authorized !== false) {
-    throw new Error(`Anonymous CP23 shadow endpoint must return 401/authorized=false: ${path} got ${response.status}`);
+    throw new Error(`Anonymous staff endpoint must return 401/authorized=false: ${path} got ${response.status}`);
   }
-  console.log(`PASS CP23 shadow endpoint denied anonymous ${method} ${path}`);
+  console.log(`PASS staff endpoint denied anonymous ${method} ${path}`);
 }
 
 const home = await fetch(new URL("/", base), { redirect: "follow" });
@@ -199,4 +207,4 @@ const robotsText = await robots.text();
 if (!robots.ok || !robotsText.includes("Allow: /")) throw new Error("robots.txt does not allow social crawlers.");
 console.log("PASS Zalo/social Open Graph preview metadata, summary and image.");
 
-console.log('PASS CP23 Digital Campus, server-protected Admin/Mod routes, shadow backend denial, Zalo link preview, existing Hub destinations, PWA and offline worker.');
+console.log('PASS Digital Campus, shared Hub registry, server-protected Admin/Mod routes, staff API denial, Zalo link preview, existing Hub destinations, PWA and offline worker.');

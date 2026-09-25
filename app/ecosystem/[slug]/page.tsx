@@ -1,5 +1,6 @@
 import { ecosystemApps } from "@/data/apps";
 import { notFound } from "next/navigation";
+import SharedHubDetails from "@/components/SharedHubDetails";
 
 export function generateStaticParams() {
   return ecosystemApps.map((app) => ({ slug: app.slug }));
@@ -7,28 +8,6 @@ export function generateStaticParams() {
 
 export default async function AppDetail({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const app = ecosystemApps.find((item) => item.slug === slug);
-  if (!app) notFound();
-
-  return (
-    <main className="detailPage">
-      <a className="backLink" href="/">← Về bản đồ</a>
-      <div className="detailPanel">
-        <span className="detailStatus">{app.status}</span>
-        <p className="sectionKicker">HIU YHCT ECOSYSTEM</p>
-        <h1>{app.name}</h1>
-        <h2>{app.tagline}</h2>
-        <p>{app.description}</p>
-        <div className="routeMeta">
-          <span><strong>Trạng thái:</strong> {app.status}</span>
-          <span><strong>Hạ tầng hiện tại:</strong> {app.hosting}</span>
-          <span><strong>Tên miền HIU TMC:</strong> {app.plannedCanonicalDomain.replace("https://", "").replace("/", "")}</span>
-        </div>
-        <div className="detailActions">
-          <a className="primaryBtn" href={app.currentUpstreamUrl}>Mở ứng dụng ↗</a>
-          <a className="secondaryBtn" href="/">Khám phá ứng dụng khác</a>
-        </div>
-      </div>
-    </main>
-  );
+  if (!ecosystemApps.some((item) => item.slug === slug)) notFound();
+  return <SharedHubDetails slug={slug} />;
 }

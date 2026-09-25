@@ -121,4 +121,4 @@ Acceptance:
 9. Update checkpoint + Drive manifest only after live smoke passes.
 
 ## Current execution
-CP23 starts Stage 1 only. No Stage 2 UI cutover is allowed until CP23 shadow storage/API has passed its own validation.
+CP23 Stage 1 passed its shadow storage/API checks. The 2026-09-25 shared publication release completes Stage 2 for Hub registry and Admin/Mod workflows; learning progress, events and search remain future stages.

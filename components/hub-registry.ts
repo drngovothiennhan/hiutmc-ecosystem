@@ -48,11 +48,19 @@ export function mergeHubDrafts(drafts: HubDrafts): EcosystemApp[] {
 export function useHubRegistry(): EcosystemApp[] {
   const [apps, setApps] = useState(ecosystemApps);
   useEffect(() => {
-    const sync = () => setApps(mergeHubDrafts(readHubDrafts()));
-    sync();
-    window.addEventListener("storage", sync);
-    window.addEventListener(CHANGE_EVENT, sync);
-    return () => { window.removeEventListener("storage", sync); window.removeEventListener(CHANGE_EVENT, sync); };
+    let live = true;
+    void fetch("/api/hub-registry", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Shared Hub registry unavailable");
+        const payload = await response.json() as { hubs?: Array<{ hubSlug?: string; publication?: HubDraft }> };
+        const allowed = new Set(ecosystemApps.map((app) => app.slug));
+        const published = Object.fromEntries((payload.hubs ?? [])
+          .filter((row) => row.hubSlug && allowed.has(row.hubSlug) && validDraft(row.publication))
+          .map((row) => [row.hubSlug!, row.publication!])) as HubDrafts;
+        if (live) setApps(mergeHubDrafts(published));
+      })
+      .catch(() => { if (live) setApps(ecosystemApps); });
+    return () => { live = false; };
   }, []);
   return apps;
 }

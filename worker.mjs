@@ -121,6 +121,20 @@ async function supabaseRpc(token, name, body = {}) {
   return { response, payload };
 }
 
+async function supabasePublicRpc(name) {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_KEY,
+      "content-type": "application/json",
+      accept: "application/json",
+    },
+    body: "{}",
+  });
+  const payload = await response.json().catch(async () => ({ error: await response.text().catch(() => "") }));
+  return { response, payload };
+}
+
 function sameOriginMutation(request) {
   const origin = request.headers.get("origin");
   return !origin || origin === "https://hiutmc.com";
@@ -273,6 +287,13 @@ export default {
       return json(stats);
     }
 
+    if (pathname === "/api/hub-registry") {
+      if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+      const { response, payload } = await supabasePublicRpc("ecosystem_public_hub_registry");
+      if (!response.ok) return json({ error: "Published Hub registry unavailable" }, 503);
+      return json({ hubs: Array.isArray(payload) ? payload : [] }, 200, { "cache-control": "public, max-age=60, s-maxage=60" });
+    }
+
 
     if (pathname === "/api/staff/shadow/snapshot") {
       if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
@@ -293,6 +314,19 @@ export default {
         p_hub_slug: String(body.hubSlug || ""),
         p_draft: body.draft && typeof body.draft === "object" ? body.draft : {},
         p_expected_revision: body.expectedRevision === null || body.expectedRevision === undefined ? null : Number(body.expectedRevision),
+      });
+      return json({ shadow: "cp23", data: payload }, response.ok ? 200 : response.status);
+    }
+
+    if (pathname === "/api/staff/shadow/publish") {
+      if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+      if (!sameOriginMutation(request)) return json({ error: "Invalid origin" }, 403);
+      const gate = await shadowStaffAccess(request, "admin");
+      if (!gate.ok) return gate.response;
+      const body = await request.json().catch(() => null);
+      if (!body || typeof body !== "object") return json({ error: "Invalid JSON" }, 400);
+      const { response, payload } = await supabaseRpc(gate.token, "ecosystem_admin_publish_hub", {
+        p_hub_slug: String(body.hubSlug || ""),
       });
       return json({ shadow: "cp23", data: payload }, response.ok ? 200 : response.status);
     }

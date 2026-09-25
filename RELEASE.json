@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260925-01",
+  "release": "HIU-YHCT-ECOSYSTEM-20260925-02",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP31",
+  "checkpoint": "CP32",
   "base_checkpoint_sha": "5ccb76683f8de06fe56bcaef00d8bd881a4ed5f0",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP31 adds a persistent page-view counter in the existing Admin Center. Only GET requests for public HTML pages on hiutmc.com are counted; Admin and Mod pages, APIs, assets, writes, and other origins are excluded. Cloudflare Durable Objects stores totals and a seven-day Vietnam-time series without IP or device identifiers. The traffic API verifies the existing Supabase staff session and admin role at the Worker before reading counts. Existing UI, SSO, routes, and Admin/Mod authorization remain intact. CI, Worker dry-run, Cloudflare deployment, anonymous-denial smoke, and production smoke are mandatory."
+  "verification": "CP32 moves Admin/Mod Hub drafts, moderation submissions, review status and audit records into shared Supabase storage. Admin publishes each Hub revision through an Admin-only RPC; the public homepage, map and Hub details read only published values through a read-only registry API, while browser-local drafts never become public automatically. RLS and RPC grants prevent anonymous writes, and the Worker verifies staff sessions and roles. CI, Worker dry-run, Cloudflare deployment, anonymous-denial smoke, public registry smoke and production smoke are mandatory."
 }
