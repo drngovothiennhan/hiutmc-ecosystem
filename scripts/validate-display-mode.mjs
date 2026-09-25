@@ -4,8 +4,12 @@ const dashboard = fs.readFileSync("app/dashboard.module.css", "utf8");
 const member = fs.readFileSync("components/MemberAuthBridge.module.css", "utf8");
 const spirit = fs.readFileSync("components/SpiritCompanion.module.css", "utf8");
 const page = fs.readFileSync("app/page.tsx", "utf8");
+const memberComponent = fs.readFileSync("components/MemberAuthBridge.tsx", "utf8");
 
 const errors = [];
+
+if (!memberComponent.includes("onModeChange?.(nextMode)")) errors.push("profile display mode must notify the account dialog when changed");
+if (!memberComponent.includes('if (next === "pc") setOpen(false);')) errors.push("member dialog must close automatically when switching to PC mode");
 
 for (const marker of [
   "CP24 Display Mode Isolation",

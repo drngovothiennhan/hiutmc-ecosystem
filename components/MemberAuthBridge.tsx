@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
-import { useDisplayMode } from "./DisplayModeToggle";
+import { useDisplayMode, type DisplayMode } from "./DisplayModeToggle";
 import { transitionBeforeAppNavigation } from "./NavigationTransitions";
 import styles from "./MemberAuthBridge.module.css";
 
@@ -433,7 +433,7 @@ export function StudyOsLink({
   return <a href={href} className={className} onClick={onClick} {...rest}>{children}</a>;
 }
 
-function ProfileDisplayModeSetting() {
+function ProfileDisplayModeSetting({ onModeChange }: { onModeChange?: (mode: DisplayMode) => void }) {
   const { mode, setMode } = useDisplayMode();
   const pcEnabled = mode === "pc";
   const nextMode = pcEnabled ? "auto" : "pc";
@@ -442,7 +442,7 @@ function ProfileDisplayModeSetting() {
     <button
       className={styles.displayModeSetting}
       type="button"
-      onClick={() => setMode(nextMode)}
+      onClick={() => { setMode(nextMode); onModeChange?.(nextMode); }}
       aria-pressed={pcEnabled}
       aria-label={pcEnabled ? "Đang bật chế độ PC. Nhấn để chuyển về Mobile." : "Đang dùng chế độ Mobile. Nhấn để chuyển sang PC."}
     >
@@ -501,7 +501,7 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
             <span><small>THÀNH VIÊN ĐÃ ĐỒNG BỘ</small><strong>{member.fullName}</strong><em>{member.studentCode || "HIU YHCT"} · {member.title}</em></span>
           </div>
           <p>Phiên đăng nhập trang chủ dùng cùng hệ tài khoản với Study OS. Quyền Admin/Mod được xác minh lại tại máy chủ trước khi mở khu vực quản trị.</p>
-          <ProfileDisplayModeSetting />
+          <ProfileDisplayModeSetting onModeChange={(next) => { if (next === "pc") setOpen(false); }} />
           <div className={styles.syncState}>
             <strong>{learningProgress?.hasSync ? "Tiến độ Study OS đã đồng bộ" : "Tiến độ Study OS chưa có bản đồng bộ thành công"}</strong>
             <small>{learningProgress?.hasSync ? `Streak ${learningProgress.streak} ngày · ${learningProgress.todayQuestions} câu hôm nay · ${learningProgress.xp} XP` : "Mở Study OS sau bản sửa để hệ thống gửi lại dữ liệu học tập lên máy chủ."}</small>
@@ -517,7 +517,7 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
           <label>Mật khẩu<input value={password} onChange={(e) => { setPassword(e.target.value); if (error) setError(""); }} type="password" autoComplete="current-password" disabled={busy} /></label>
           {error && <div className={styles.error} role="alert">{error}</div>}
           <button className={styles.primary} type="submit" disabled={busy || !studentCode.trim() || !password}>{busy ? "Đang xác thực…" : "Đăng nhập"}</button>
-          <ProfileDisplayModeSetting />
+          <ProfileDisplayModeSetting onModeChange={(next) => { if (next === "pc") setOpen(false); }} />
           <small className={styles.note}>Tài khoản và quyền thành viên được xác thực trực tiếp từ hệ thống Study OS và hồ sơ club_members.</small>
         </form>}
       </section>
