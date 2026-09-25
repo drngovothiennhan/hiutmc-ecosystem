@@ -72,6 +72,8 @@ jobs:
             done
             test "$code" = "200" || (echo "::error::$path returned $code after retries" && exit 1)
           done
+          proxy_status="$(curl -sS --max-time 10 -o /tmp/proxy-body -w '%{http_code}' -X GET "$PREVIEW_URL/api/g2-member-login" || true)"
+          test "$proxy_status" = "405" || (echo "::error::Preview login proxy route returned $proxy_status for a safe GET guard check" && exit 1)
 
       - name: Install Playwright Chromium
         run: |
