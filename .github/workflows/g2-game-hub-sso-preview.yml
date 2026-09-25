@@ -93,7 +93,17 @@ jobs:
           for (const [width, height] of [[390, 844], [768, 1024], [1024, 900]]) {
             const page = await browser.newPage({ viewport: { width, height } });
             await page.goto(`${url}/?g2-sso-test=1`, { waitUntil: "domcontentloaded", timeout: 60000 });
-            await page.getByRole("button", { name: "Kiểm tra đăng nhập Game Hub preview" }).waitFor({ state: "visible", timeout: 15000 });
+            const previewButton = page.getByRole("button", { name: "Kiểm tra đăng nhập Game Hub preview" });
+            await previewButton.waitFor({ state: "visible", timeout: 15000 });
+            const buttonMetrics = await previewButton.evaluate((el) => ({
+              clientWidth: el.clientWidth,
+              scrollWidth: el.scrollWidth,
+              clientHeight: el.clientHeight,
+              scrollHeight: el.scrollHeight,
+            }));
+            if (buttonMetrics.scrollWidth > buttonMetrics.clientWidth + 1 || buttonMetrics.scrollHeight > buttonMetrics.clientHeight + 1) {
+              throw new Error(`G2 preview button text is clipped at ${width}px: ${JSON.stringify(buttonMetrics)}`);
+            }
             const metrics = await page.evaluate(() => ({
               scrollWidth: document.documentElement.scrollWidth,
               clientWidth: document.documentElement.clientWidth,
