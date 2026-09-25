@@ -79,13 +79,23 @@ for (const [route, marker] of sameOriginAppRoutes) {
   if (!text.includes(marker)) throw new Error(`${url} gateway missing expected marker: ${marker}`);
   if (!response.headers.get("x-hiutmc-app-gateway")) throw new Error(`${url} missing gateway header`);
   if (!text.includes("<base href=")) throw new Error(`${url} missing same-origin base rewrite`);
-  console.log(`PASS same-origin gateway ${response.status} ${url} (attempt ${attempt})`);
+  const assetRefs = [...text.matchAll(/<(?:script|link)[^>]+(?:src|href)=["']([^"'#]+)["']/gi)]
+    .map(match => match[1])
+    .filter(ref => !ref.startsWith("data:"))
+    .slice(0, 8);
+  if (!assetRefs.length) throw new Error(`${url} gateway did not expose any shell asset references`);
+  for (const ref of assetRefs) {
+    const assetUrl = new URL(ref, url).toString();
+    const asset = await getWithRetry(assetUrl, 4);
+    if (!asset.response.ok) throw new Error(`${assetUrl} gateway shell asset failed`);
+  }
+  console.log(`PASS same-origin gateway ${response.status} ${url} + ${assetRefs.length} shell assets (attempt ${attempt})`);
 }
 
 const sameOriginDeepRoutes = [
   ["/apps/study/ai", "YHCT HIU 4.0"],
   ["/apps/study/api/manifest", null],
-  ["/apps/thietchan/open-source.html", "Nguồn mở"],
+  ["/apps/thietchan/open-source.html", "Thông tin ứng dụng & nguồn mở"],
   ["/apps/trungyvan/manifest.webmanifest", null],
   ["/apps/atlas/data/meridians.json", null],
   ["/apps/atlas/models/atlas.json", null],
