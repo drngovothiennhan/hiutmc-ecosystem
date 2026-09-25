@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useEffect, type CSSProperties } from "react";
 import HomeIcon, { type HomeIconName } from "@/components/HomeIcon";
 import DailyMissions from "@/components/DailyMissions";
 import DisplayModeToggle from "@/components/DisplayModeToggle";
@@ -30,10 +30,18 @@ const events = [
 
 function HomeContent() {
   const apps = useHubRegistry();
-  const { openStudyOs, member, learningProgress, learningProgressReady } = useMemberAuth();
+  const { openStudyOs, openGameHub, member, ready, learningProgress, learningProgressReady } = useMemberAuth();
   const studyOsUrl = apps.find((app) => app.slug === "study-os")?.launchUrl ?? "/learn/";
   const atlasUrl = apps.find((app) => app.slug === "atlas")?.launchUrl ?? "/ecosystem/atlas/";
   const gameHubUrl = "https://hiutmc-game-hub.pages.dev/";
+  useEffect(() => {
+    if (!ready || !member || !canAccessGameHub(member.role)) return;
+    const current = new URL(window.location.href);
+    if (current.searchParams.get("open") !== "game-hub") return;
+    current.searchParams.delete("open");
+    window.history.replaceState(window.history.state, "", current.pathname + current.search + current.hash);
+    void openGameHub(gameHubUrl);
+  }, [ready, member?.id, member?.role, openGameHub, gameHubUrl]);
   const synced = Boolean(member && learningProgressReady && learningProgress?.hasSync);
   const latestScore = synced ? learningProgress?.lastExamScore ?? null : null;
   const ringLabel = !member ? "—" : !learningProgressReady ? "…" : synced ? (latestScore !== null ? `${latestScore}%` : "✓") : "—";
