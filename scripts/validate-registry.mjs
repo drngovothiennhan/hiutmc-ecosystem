@@ -22,9 +22,22 @@ for (const app of ecosystemApps) {
   seenSlugs.add(app.slug);
 
   let upstream;
+  let launch;
   let canonical;
   try { upstream = new URL(app.currentUpstreamUrl); } catch { errors.push(`Invalid upstream URL for ${app.slug}`); }
+  try { launch = new URL(app.launchUrl); } catch { errors.push(`Invalid launch URL for ${app.slug}`); }
   try { canonical = new URL(app.plannedCanonicalDomain); } catch { errors.push(`Invalid canonical URL for ${app.slug}`); }
+
+  const expectedLaunchPath = {
+    "study-os": "/apps/study/",
+    "ai-thiet-chan": "/apps/thietchan/",
+    "trung-y-van": "/apps/trungyvan/",
+    "atlas": "/apps/atlas/",
+  }[app.slug];
+
+  if (launch && (launch.protocol !== "https:" || launch.hostname !== "hiutmc.com" || launch.pathname !== expectedLaunchPath)) {
+    errors.push(`${app.slug} launch URL must stay inside the HIU TMC PWA scope at https://hiutmc.com${expectedLaunchPath}`);
+  }
 
   if (upstream) {
     if (upstream.protocol !== "https:") errors.push(`${app.slug} upstream must use HTTPS.`);
