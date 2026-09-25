@@ -30,13 +30,13 @@ function LibraryGateway() {
         <span className={styles.kicker}>HIU TMC · STUDY OS</span>
         <h1>Thư viện học liệu</h1>
         <p className={styles.lead}>
-          Hub mở danh mục Thư viện trong Study OS. Study OS giữ dữ liệu tài liệu và tự kiểm tra
-          phiên đăng nhập, trạng thái xuất bản cùng quyền đọc của từng thành viên.
+          Hub điều hướng đến danh mục tài liệu trong Study OS. Study OS giữ dữ liệu tài liệu và kiểm tra
+          phiên đăng nhập, trạng thái xuất bản cùng quyền truy cập của từng thành viên.
         </p>
         <div className={styles.info}>
           <span aria-hidden="true">▤</span>
           <div>
-            <strong>Đọc và tra cứu trong Study OS</strong>
+            <strong>Danh mục tài liệu do Study OS quản lý</strong>
             <p>Phiên thành viên hiện có sẽ được chuyển tiếp bằng cơ chế SSO đang dùng giữa hai ứng dụng.</p>
           </div>
         </div>
@@ -49,7 +49,7 @@ function LibraryGateway() {
           {!ready ? "Đang kiểm tra phiên…" : member ? "Mở Thư viện trong Study OS →" : "Đăng nhập hoặc mở Thư viện →"}
         </button>
         <p className={styles.note} id="library-access-note">
-          Hub không lưu bản sao tài liệu hoặc đường dẫn tệp gốc. Study OS sẽ hiển thị nội dung theo quyền đã cấp.
+          Kết nối hiện mở danh mục Study OS. Trình đọc online qua Hub cần endpoint nội dung có kiểm soát; Hub không lưu bản sao hoặc đường dẫn tệp gốc.
         </p>
       </section>
     </main>
