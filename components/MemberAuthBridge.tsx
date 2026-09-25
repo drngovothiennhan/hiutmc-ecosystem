@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
 import DisplayModeToggle from "./DisplayModeToggle";
 import styles from "./MemberAuthBridge.module.css";
+import { assertAuthMemberLink, memberIdFromLoginResponse, trustedMemberIdFromAuthUser } from "@/lib/member-auth-identity.mjs";
 
 const SUPABASE_URL = "https://gzmpnsrwqjpsbklyflqr.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG";
@@ -119,14 +120,17 @@ function mapMember(row: Record<string, unknown>): Member {
   };
 }
 
-async function fetchMember(accessToken: string): Promise<Member> {
-  const payload = tokenPayload(accessToken);
-  const appMeta = (payload.app_metadata || {}) as Record<string, unknown>;
-  const memberId = String(appMeta.member_id || "");
-  const authUserId = String(payload.sub || "");
+async function fetchMember(accessToken: string, expectedMemberId?: string): Promise<Member> {
+  const authResponse = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` },
+    cache: "no-store",
+  });
+  const authUser = (await authResponse.json().catch(() => null)) as Record<string, unknown> | null;
+  if (!authResponse.ok || !authUser?.id) throw new Error("Không xác minh được phiên thành viên.");
+  const memberId = trustedMemberIdFromAuthUser(authUser, expectedMemberId);
   const url = new URL(`${SUPABASE_URL}/rest/v1/club_members`);
   url.searchParams.set("select", "id,auth_user_id,student_code,full_name,role,status,position_title,avatar_url,login_enabled");
-  url.searchParams.set(memberId ? "id" : "auth_user_id", `eq.${memberId || authUserId}`);
+  url.searchParams.set("id", `eq.${memberId}`);
   url.searchParams.set("limit", "1");
   const response = await fetch(url.toString(), {
     headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` },
@@ -136,6 +140,7 @@ async function fetchMember(accessToken: string): Promise<Member> {
   const rows = (await response.json()) as Record<string, unknown>[];
   const row = rows[0];
   if (!row) throw new Error("Không tìm thấy hồ sơ thành viên.");
+  assertAuthMemberLink(String(authUser.id), row, memberId);
   if (String(row.status || "approved") !== "approved" || row.login_enabled === false) {
     throw new Error("Tài khoản chưa được phép đăng nhập.");
   }
@@ -230,10 +235,29 @@ async function loginMember(studentCode: string, password: string): Promise<Store
   });
   const body = (await response.json().catch(() => ({}))) as Record<string, unknown>;
   if (!response.ok) throw new Error(String(body.error || "Đăng nhập không thành công"));
-  const accessToken = String(body.access_token || "");
-  const refreshToken = String(body.refresh_token || "");
-  if (!accessToken || !refreshToken) throw new Error("Máy chủ chưa trả về phiên đăng nhập hợp lệ.");
-  const member = await fetchMember(accessToken);
+  const initialAccessToken = String(body.access_token || "");
+  const initialRefreshToken = String(body.refresh_token || "");
+  if (!initialAccessToken || !initialRefreshToken) throw new Error("Máy chủ chưa trả về phiên đăng nhập hợp lệ.");
+  const expectedMemberId = memberIdFromLoginResponse(body, studentCode);
+  // The member-login Edge Function may update app_metadata after signInWithPassword
+  // has minted its first JWT. Refresh once so the Hub receives current trusted claims.
+  const refreshResponse = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+    method: "POST",
+    headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
+    body: JSON.stringify({ refresh_token: initialRefreshToken }),
+    cache: "no-store",
+  });
+  const refreshedBody = (await refreshResponse.json().catch(() => ({}))) as Record<string, unknown>;
+  const accessToken = String(refreshedBody.access_token || "");
+  const refreshToken = String(refreshedBody.refresh_token || "");
+  if (!refreshResponse.ok || !accessToken || !refreshToken) {
+    throw new Error("Không thể làm mới phiên đăng nhập để đồng bộ hồ sơ thành viên.");
+  }
+  const member = await fetchMember(accessToken, expectedMemberId);
+  const expectedStudentCode = studentCode.replace(/\s/g, "").toUpperCase();
+  if (String(member.studentCode || "").replace(/\s/g, "").toUpperCase() !== expectedStudentCode) {
+    throw new Error("Hồ sơ Auth không khớp MSSV đăng nhập.");
+  }
   const session = { accessToken, refreshToken, expiresAt: tokenExpiry(accessToken), member };
   saveStored(session);
   return session;
