@@ -15,6 +15,9 @@ type Resource = {
   title: string;
   resourceType: string;
   mimeType: string;
+  author?: string;
+  subject?: string;
+  keywords?: string;
   updatedAt: string;
 };
 type PdfDocument = {
@@ -55,7 +58,7 @@ function loadPdfJs(): Promise<PdfJs> {
   return pdfJsLoad;
 }
 
-function LibraryReader({ resource, apiBase, onClose }: { resource: Resource; apiBase: string; onClose: () => void }) {
+function LibraryReader({ resource, apiBase, onClose, onResearch }: { resource: Resource; apiBase: string; onClose: () => void; onResearch: () => void }) {
   const { getMemberAccessToken } = useMemberAuth();
   const frameRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -148,7 +151,7 @@ function LibraryReader({ resource, apiBase, onClose }: { resource: Resource; api
     <section className={styles.reader} ref={frameRef} aria-label={`Trình đọc ${resource.title}`}>
       <header className={styles.readerHeader}>
         <div><strong>{resource.title}</strong><small>Chỉ xem trực tuyến · Quyền truy cập được kiểm tra trên StudyOS</small></div>
-        <button type="button" onClick={onClose} aria-label="Đóng trình đọc">Đóng</button>
+        <div className={styles.readerActions}><button type="button" onClick={onResearch}>Nghiên cứu chuyên sâu trong StudyOS →</button><button type="button" onClick={onClose} aria-label="Đóng trình đọc">Đóng</button></div>
       </header>
       <nav className={styles.controls} aria-label="Điều khiển tài liệu">
         <button type="button" onClick={() => setPage(value => Math.max(1, value - 1))} disabled={page <= 1 || busy}>Trang trước</button>
@@ -175,6 +178,7 @@ function LibraryGateway() {
   const [query, setQuery] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [details, setDetails] = useState<Resource | null>(null);
   const [selected, setSelected] = useState<Resource | null>(null);
   const [revision, setRevision] = useState(0);
   const studyOs = apps.find((app) => app.slug === "study-os");
@@ -221,7 +225,17 @@ function LibraryGateway() {
     return () => { live = false; controller.abort(); };
   }, [member?.id, apiBase, getMemberAccessToken, revision]);
 
-  const visible = useMemo(() => items.filter(item => item.title.toLocaleLowerCase("vi").includes(query.trim().toLocaleLowerCase("vi"))), [items, query]);
+  const visible = useMemo(() => {
+    const needle = query.trim().toLocaleLowerCase("vi");
+    if (!needle) return items;
+    return items.filter(item => [item.title,item.author,item.subject,item.keywords,item.mimeType]
+      .filter(Boolean).join(" ").toLocaleLowerCase("vi").includes(needle));
+  }, [items, query]);
+  const openResearch = (item: Resource) => {
+    const target = new URL(studyOsUrl);
+    target.searchParams.set("resourceKey", item.resourceKey);
+    void openStudyOs(target.toString());
+  };
 
   return (
     <main className={styles.page}>
@@ -242,22 +256,33 @@ function LibraryGateway() {
         ) : (
           <>
             <div className={styles.libraryTools}>
-              <label>Tìm tài liệu<input value={query} onChange={event => setQuery(event.target.value)} placeholder="Nhập tên tài liệu…" maxLength={200} /></label>
+              <label>Tìm tài liệu<input value={query} onChange={event => setQuery(event.target.value)} placeholder="Tên, tác giả, chủ đề hoặc từ khóa…" maxLength={200} /></label>
               <button type="button" onClick={() => setRevision(value => value + 1)} disabled={busy}>Làm mới</button>
             </div>
             {busy ? <p role="status">Đang tải danh mục…</p> : error ? <p className={styles.error} role="alert">{error}</p> : visible.length ? (
               <ul className={styles.list}>{visible.map(item => (
                 <li key={item.resourceKey}>
-                  <div><strong>{item.title}</strong><small>{item.mimeType}{item.updatedAt && !Number.isNaN(Date.parse(item.updatedAt)) ? ` · ${new Date(item.updatedAt).toLocaleDateString("vi-VN")}` : ""}</small></div>
-                  {item.mimeType === "application/pdf" ? (
-                    <button type="button" onClick={() => setSelected(item)}>Mở để xem</button>
-                  ) : (
-                    <button type="button" onClick={() => void openStudyOs(studyOsUrl)}>Mở trong StudyOS →</button>
-                  )}
+                  <div><strong>{item.title}</strong><small>{item.author ? `Tác giả: ${item.author} · ` : ""}{item.subject ? `Chủ đề: ${item.subject} · ` : ""}{item.mimeType}{item.updatedAt && !Number.isNaN(Date.parse(item.updatedAt)) ? ` · ${new Date(item.updatedAt).toLocaleDateString("vi-VN")}` : ""}</small></div>
+                  <button type="button" onClick={() => setDetails(item)}>Chi tiết</button>
                 </li>
               ))}</ul>
             ) : <p>{items.length ? "Không tìm thấy tài liệu phù hợp." : "Chưa có học liệu được phát hành cho thành viên."}</p>}
-            {selected && <LibraryReader resource={selected} apiBase={apiBase} onClose={() => setSelected(null)} />}
+            {details && <section className={styles.detailBackdrop} role="dialog" aria-modal="true" aria-labelledby="library-detail-title">
+              <article className={styles.detailCard}>
+                <button type="button" className={styles.detailClose} onClick={() => setDetails(null)} aria-label="Đóng chi tiết">Đóng</button>
+                <span className={styles.kicker}>CHI TIẾT HỌC LIỆU</span>
+                <h2 id="library-detail-title">{details.title}</h2>
+                {details.author && <p><strong>Tác giả:</strong> {details.author}</p>}
+                {details.subject && <p><strong>Chủ đề:</strong> {details.subject}</p>}
+                {details.keywords && <p><strong>Từ khóa:</strong> {details.keywords}</p>}
+                <p><strong>Định dạng:</strong> {details.mimeType || "Chưa có metadata"}</p>
+                <div className={styles.detailActions}>
+                  {details.mimeType === "application/pdf" && <button className={styles.primary} type="button" onClick={() => {setSelected(details);setDetails(null);}}>Đọc online</button>}
+                  <button type="button" onClick={() => openResearch(details)}>Nghiên cứu chuyên sâu trong StudyOS →</button>
+                </div>
+              </article>
+            </section>}
+            {selected && <LibraryReader resource={selected} apiBase={apiBase} onClose={() => setSelected(null)} onResearch={() => openResearch(selected)} />}
           </>
         )}
       </section>
