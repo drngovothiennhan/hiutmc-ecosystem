@@ -7,6 +7,7 @@ export type EcosystemApp = {
   status: "Production" | "Preview" | "Development";
   hosting: "Vercel" | "GitHub Pages" | "Cloudflare";
   currentUpstreamUrl: string;
+  launchUrl: string;
   plannedCanonicalDomain: string;
   verifiedAt: string;
   x: number;
@@ -23,6 +24,7 @@ export const ecosystemApps: EcosystemApp[] = [
     description: "Không gian học tập số dành cho sinh viên Y học cổ truyền HIU, tập trung vào học liệu, luyện tập và trải nghiệm học tập thống nhất.",
     hosting: "Vercel",
     currentUpstreamUrl: "https://yhct-hiu-final4-stage-hiu-yhct.vercel.app/",
+    launchUrl: "https://hiutmc.com/apps/study/",
     plannedCanonicalDomain: "https://study.hiutmc.com/",
     verifiedAt: "2026-09-23",
     status: "Production",
@@ -38,6 +40,7 @@ export const ecosystemApps: EcosystemApp[] = [
     description: "Khu trải nghiệm AI hỗ trợ quan sát, học và đối chiếu đặc điểm lưỡi trong bối cảnh giáo dục Y học cổ truyền.",
     hosting: "Vercel",
     currentUpstreamUrl: "https://ai-thiet-chan-hiu-yhct.vercel.app/",
+    launchUrl: "https://hiutmc.com/apps/thietchan/",
     plannedCanonicalDomain: "https://thietchan.hiutmc.com/",
     verifiedAt: "2026-09-23",
     status: "Production",
@@ -53,6 +56,7 @@ export const ecosystemApps: EcosystemApp[] = [
     description: "Không gian đọc, tra cứu và kết nối học liệu Trung y văn cho sinh viên và hoạt động học thuật của câu lạc bộ.",
     hosting: "GitHub Pages",
     currentUpstreamUrl: "https://drngovothiennhan.github.io/trung-y-van-hiu/",
+    launchUrl: "https://hiutmc.com/apps/trungyvan/",
     plannedCanonicalDomain: "https://trungyvan.hiutmc.com/",
     verifiedAt: "2026-09-22",
     status: "Production",
@@ -68,6 +72,7 @@ export const ecosystemApps: EcosystemApp[] = [
     description: "Mô hình tương tác phục vụ học huyệt vị, đường kinh và liên hệ giải phẫu theo định hướng dành cho sinh viên Y học cổ truyền.",
     hosting: "GitHub Pages",
     currentUpstreamUrl: "https://drngovothiennhan.github.io/human-atlas/",
+    launchUrl: "https://hiutmc.com/apps/atlas/",
     plannedCanonicalDomain: "https://atlas.hiutmc.com/",
     verifiedAt: "2026-09-23",
     status: "Preview",
