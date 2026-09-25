@@ -53,7 +53,7 @@ jobs:
           node -e 'const fs=require("fs");const cfg=JSON.parse(fs.readFileSync("wrangler.jsonc","utf8"));cfg.name="hiutmc-ecosystem-g2-sso-preview";cfg.routes=[];cfg.previews={};cfg.workers_dev=true;cfg.preview_urls=true;fs.writeFileSync("wrangler.g2.preview.jsonc",JSON.stringify(cfg,null,2));'
           npx wrangler preview --config wrangler.g2.preview.jsonc --name hiutmc-ecosystem-g2-sso-preview --message "G2 Game Hub preview SSO handoff" --json > preview.json 2>&1
           cat preview.json
-          PREVIEW_URL="$(grep -oE 'https://[^"[:space:]]+workers\.dev' preview.json | head -n 1)"
+          PREVIEW_URL="$(grep -oE 'https://[^"[:space:]]+workers\.dev' preview.json | tail -n 1)"
           test -n "$PREVIEW_URL"
           echo "preview_url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
           echo "### Isolated G2 Ecosystem Preview" >> "$GITHUB_STEP_SUMMARY"
@@ -64,8 +64,13 @@ jobs:
           PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
         run: |
           for path in / '/?g2-sso-test=1'; do
-            code="$(curl -L -sS -o /tmp/body.html -w '%{http_code}' "$PREVIEW_URL$path")"
-            test "$code" = "200" || (echo "::error::$path returned $code" && exit 1)
+            code="000"
+            for attempt in {1..15}; do
+              code="$(curl -L -sS --max-time 10 -o /tmp/body.html -w '%{http_code}' "$PREVIEW_URL$path" || true)"
+              test "$code" = "200" && break
+              sleep 2
+            done
+            test "$code" = "200" || (echo "::error::$path returned $code after retries" && exit 1)
           done
 
       - name: Install Playwright Chromium
