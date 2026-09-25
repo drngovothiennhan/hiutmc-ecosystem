@@ -7,4 +7,6 @@
 - Privacy: no IP addresses, user agents, account IDs or device identifiers are stored. This measures page views, not unique visitors.
 - Access control: `/api/admin/traffic` checks the existing Supabase session and requires the canonical `admin` role in the Cloudflare Worker. The Mod Center does not show the traffic tab.
 - Verification: unit tests cover counting, exclusions, anonymous denial, Admin access and Mod denial; CI/build, Wrangler dry-run, deploy and production smoke are required.
-- Deployment state: candidate only until the production workflow and live smoke succeed.
+- Deployment state: live on production. GitHub Actions deploy and production smoke passed in run #46 for commit `9fc99e3acc1698935e723fbe6d2fcf7599cefc77`.
+- Cloudflare Worker version: `8225f14e-757c-4f6e-9936-2c3435f184d8`.
+- Run evidence: https://github.com/drngovothiennhan/hiutmc-ecosystem/actions/runs/36078439597

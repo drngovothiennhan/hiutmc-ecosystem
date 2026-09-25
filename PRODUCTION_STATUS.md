@@ -42,6 +42,14 @@
 - The visible Admin/Mod UI still uses the existing browser-local source during CP23; no public Hub or graphical behavior is changed.
 - Stage 2 cutover is blocked until CP23 production smoke is complete.
 
+## CP31 Admin traffic counter
+- The Admin Center includes a server-protected traffic view; the Mod Center does not expose it.
+- It counts public HTML page views on `hiutmc.com`, excluding static assets, API calls, Admin/Mod routes and prefetches.
+- The Cloudflare Durable Object keeps the lifetime total and daily totals for a rolling 31-day window; the Admin UI displays today and the last seven days in Vietnam time.
+- The counter does not retain IP addresses, user agents, account identifiers or device identifiers. Values represent page views, not unique visitors.
+- Production deployment and smoke passed in GitHub Actions run #46: https://github.com/drngovothiennhan/hiutmc-ecosystem/actions/runs/36078439597.
+- Cloudflare Worker version: `8225f14e-757c-4f6e-9936-2c3435f184d8`.
+
 ## Production release gates
 1. Repository boundary, release metadata and Hub registry validation.
 2. Map asset, PWA manifest/icons, Community contract and learning-progress validation.
