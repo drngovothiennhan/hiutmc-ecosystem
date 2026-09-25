@@ -123,6 +123,12 @@ function HomeContent() {
                     </a>
                   );
                 })}
+                <a className={styles.hub} href="/library/" style={{ "--hub": "#9f1c3b" } as CSSProperties}>
+                  <span className={styles.hubIcon}><HomeIcon name="nav-study" /></span>
+                  <strong>Thư viện HIU TMC</strong>
+                  <p>Tra cứu học liệu đã phát hành trong Study OS.</p>
+                  <b>Mở Thư viện →</b>
+                </a>
               </div>
             </section>
 
