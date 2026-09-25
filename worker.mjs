@@ -395,6 +395,16 @@ async function proxyEcosystemApp(request, url, config, suffixOverride = null) {
   let upstream;
   try {
     upstream = await fetch(proxyRequest, { redirect: "manual" });
+    const acceptsHtml = request.method === "GET" && request.headers.get("accept")?.includes("text/html");
+    const routeLike = !/\.[a-z0-9]{1,10}$/i.test(suffix.split("?")[0]);
+    if (upstream.status === 404 && acceptsHtml && routeLike) {
+      const fallbackTarget = new URL(config.upstreamOrigin);
+      fallbackTarget.pathname = joinProxyPath(config.upstreamBase, "/");
+      fallbackTarget.search = "";
+      const fallbackRequest = new Request(fallbackTarget.toString(), proxyRequest);
+      fallbackRequest.headers.set("referer", fallbackTarget.origin + fallbackTarget.pathname);
+      upstream = await fetch(fallbackRequest, { redirect: "manual" });
+    }
   } catch {
     if (request.method === "GET" && request.headers.get("accept")?.includes("text/html")) {
       return Response.redirect(target.toString(), 302);
