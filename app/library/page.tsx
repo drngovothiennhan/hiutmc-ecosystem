@@ -151,7 +151,7 @@ function LibraryReader({ resource, apiBase, onClose, onResearch }: { resource: R
     <section className={styles.reader} ref={frameRef} aria-label={`Trình đọc ${resource.title}`}>
       <header className={styles.readerHeader}>
         <div><strong>{resource.title}</strong><small>Chỉ xem trực tuyến · Quyền truy cập được kiểm tra trên StudyOS</small></div>
-        <div className={styles.readerActions}><button type="button" onClick={onResearch}>Nghiên cứu chuyên sâu trong StudyOS →</button><button type="button" onClick={onClose} aria-label="Đóng trình đọc">Đóng</button></div>
+        <div className={styles.readerActions}><button type="button" onClick={onResearch}>Nghiên cứu chuyên sâu trong StudyOS →</button><button type="button" autoFocus onClick={onClose} aria-label="Đóng trình đọc">Đóng</button></div>
       </header>
       <nav className={styles.controls} aria-label="Điều khiển tài liệu">
         <button type="button" onClick={() => setPage(value => Math.max(1, value - 1))} disabled={page <= 1 || busy}>Trang trước</button>
@@ -197,6 +197,17 @@ function LibraryGateway() {
       return "https://study.hiutmc.com/research";
     }
   })();
+
+  useEffect(() => {
+    if (!details && !selected) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (selected) setSelected(null);
+      else setDetails(null);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [details, selected]);
 
   useEffect(() => {
     let live = true;
@@ -269,7 +280,7 @@ function LibraryGateway() {
             ) : <p>{items.length ? "Không tìm thấy tài liệu phù hợp." : "Chưa có học liệu được phát hành cho thành viên."}</p>}
             {details && <section className={styles.detailBackdrop} role="dialog" aria-modal="true" aria-labelledby="library-detail-title">
               <article className={styles.detailCard}>
-                <button type="button" className={styles.detailClose} onClick={() => setDetails(null)} aria-label="Đóng chi tiết">Đóng</button>
+                <button type="button" autoFocus className={styles.detailClose} onClick={() => setDetails(null)} aria-label="Đóng chi tiết">Đóng</button>
                 <span className={styles.kicker}>CHI TIẾT HỌC LIỆU</span>
                 <h2 id="library-detail-title">{details.title}</h2>
                 {details.author && <p><strong>Tác giả:</strong> {details.author}</p>}
