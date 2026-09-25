@@ -480,7 +480,7 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
           <p>Phiên đăng nhập trang chủ dùng cùng hệ tài khoản với Study OS. Quyền Admin/Mod được xác minh lại tại máy chủ trước khi mở khu vực quản trị.</p>
           <div className={styles.displayModeSetting}>
             <span><strong>Chế độ hiển thị</strong><small>Chuyển Mobile/PC ngay trong hồ sơ thành viên.</small></span>
-            <DisplayModeToggle className={styles.profileModeButton} />
+            <DisplayModeToggle className={styles.profileModeButton} onModeChange={(next) => { if (next === "pc") setOpen(false); }} />
           </div>
           <div className={styles.syncState}>
             <strong>{learningProgress?.hasSync ? "Tiến độ Study OS đã đồng bộ" : "Tiến độ Study OS chưa có bản đồng bộ thành công"}</strong>
@@ -499,7 +499,7 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
           <button className={styles.primary} type="submit" disabled={busy || !studentCode.trim() || !password}>{busy ? "Đang xác thực…" : "Đăng nhập"}</button>
           <div className={styles.displayModeSetting}>
             <span><strong>Chế độ hiển thị</strong><small>Đổi Mobile/PC trước hoặc sau khi đăng nhập.</small></span>
-            <DisplayModeToggle className={styles.profileModeButton} />
+            <DisplayModeToggle className={styles.profileModeButton} onModeChange={(next) => { if (next === "pc") setOpen(false); }} />
           </div>
           <small className={styles.note}>Tài khoản và quyền thành viên được xác thực trực tiếp từ hệ thống Study OS và hồ sơ club_members.</small>
         </form>}
