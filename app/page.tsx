@@ -31,8 +31,8 @@ const events = [
 function HomeContent() {
   const apps = useHubRegistry();
   const { openStudyOs, member, learningProgress, learningProgressReady } = useMemberAuth();
-  const studyOsUrl = apps.find((app) => app.slug === "study-os")?.currentUpstreamUrl ?? "/learn/";
-  const atlasUrl = apps.find((app) => app.slug === "atlas")?.currentUpstreamUrl ?? "/ecosystem/atlas/";
+  const studyOsUrl = apps.find((app) => app.slug === "study-os")?.launchUrl ?? "/learn/";
+  const atlasUrl = apps.find((app) => app.slug === "atlas")?.launchUrl ?? "/ecosystem/atlas/";
   const synced = Boolean(member && learningProgressReady && learningProgress?.hasSync);
   const latestScore = synced ? learningProgress?.lastExamScore ?? null : null;
   const ringLabel = !member ? "—" : !learningProgressReady ? "…" : synced ? (latestScore !== null ? `${latestScore}%` : "✓") : "—";
@@ -115,7 +115,7 @@ function HomeContent() {
                 {apps.map((app) => {
                   const meta = hubMeta[app.slug] ?? { icon: "nav-ai", tone: app.accent };
                   return (
-                    <a key={app.slug} className={styles.hub} href={app.currentUpstreamUrl} onClick={app.slug === "study-os" ? (event) => { event.preventDefault(); void openStudyOs(app.currentUpstreamUrl); } : undefined} style={{ "--hub": meta.tone } as CSSProperties}>
+                    <a key={app.slug} className={styles.hub} href={app.launchUrl} onClick={app.slug === "study-os" ? (event) => { event.preventDefault(); void openStudyOs(app.launchUrl); } : undefined} style={{ "--hub": meta.tone } as CSSProperties}>
                       <span className={styles.hubIcon}><HomeIcon name={meta.icon} /></span>
                       <strong>{app.shortName}</strong>
                       <p>{app.tagline}</p>
