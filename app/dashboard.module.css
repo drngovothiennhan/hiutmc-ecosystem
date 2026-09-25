@@ -383,7 +383,10 @@
   border-radius:12px;
   background:#9f1c3b;
   color:#fff;
-  font:700 12px/1.35 inherit;
+  font:inherit;
+  font-size:12px;
+  font-weight:700;
+  line-height:1.35;
   text-align:center;
   white-space:normal;
   overflow-wrap:anywhere;
