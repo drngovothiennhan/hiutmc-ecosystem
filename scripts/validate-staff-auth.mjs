@@ -39,6 +39,17 @@ for (const marker of [
   if (!files.auth.includes(marker)) errors.push(`member auth bridge missing marker: ${marker}`);
 }
 
+const loginFlowStart = files.auth.indexOf("login: async (studentCode, password) => {");
+const loginFlowEnd = files.auth.indexOf("logout: async () => {", loginFlowStart);
+const loginFlow = loginFlowStart >= 0 && loginFlowEnd > loginFlowStart
+  ? files.auth.slice(loginFlowStart, loginFlowEnd)
+  : "";
+const gameHubReturnIndex = loginFlow.indexOf("navigateToGameHub(next)");
+const staffSyncIndex = loginFlow.indexOf("await syncStaffSession(next.accessToken)");
+if (gameHubReturnIndex < 0 || (staffSyncIndex >= 0 && staffSyncIndex < gameHubReturnIndex)) {
+  errors.push("Game Hub sign-in must hand off before optional staff-session sync can block navigation.");
+}
+
 const gameHubLaunchStart = files.auth.indexOf("openGameHub: async (rawUrl) => {");
 const gameHubLaunchEnd = files.auth.indexOf("refreshLearningProgress,", gameHubLaunchStart);
 const gameHubLaunch = gameHubLaunchStart >= 0 && gameHubLaunchEnd > gameHubLaunchStart
