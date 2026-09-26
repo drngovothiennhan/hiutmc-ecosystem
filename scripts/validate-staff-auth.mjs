@@ -33,6 +33,8 @@ for (const marker of [
   "openGameHub: async",
   "if (!session || !canAccessGameHub(session.member.role)) return;",
   "async function refreshSession(current: StoredSession)",
+  'new URLSearchParams(window.location.search).get("open") === "game-hub"',
+  "navigateToGameHub(next)",
 ]) {
   if (!files.auth.includes(marker)) errors.push(`member auth bridge missing marker: ${marker}`);
 }
