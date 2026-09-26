@@ -387,6 +387,14 @@ export default {
     }
 
 
+    if (pathname === "/api/staff/shadow/game-hub-errors") {
+      if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+      const gate = await shadowStaffAccess(request, "admin");
+      if (!gate.ok) return gate.response;
+      const { response, payload } = await supabaseRpc(gate.token, "ecosystem_admin_gamehub_error_feed_v1", { p_limit: 100 });
+      return json({ shadow: "gamehub-errors-v1", events: Array.isArray(payload) ? payload : [], error: response.ok ? undefined : "feed_unavailable" }, response.ok ? 200 : response.status);
+    }
+
     if (pathname === "/api/staff/shadow/snapshot") {
       if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
       const gate = await shadowStaffAccess(request, "mod");
