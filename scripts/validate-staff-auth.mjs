@@ -32,11 +32,25 @@ for (const marker of [
   "export function canAccessGameHub",
   "openGameHub: async",
   "if (!session || !canAccessGameHub(session.member.role)) return;",
-  "async function refreshSession(current: StoredSession, forceRefresh = false)",
-  "const fresh = await refreshSession(session, true);",
+  "async function refreshSession(current: StoredSession)",
 ]) {
   if (!files.auth.includes(marker)) errors.push(`member auth bridge missing marker: ${marker}`);
 }
+
+const gameHubLaunchStart = files.auth.indexOf("openGameHub: async (rawUrl) => {");
+const gameHubLaunchEnd = files.auth.indexOf("refreshLearningProgress,", gameHubLaunchStart);
+const gameHubLaunch = gameHubLaunchStart >= 0 && gameHubLaunchEnd > gameHubLaunchStart
+  ? files.auth.slice(gameHubLaunchStart, gameHubLaunchEnd)
+  : "";
+for (const marker of [
+  'target.origin !== new URL(GAME_HUB_URL).origin',
+  "access_token: session.accessToken",
+  "refresh_token: session.refreshToken",
+  "window.location.assign(target.toString())",
+]) {
+  if (!gameHubLaunch.includes(marker)) errors.push(`Game Hub launch missing safe handoff marker: ${marker}`);
+}
+if (gameHubLaunch.includes("await ")) errors.push("Game Hub launch must not wait on network or animation before navigating.");
 
 for (const marker of [
   'fetch("/api/staff/access"',
