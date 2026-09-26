@@ -364,12 +364,15 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     ready,
     login: async (studentCode, password) => {
       const next = await loginMember(studentCode, password);
-      const access = await syncStaffSession(next.accessToken);
+      const returningToGameHub = new URLSearchParams(window.location.search).get("open") === "game-hub";
       setSession(next);
-      setStaffAccess(access?.authorized ? access : null);
-      if (new URLSearchParams(window.location.search).get("open") === "game-hub") {
+      if (returningToGameHub) {
+        // Complete member SSO before optional staff authorization work.
         navigateToGameHub(next);
+        return null;
       }
+      const access = await syncStaffSession(next.accessToken);
+      setStaffAccess(access?.authorized ? access : null);
       return access;
     },
     logout: async () => {
