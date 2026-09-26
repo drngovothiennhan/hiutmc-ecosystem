@@ -154,6 +154,29 @@ if (publicHubsResponse.status !== 200 || !Array.isArray(publicHubs?.hubs)) {
 }
 console.log("PASS public published Hub registry API");
 
+const newsFeedUrl = "https://gzmpnsrwqjpsbklyflqr.supabase.co/rest/v1/rpc/tcm_news_feed_v1";
+const { response: publicNewsResponse, body: publicNewsText } = await fetchBody(newsFeedUrl, {
+  method: "POST",
+  headers: {
+    apikey: "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG",
+    "content-type": "application/json",
+    accept: "application/json",
+  },
+  body: JSON.stringify({ p_limit: 3 }),
+});
+const publicNews = JSON.parse(publicNewsText || "null");
+if (publicNewsResponse.status !== 200 || !Array.isArray(publicNews)) {
+  throw new Error(`Published Google News feed RPC must return an array; got ${publicNewsResponse.status}`);
+}
+for (const item of publicNews) {
+  let sourceIsHttps = false;
+  try { sourceIsHttps = new URL(item.canonical_url).protocol === "https:"; } catch {}
+  if (typeof item.id !== "string" || typeof item.title !== "string" || !sourceIsHttps) {
+    throw new Error("Published Google News feed returned a row without a title, id, or HTTPS source link");
+  }
+}
+console.log(`PASS public published Google News feed RPC (${publicNews.length} live rows)`);
+
 for (const [path, method] of [
   ["/api/staff/shadow/snapshot", "GET"],
   ["/api/staff/shadow/hub-draft", "POST"],
