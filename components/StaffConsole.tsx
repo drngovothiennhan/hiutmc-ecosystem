@@ -42,6 +42,8 @@ export default function StaffConsole({ mode }: { mode: "admin" | "mod" }) {
   const [authReady, setAuthReady] = useState(false);
   const [notice, setNotice] = useState("");
   const [request, setRequest] = useState("");
+  const [gameHubErrors, setGameHubErrors] = useState<Array<{ id: string; errorCode: string; routeKey: string; createdAt: string }>>([]);
+  const [gameHubErrorNotice, setGameHubErrorNotice] = useState("");
   const apps = useMemo(() => mergeHubDrafts(drafts), [drafts]);
   const visibleTabs = useMemo(
     () => mode === "admin" ? tabList : tabList.filter((item) => ["overview", "moderation", "audit"].includes(item.id)),
@@ -70,6 +72,23 @@ export default function StaffConsole({ mode }: { mode: "admin" | "mod" }) {
     return () => { live = false; };
   }, [mode]);
 
+  useEffect(() => {
+    if (!authReady || mode !== "admin" || tab !== "audit") return;
+    let live = true;
+    const refresh = async () => {
+      try {
+        const response = await fetch("/api/staff/shadow/game-hub-errors", { cache: "no-store" });
+        const payload = await response.json().catch(() => null) as { events?: typeof gameHubErrors; error?: string } | null;
+        if (!response.ok) throw new Error("Không tải được nhật ký lỗi Game Hub.");
+        if (live) { setGameHubErrors(Array.isArray(payload?.events) ? payload.events : []); setGameHubErrorNotice(""); }
+      } catch {
+        if (live) setGameHubErrorNotice("Chưa tải được nhật ký lỗi Game Hub. Hãy thử làm mới.");
+      }
+    };
+    void refresh();
+    const timer = window.setInterval(() => { void refresh(); }, 60_000);
+    return () => { live = false; window.clearInterval(timer); };
+  }, [authReady, mode, tab]);
   useEffect(() => { setDrafts(readHubDrafts()); setStored(readStored()); setReady(true); }, []);
   useEffect(() => { if (ready) localStorage.setItem(STORE_KEY, JSON.stringify(stored)); }, [stored, ready]);
   const log = (text: string) => setStored((s) => ({ ...s, logs: [{ id: id(), text, date: new Date().toLocaleString("vi-VN") }, ...s.logs].slice(0, 100) }));
@@ -135,7 +154,7 @@ export default function StaffConsole({ mode }: { mode: "admin" | "mod" }) {
 
       {tab === "roles" && <div className={styles.content}><div className={styles.intro}><h2>Thành viên và vai trò</h2><p>Phiên hiện tại đã được xác thực từ hệ thống thành viên dùng chung; quyền hiển thị lấy từ vai trò máy chủ.</p></div><div className={styles.roles}><article><span>◇</span><h3>Admin</h3><p>Vai trò dự kiến: quản lý nội dung Hub, cấu hình và quy trình xuất bản.</p><b>Admin: yêu cầu role admin tại máy chủ</b></article><article><span>◎</span><h3>Moderator</h3><p>Vai trò dự kiến: xem xét và gửi đề xuất nội dung cho Admin.</p><b>Moderator: yêu cầu role mod/super_mod/admin</b></article></div><div className={styles.warning}><strong>Không hiển thị dữ liệu thành viên không cần thiết</strong><p>Khu vực này chỉ dùng thông tin vai trò tối thiểu để phân quyền; không tự tạo tên, email, điểm số hoặc thông tin tài khoản.</p></div></div>}
 
-      {tab === "audit" && <div className={styles.content}><div className={styles.intro}><h2>Nhật ký thao tác</h2><p>Thao tác được ghi trên trình duyệt hiện tại.</p></div>{stored.logs.length === 0 ? <div className={styles.empty}><span>≋</span><strong>Chưa có thao tác được ghi</strong><p>Nhật ký xuất hiện khi lưu bản nháp hoặc duyệt mục cục bộ.</p></div> : <div className={styles.logs}>{stored.logs.map((item) => <article key={item.id}><span>•</span><div><strong>{item.text}</strong><small>{item.date} · Trình duyệt này</small></div></article>)}</div>}</div>}
+      {tab === "audit" && <div className={styles.content}><div className={styles.intro}><h2>Nhật ký thao tác</h2><p>Thao tác được ghi trên trình duyệt hiện tại.</p></div>{mode === "admin" && <section className={styles.panel}><div className={styles.intro}><h2>Lỗi Game Hub · Y Quán</h2><p>Mã lỗi và khu vực phát sinh, tự làm mới mỗi phút. Không hiển thị nội dung phiên hay dữ liệu người chơi.</p></div>{gameHubErrorNotice && <p className={styles.statusMessage} role="status">{gameHubErrorNotice}</p>}{gameHubErrors.length === 0 ? <div className={styles.empty}><strong>Chưa có lỗi được ghi nhận</strong><p>Nhật ký sẽ xuất hiện khi Game Hub gửi mã lỗi hợp lệ.</p></div> : <div className={styles.logs}>{gameHubErrors.map((item) => <article key={item.id}><span>!</span><div><strong>{item.errorCode} · {item.routeKey}</strong><small>{new Date(item.createdAt).toLocaleString("vi-VN")} · Game Hub</small></div></article>)}</div>}</section>}{stored.logs.length === 0 ? <div className={styles.empty}><span>≋</span><strong>Chưa có thao tác được ghi</strong><p>Nhật ký xuất hiện khi lưu bản nháp hoặc duyệt mục cục bộ.</p></div> : <div className={styles.logs}>{stored.logs.map((item) => <article key={item.id}><span>•</span><div><strong>{item.text}</strong><small>{item.date} · Trình duyệt này</small></div></article>)}</div>}</div>}
 
       {tab === "settings" && <div className={styles.content}><div className={styles.intro}><h2>Cấu hình và sao lưu</h2><p>Xuất hoặc nhập dữ liệu bản nháp trên thiết bị.</p></div><section className={styles.panel}><h3>Sao lưu JSON</h3><p>File chỉ chứa các bản nháp Hub, không có mật khẩu hay tài khoản thành viên.</p><div className={styles.actions}><button className={styles.primary} onClick={exportJson}>Xuất JSON</button><label className={styles.fileButton}>Nhập JSON<input type="file" accept="application/json,.json" onChange={importJson} /></label><button className={styles.danger} onClick={clearDrafts}>Khôi phục mặc định</button></div></section><section className={styles.panel}><h3>Tình trạng kết nối</h3><ul className={styles.checks}><li>Đăng nhập Staff: đã xác minh qua Supabase session</li><li>Phân quyền Admin/Moderator: đã chặn tại Cloudflare Worker</li><li>Xuất bản nội dung dùng chung: chưa kết nối</li><li>Lưu bản nháp cục bộ: hoạt động</li></ul></section></div>}
     </section>
