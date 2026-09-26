@@ -473,12 +473,13 @@ export function GameHubLink({
   [key: string]: unknown;
 }) {
   const { member, openGameHub } = useMemberAuth();
-  if (!member || !canAccessGameHub(member.role)) return null;
+  const canBridgeSession = Boolean(member && canAccessGameHub(member.role));
   const onClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!canBridgeSession) return;
     event.preventDefault();
     void openGameHub(href);
   };
-  return <a href={href} className={className} {...rest} onClick={onClick}>{children}</a>;
+  return <a href={href} className={className} {...rest} onClick={canBridgeSession ? onClick : undefined}>{children}</a>;
 }
 
 function ProfileDisplayModeSetting({ onModeChange }: { onModeChange?: (mode: DisplayMode) => void }) {
@@ -508,16 +509,22 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    if (!ready || member) return;
+    if (new URLSearchParams(window.location.search).get("open") === "game-hub") setOpen(true);
+  }, [ready, member]);
+
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (busy || !studentCode.trim() || !password) return;
+    const returningToGameHub = new URLSearchParams(window.location.search).get("open") === "game-hub";
     setBusy(true);
     setError("");
     try {
       const access = await login(studentCode, password);
       setPassword("");
       setOpen(false);
-      if (access?.authorized) {
+      if (access?.authorized && !returningToGameHub) {
         window.location.assign(access.canAdmin ? "/admin/" : "/mod/");
       }
     } catch (cause) {

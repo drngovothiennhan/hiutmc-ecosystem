@@ -133,14 +133,12 @@ function HomeContent() {
                     </a>
                   );
                 })}
-                {canAccessGameHub(member?.role) && (
-                  <GameHubLink href={gameHubUrl} className={styles.hub} style={{ "--hub": "#4d704c" } as CSSProperties}>
-                    <span className={styles.hubIcon}><HomeIcon name="herbal-function" /></span>
-                    <strong>Game Hub</strong>
-                    <p>Trải nghiệm game học thuật HIU TMC.</p>
-                    <b>Mở ứng dụng →</b>
-                  </GameHubLink>
-                )}
+                <GameHubLink href={gameHubUrl} className={styles.hub} style={{ "--hub": "#4d704c" } as CSSProperties}>
+                  <span className={styles.hubIcon}><HomeIcon name="herbal-function" /></span>
+                  <strong>Game Hub</strong>
+                  <p>Đăng nhập tài khoản HIU TMC để mở Gia Viên Dược Thảo.</p>
+                  <b>Mở ứng dụng →</b>
+                </GameHubLink>
               </div>
             </section>
 
