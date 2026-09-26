@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260925-02",
+  "release": "HIU-YHCT-ECOSYSTEM-20260926-01",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP32",
-  "base_checkpoint_sha": "5ccb76683f8de06fe56bcaef00d8bd881a4ed5f0",
+  "checkpoint": "CP33",
+  "base_checkpoint_sha": "1b49bc48b1139f50b9cea776f53b5502acec9c0e",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP32 moves Admin/Mod Hub drafts, moderation submissions, review status and audit records into shared Supabase storage. Admin publishes each Hub revision through an Admin-only RPC; the public homepage, map and Hub details read only published values through a read-only registry API, while browser-local drafts never become public automatically. RLS and RPC grants prevent anonymous writes, and the Worker verifies staff sessions and roles. CI, Worker dry-run, Cloudflare deployment, anonymous-denial smoke, public registry smoke and production smoke are mandatory."
+  "verification": "CP33 fixes Game Hub launch responsiveness: the allowlisted launch hands off the already validated HIU TMC session immediately, while Game Hub validates or refreshes that session during bootstrap. CI, Worker dry-run, Cloudflare deployment, anonymous-denial smoke, public registry smoke and production smoke are mandatory."
 }
