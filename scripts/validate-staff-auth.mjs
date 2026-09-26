@@ -56,12 +56,14 @@ const gameHubLaunch = gameHubLaunchStart >= 0 && gameHubLaunchEnd > gameHubLaunc
   ? files.auth.slice(gameHubLaunchStart, gameHubLaunchEnd)
   : "";
 for (const marker of [
-  'target.origin !== new URL(GAME_HUB_URL).origin',
-  "access_token: session.accessToken",
-  "refresh_token: session.refreshToken",
+  "target.origin !== window.location.origin",
+  "/^\\/apps\\/game-hub(?:\\/|$)/.test(target.pathname)",
   "window.location.assign(target.toString())",
 ]) {
-  if (!gameHubLaunch.includes(marker)) errors.push(`Game Hub launch missing safe handoff marker: ${marker}`);
+  if (!gameHubLaunch.includes(marker)) errors.push(`Game Hub launch missing same-origin handoff marker: ${marker}`);
+}
+if (/access_token:\s*session\.accessToken|refresh_token:\s*session\.refreshToken/.test(gameHubLaunch)) {
+  errors.push("Game Hub launch must not copy rotating session credentials into the URL.");
 }
 if (gameHubLaunch.includes("await ")) errors.push("Game Hub launch must not wait on network or animation before navigating.");
 

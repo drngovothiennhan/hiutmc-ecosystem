@@ -23,6 +23,11 @@ const APP_PROXY_CONFIG = Object.freeze({
     upstreamOrigin: "https://drngovothiennhan.github.io",
     upstreamBase: "/human-atlas",
   },
+  gamehub: {
+    prefix: "/apps/game-hub",
+    upstreamOrigin: "https://hiutmc-game-hub.pages.dev",
+    upstreamBase: "",
+  },
 });
 
 

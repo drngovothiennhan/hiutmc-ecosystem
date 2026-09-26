@@ -8,8 +8,8 @@ import styles from "./MemberAuthBridge.module.css";
 const SUPABASE_URL = "https://gzmpnsrwqjpsbklyflqr.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG";
 const STORAGE_KEY = "hiutmc-member-session-v1";
+const SESSION_REFRESH_LOCK = "hiutmc-supabase-session-refresh-v1";
 const BRIDGE_FLAG = "ecosystem_sso";
-const GAME_HUB_URL = "https://hiutmc-game-hub.pages.dev/";
 const GAME_HUB_ROLES = new Set(["member", "mod", "super_mod", "leader", "admin"]);
 
 export function canAccessGameHub(role?: string | null) {
@@ -115,16 +115,17 @@ function saveStored(session: StoredSession | null) {
   } catch {}
 }
 
+function authFailure(message: string, status: number) {
+  const error = new Error(message) as Error & { clearSession?: boolean };
+  error.clearSession = status === 401;
+  return error;
+}
+
 function navigateToGameHub(session: Pick<StoredSession, "accessToken" | "refreshToken"> | null) {
-  const target = new URL(GAME_HUB_URL);
-  if (session?.accessToken && session.refreshToken) {
-    target.hash = new URLSearchParams({
-      [BRIDGE_FLAG]: "1",
-      access_token: session.accessToken,
-      refresh_token: session.refreshToken,
-    }).toString();
-  }
-  window.location.assign(target.toString());
+  // Eco and the reverse-proxied Game Hub share one same-origin session store.
+  // Never copy rotating credentials into a URL fragment.
+  void session;
+  window.location.assign("/apps/game-hub/");
 }
 
 function mapMember(row: Record<string, unknown>): Member {
@@ -151,7 +152,7 @@ async function fetchMember(accessToken: string): Promise<Member> {
     headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` },
     cache: "no-store",
   });
-  if (!response.ok) throw new Error("Không thể xác minh hồ sơ thành viên.");
+  if (!response.ok) throw authFailure("Không thể xác minh hồ sơ thành viên.", response.status);
   const rows = (await response.json()) as Record<string, unknown>[];
   const row = rows[0];
   if (!row) throw new Error("Không tìm thấy hồ sơ thành viên.");
@@ -211,24 +212,45 @@ async function fetchLearningProgress(accessToken: string): Promise<LearningProgr
 }
 
 async function refreshSession(current: StoredSession): Promise<StoredSession> {
-  let accessToken = current.accessToken;
-  let refreshToken = current.refreshToken;
-  if (current.expiresAt - Date.now() <= 90_000) {
-    const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
-      method: "POST",
-      headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
-      body: JSON.stringify({ refresh_token: current.refreshToken }),
-    });
-    const body = (await response.json().catch(() => ({}))) as Record<string, unknown>;
-    if (!response.ok) throw new Error("Phiên đăng nhập đã hết hạn.");
-    accessToken = String(body.access_token || "");
-    refreshToken = String(body.refresh_token || current.refreshToken);
+  const refresh = async () => {
+    // Re-read after acquiring the shared origin lock; another tab may have
+    // already rotated the refresh token while this request was waiting.
+    const latest = readStored() ?? current;
+    let accessToken = latest.accessToken;
+    let refreshToken = latest.refreshToken;
+    if (latest.expiresAt - Date.now() <= 90_000) {
+      const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+        method: "POST",
+        headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: latest.refreshToken }),
+        cache: "no-store",
+      });
+      const body = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+      if (!response.ok) throw authFailure("Không thể làm mới phiên HIU TMC.", response.status);
+      accessToken = String(body.access_token || "");
+      refreshToken = String(body.refresh_token || latest.refreshToken);
+    }
+    if (!accessToken) throw new Error("Phiên đăng nhập không hợp lệ.");
+    const member = await fetchMember(accessToken);
+    const next = { accessToken, refreshToken, expiresAt: tokenExpiry(accessToken), member };
+    saveStored(next);
+    return next;
+  };
+  const hostname = window.location.hostname || "";
+  const sameOriginHub = hostname === "hiutmc.com" || hostname.endsWith(".hiutmc.com");
+  if (sameOriginHub && navigator.locks?.request) {
+    let refreshStarted = false;
+    try {
+      return await navigator.locks.request(SESSION_REFRESH_LOCK, () => {
+        refreshStarted = true;
+        return refresh();
+      });
+    } catch (error) {
+      // Fall back only when the lock callback never began. Never rotate twice.
+      if (refreshStarted) throw error;
+    }
   }
-  if (!accessToken) throw new Error("Phiên đăng nhập không hợp lệ.");
-  const member = await fetchMember(accessToken);
-  const next = { accessToken, refreshToken, expiresAt: tokenExpiry(accessToken), member };
-  saveStored(next);
-  return next;
+  return refresh();
 }
 
 async function loginMember(studentCode: string, password: string): Promise<StoredSession> {
@@ -299,11 +321,15 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
           setSession(refreshed);
           setStaffAccess(access?.authorized ? access : null);
         }
-      } catch {
-        saveStored(null);
-        await clearStaffSession();
+      } catch (error) {
+        const unauthorized = (error as Error & { clearSession?: boolean })?.clearSession === true;
+        const cached = unauthorized ? null : readStored();
+        if (unauthorized) {
+          saveStored(null);
+          await clearStaffSession();
+        }
         if (live) {
-          setSession(null);
+          setSession(cached);
           setStaffAccess(null);
         }
       } finally {
@@ -414,11 +440,14 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
         target.hash = fragment.toString();
         await transitionBeforeAppNavigation(target.toString());
         window.location.assign(target.toString());
-      } catch {
-        saveStored(null);
-        await clearStaffSession();
-        setSession(null);
-        setStaffAccess(null);
+      } catch (error) {
+        if ((error as Error & { clearSession?: boolean })?.clearSession) {
+          saveStored(null);
+          await clearStaffSession();
+          setSession(null);
+          setStaffAccess(null);
+        }
+        // A satellite app outage or 5xx does not invalidate HIU TMC auth.
         await transitionBeforeAppNavigation(target.toString());
         window.location.assign(target.toString());
       }
@@ -427,15 +456,9 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       if (!session || !canAccessGameHub(session.member.role)) return;
       let target: URL;
       try { target = new URL(rawUrl, window.location.href); } catch { return; }
-      if (target.origin !== new URL(GAME_HUB_URL).origin) return;
-      // The ecosystem session was already refreshed during auth bootstrap.
-      // Do not block this tap on a second forced token refresh or the long
-      // cross-app exit animation; Game Hub verifies/refreshes the bridge itself.
-      target.hash = new URLSearchParams({
-        [BRIDGE_FLAG]: "1",
-        access_token: session.accessToken,
-        refresh_token: session.refreshToken,
-      }).toString();
+      if (target.origin !== window.location.origin || !/^\/apps\/game-hub(?:\/|$)/.test(target.pathname)) return;
+      // Same-origin proxy reads the existing session. Do not wait on refresh,
+      // staff authorization, or any other optional API before navigating.
       window.location.assign(target.toString());
     },
     refreshLearningProgress,

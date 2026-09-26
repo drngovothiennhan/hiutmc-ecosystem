@@ -33,7 +33,7 @@ function HomeContent() {
   const { openStudyOs, openGameHub, member, ready, learningProgress, learningProgressReady } = useMemberAuth();
   const studyOsUrl = apps.find((app) => app.slug === "study-os")?.launchUrl ?? "/learn/";
   const atlasUrl = apps.find((app) => app.slug === "atlas")?.launchUrl ?? "/ecosystem/atlas/";
-  const gameHubUrl = "https://hiutmc-game-hub.pages.dev/";
+  const gameHubUrl = "/apps/game-hub/";
   useEffect(() => {
     if (!ready || !member || !canAccessGameHub(member.role)) return;
     const current = new URL(window.location.href);
