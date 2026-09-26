@@ -115,6 +115,18 @@ function saveStored(session: StoredSession | null) {
   } catch {}
 }
 
+function navigateToGameHub(session: Pick<StoredSession, "accessToken" | "refreshToken"> | null) {
+  const target = new URL(GAME_HUB_URL);
+  if (session?.accessToken && session.refreshToken) {
+    target.hash = new URLSearchParams({
+      [BRIDGE_FLAG]: "1",
+      access_token: session.accessToken,
+      refresh_token: session.refreshToken,
+    }).toString();
+  }
+  window.location.assign(target.toString());
+}
+
 function mapMember(row: Record<string, unknown>): Member {
   return {
     id: String(row.id || ""),
@@ -355,6 +367,9 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       const access = await syncStaffSession(next.accessToken);
       setSession(next);
       setStaffAccess(access?.authorized ? access : null);
+      if (new URLSearchParams(window.location.search).get("open") === "game-hub") {
+        navigateToGameHub(next);
+      }
       return access;
     },
     logout: async () => {
