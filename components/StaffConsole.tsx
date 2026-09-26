@@ -9,6 +9,14 @@ type Tab = "overview" | "traffic" | "content" | "links" | "moderation" | "roles"
 type QueueItem = { id: string; text: string; date: string; status: string };
 type LogItem = { id: string; text: string; date: string };
 type Stored = { queue: QueueItem[]; logs: LogItem[] };
+type BackendAuditItem = {
+  id: string | number;
+  action: string;
+  targetId?: string | null;
+  actorRole?: string | null;
+  createdAt: string;
+  details?: { source?: string; code?: string; message?: string; route?: string; context?: Record<string, unknown> };
+};
 type HubRevisions = Record<string, number>;
 type StaffAccess = {
   authorized: boolean;
@@ -57,6 +65,9 @@ export default function StaffConsole({ mode }: { mode: "admin" | "mod" }) {
   const [traffic, setTraffic] = useState<TrafficStats | null>(null);
   const [trafficError, setTrafficError] = useState("");
   const [trafficRefresh, setTrafficRefresh] = useState(0);
+  const [snapshotRefresh, setSnapshotRefresh] = useState(0);
+  const [gameHubErrors, setGameHubErrors] = useState<BackendAuditItem[]>([]);
+  const [auditServerState, setAuditServerState] = useState("Chưa tải nhật ký lỗi.");
   const apps = useMemo(() => mergeHubDrafts(drafts), [drafts]);
   const visibleTabs = useMemo(
     () => mode === "admin" ? tabList : tabList.filter((item) => ["overview", "moderation", "audit"].includes(item.id)),
@@ -89,23 +100,30 @@ export default function StaffConsole({ mode }: { mode: "admin" | "mod" }) {
   useEffect(() => {
     if (!authReady) return;
     let live = true;
+    setAuditServerState("Đang tải nhật ký từ máy chủ…");
     void staffRequest("/api/staff/shadow/snapshot").then((result) => {
       if (!live) return;
-      const snapshot = result?.data as { hubDrafts?: Array<{ hubSlug: string; draft: HubDrafts[string]; revision: number }>; moderationQueue?: Array<{ id: string; payload: { text?: string }; status: string; createdAt: string }>; auditLog?: Array<{ id: string | number; action: string; targetId?: string; createdAt: string }> } | null;
+      const snapshot = result?.data as { hubDrafts?: Array<{ hubSlug: string; draft: HubDrafts[string]; revision: number }>; moderationQueue?: Array<{ id: string; payload: { text?: string }; status: string; createdAt: string }>; auditLog?: BackendAuditItem[] } | null;
+      const auditLog = snapshot?.auditLog ?? [];
       const sharedDrafts = Object.fromEntries((snapshot?.hubDrafts ?? []).map((row) => [row.hubSlug, row.draft])) as HubDrafts;
       const nextRevisions = Object.fromEntries((snapshot?.hubDrafts ?? []).map((row) => [row.hubSlug, Number(row.revision)]));
       setDrafts((localDrafts) => ({ ...localDrafts, ...sharedDrafts }));
       setRevisions(nextRevisions);
       setStored({
         queue: (snapshot?.moderationQueue ?? []).map((row) => ({ id: row.id, text: String(row.payload?.text || "Nội dung cần xem xét"), date: dateLabel(row.createdAt), status: row.status === "pending" ? "Chờ duyệt" : row.status === "archived" ? "Đã lưu trữ" : "Đã duyệt" })),
-        logs: (snapshot?.auditLog ?? []).map((row) => ({ id: String(row.id), text: `${row.action}${row.targetId ? ` · ${row.targetId}` : ""}`, date: dateLabel(row.createdAt) })),
+        logs: auditLog.map((row) => ({ id: String(row.id), text: `${row.action}${row.targetId ? ` · ${row.targetId}` : ""}`, date: dateLabel(row.createdAt) })),
       });
+      setGameHubErrors(auditLog.filter((row) => row.action === "game_hub_error" && row.details?.source === "hiutmc-game-hub"));
+      setAuditServerState("Đã đồng bộ nhật ký máy chủ.");
       setSharedReady(true);
     }).catch((error: unknown) => {
-      if (live) setNotice(error instanceof Error ? `Không tải được dữ liệu dùng chung: ${error.message}` : "Không tải được dữ liệu dùng chung.");
+      if (live) {
+        setAuditServerState("Không tải được nhật ký máy chủ. Hãy thử làm mới.");
+        setNotice(error instanceof Error ? `Không tải được dữ liệu dùng chung: ${error.message}` : "Không tải được dữ liệu dùng chung.");
+      }
     });
     return () => { live = false; };
-  }, [authReady]);
+  }, [authReady, snapshotRefresh]);
   useEffect(() => {
     if (!authReady || mode !== "admin" || tab !== "traffic") return;
     let live = true;
@@ -204,7 +222,7 @@ export default function StaffConsole({ mode }: { mode: "admin" | "mod" }) {
       <div className={styles.warning}><strong>Quyền truy cập đã xác thực tại máy chủ</strong><p>Cloudflare xác minh phiên Supabase và vai trò club_members. Bản nháp Hub, xuất bản công khai, hàng chờ Moderator và nhật ký được lưu trên Supabase để đồng bộ giữa các thiết bị.</p></div>
       {notice && <p className={styles.statusMessage} role="status">{notice}</p>}
 
-      {tab === "overview" && <div className={styles.content}><div className={styles.metrics}><article><small>HUB</small><strong>{ecosystemApps.length}</strong><span>Điểm đến trong registry</span></article><article><small>BẢN NHÁP ĐÃ SỬA</small><strong>{Object.keys(drafts).length}</strong><span>Bản nháp trên biểu mẫu</span></article><article><small>MỤC CHỜ DUYỆT</small><strong>{stored.queue.filter((x) => x.status === "Chờ duyệt").length}</strong><span>Hàng chờ dùng chung</span></article><article><small>NHẬT KÝ</small><strong>{stored.logs.length}</strong><span>Ghi nhận trên máy chủ</span></article></div><section className={styles.panel}><h2>Quản lý lối vào hệ sinh thái</h2><p>Chỉnh tên, mô tả và URL HTTPS; lưu nháp dùng chung hoặc xuất bản để cập nhật trang chính cho mọi thiết bị.</p><button className={styles.primary} onClick={() => setTab(mode === "admin" ? "content" : "moderation")}>{mode === "admin" ? "Mở Nội dung Hub →" : "Mở hàng chờ duyệt →"}</button></section><section className={styles.panel}><h2>Quy trình duyệt</h2><p>Admin và Moderator dùng quyền từ hồ sơ club_members; mọi thao tác ghi nhận tại máy chủ.</p><button className={styles.secondary} onClick={() => setTab(mode === "admin" ? "roles" : "audit")}>{mode === "admin" ? "Xem vai trò & quyền" : "Xem nhật ký"}</button></section></div>}
+      {tab === "overview" && <div className={styles.content}><div className={styles.metrics}><article><small>HUB</small><strong>{ecosystemApps.length}</strong><span>Điểm đến trong registry</span></article><article><small>BẢN NHÁP ĐÃ SỬA</small><strong>{Object.keys(drafts).length}</strong><span>Bản nháp trên biểu mẫu</span></article><article><small>MỤC CHỜ DUYỆT</small><strong>{stored.queue.filter((x) => x.status === "Chờ duyệt").length}</strong><span>Hàng chờ dùng chung</span></article><article><small>LỖI GAME HUB</small><strong>{gameHubErrors.length}</strong><span>{auditServerState}</span></article></div><section className={styles.panel}><h2>Quản lý lối vào hệ sinh thái</h2><p>Chỉnh tên, mô tả và URL HTTPS; lưu nháp dùng chung hoặc xuất bản để cập nhật trang chính cho mọi thiết bị.</p><button className={styles.primary} onClick={() => setTab(mode === "admin" ? "content" : "moderation")}>{mode === "admin" ? "Mở Nội dung Hub →" : "Mở hàng chờ duyệt →"}</button></section><section className={styles.panel}><h2>Quy trình duyệt</h2><p>Admin và Moderator dùng quyền từ hồ sơ club_members; mọi thao tác ghi nhận tại máy chủ.</p><button className={styles.secondary} onClick={() => setTab(mode === "admin" ? "roles" : "audit")}>{mode === "admin" ? "Xem vai trò & quyền" : "Xem nhật ký"}</button></section><section className={styles.panel}><h2>Báo lỗi Game Hub</h2><p>{auditServerState} · {gameHubErrors.length} lỗi gần đây trong nhật ký máy chủ.</p><button className={styles.secondary} onClick={() => setSnapshotRefresh((value) => value + 1)}>Làm mới nhật ký</button>{gameHubErrors.length === 0 ? <div className={styles.empty}><span>✓</span><strong>Chưa có lỗi Game Hub được ghi nhận</strong><p>Khi có lỗi, mã và thời điểm sẽ xuất hiện tại đây.</p></div> : <div className={styles.logs}>{gameHubErrors.slice(0, 5).map((item) => <article key={String(item.id)}><span>!</span><div><strong>{item.details?.code || "application_error"} · {item.details?.message || "Lỗi ứng dụng"}</strong><small>{item.details?.route || "Game Hub"} · {dateLabel(item.createdAt)} · {item.actorRole || "member"}</small></div></article>)}</div>}</section></div>}
 
       {tab === "traffic" && mode === "admin" && <div className={styles.content}>
         <div className={styles.intro}><h2>Thống kê lượt truy cập</h2><p>Chỉ Admin đã xác thực mới xem được. Bộ đếm ghi nhận lượt mở trang công khai, không lưu địa chỉ IP hoặc thông tin định danh thiết bị.</p></div>
@@ -230,7 +248,7 @@ export default function StaffConsole({ mode }: { mode: "admin" | "mod" }) {
 
       {tab === "roles" && <div className={styles.content}><div className={styles.intro}><h2>Thành viên và vai trò</h2><p>Phiên hiện tại đã được xác thực từ hệ thống thành viên dùng chung; quyền hiển thị lấy từ vai trò máy chủ.</p></div><div className={styles.roles}><article><span>◇</span><h3>Admin</h3><p>Vai trò dự kiến: quản lý nội dung Hub, cấu hình và quy trình xuất bản.</p><b>Admin: yêu cầu role admin tại máy chủ</b></article><article><span>◎</span><h3>Moderator</h3><p>Vai trò dự kiến: xem xét và gửi đề xuất nội dung cho Admin.</p><b>Moderator: yêu cầu role mod/super_mod/admin</b></article></div><div className={styles.warning}><strong>Không hiển thị dữ liệu thành viên không cần thiết</strong><p>Khu vực này chỉ dùng thông tin vai trò tối thiểu để phân quyền; không tự tạo tên, email, điểm số hoặc thông tin tài khoản.</p></div></div>}
 
-      {tab === "audit" && <div className={styles.content}><div className={styles.intro}><h2>Nhật ký thao tác</h2><p>Nhật ký được lưu tại Supabase và dùng chung giữa các thiết bị.</p></div>{stored.logs.length === 0 ? <div className={styles.empty}><span>≋</span><strong>Chưa có thao tác được ghi</strong><p>Nhật ký máy chủ sẽ xuất hiện sau khi có thao tác được ghi nhận.</p></div> : <div className={styles.logs}>{stored.logs.map((item) => <article key={item.id}><span>•</span><div><strong>{item.text}</strong><small>{item.date} · Máy chủ</small></div></article>)}</div>}</div>}
+      {tab === "audit" && <div className={styles.content}><div className={styles.intro}><h2>Nhật ký thao tác và báo lỗi</h2><p>Nhật ký được lưu tại Supabase và dùng chung giữa các thiết bị.</p><button className={styles.secondary} onClick={() => setSnapshotRefresh((value) => value + 1)}>Làm mới nhật ký backend</button><p>{auditServerState}</p></div><section className={styles.panel}><h3>Lỗi Game Hub gần đây ({gameHubErrors.length})</h3>{gameHubErrors.length === 0 ? <p>Chưa có báo lỗi Game Hub trong nhật ký backend.</p> : <div className={styles.logs}>{gameHubErrors.map((item) => <article key={String(item.id)}><span>!</span><div><strong>{item.details?.code || "application_error"} · {item.details?.message || "Lỗi ứng dụng"}</strong><small>{item.details?.route || "Game Hub"} · {dateLabel(item.createdAt)} · {item.actorRole || "member"} · #{item.id}</small></div></article>)}</div>}</section><div className={styles.intro}><h3>Tất cả nhật ký máy chủ</h3></div>{stored.logs.length === 0 ? <div className={styles.empty}><span>≋</span><strong>Chưa có thao tác được ghi</strong><p>Nhật ký máy chủ sẽ xuất hiện sau khi có thao tác được ghi nhận.</p></div> : <div className={styles.logs}>{stored.logs.map((item) => <article key={item.id}><span>•</span><div><strong>{item.text}</strong><small>{item.date} · Máy chủ</small></div></article>)}</div>}</div>}
 
       {tab === "settings" && <div className={styles.content}><div className={styles.intro}><h2>Cấu hình và sao lưu</h2><p>Nhập hoặc xuất dữ liệu JSON để chuẩn bị bản nháp; thao tác lưu và xuất bản cần thực hiện trong Nội dung Hub.</p></div><section className={styles.panel}><h3>Sao lưu JSON</h3><p>File chỉ chứa các bản nháp Hub, không có mật khẩu hay tài khoản thành viên.</p><div className={styles.actions}><button className={styles.primary} onClick={exportJson}>Xuất JSON</button><label className={styles.fileButton}>Nhập JSON<input type="file" accept="application/json,.json" onChange={importJson} /></label><button className={styles.danger} onClick={clearDrafts}>Xóa chỉnh sửa chưa lưu</button></div></section><section className={styles.panel}><h3>Tình trạng kết nối</h3><ul className={styles.checks}><li>Đăng nhập Staff: đã xác minh qua Supabase session</li><li>Phân quyền Admin/Moderator: đã chặn tại Cloudflare Worker</li><li>Dữ liệu nháp, duyệt và nhật ký: Supabase dùng chung</li><li>Hub đã xuất bản: hiển thị công khai và đồng bộ qua Cloudflare</li></ul></section></div>}
     </section>
