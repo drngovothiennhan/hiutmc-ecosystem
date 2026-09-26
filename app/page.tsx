@@ -196,7 +196,6 @@ function HomeContent() {
         <StudyOsLink href={studyOsUrl}><i><HomeIcon name="nav-study" /></i><span>Học tập</span></StudyOsLink>
         <a href={atlasUrl}><i><HomeIcon name="nav-atlas" /></i><span>Atlas</span></a>
         <a href="/ai/"><i><HomeIcon name="nav-ai" /></i><span>AI</span></a>
-        <a href="https://hiutmc-game-hub.pages.dev/" onClick={member ? (event) => { event.preventDefault(); void openGameHub(); } : undefined}><i><HomeIcon name="herbal-function" /></i><span>Game Hub</span></a>
         <a href="/community/"><i><HomeIcon name="nav-community" /></i><span>Cộng đồng</span></a>
       </nav>
 
