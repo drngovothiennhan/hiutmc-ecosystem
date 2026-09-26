@@ -198,10 +198,10 @@ async function fetchLearningProgress(accessToken: string): Promise<LearningProgr
   }
 }
 
-async function refreshSession(current: StoredSession, forceRefresh = false): Promise<StoredSession> {
+async function refreshSession(current: StoredSession): Promise<StoredSession> {
   let accessToken = current.accessToken;
   let refreshToken = current.refreshToken;
-  if (forceRefresh || current.expiresAt - Date.now() <= 90_000) {
+  if (current.expiresAt - Date.now() <= 90_000) {
     const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
       method: "POST",
       headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
@@ -410,21 +410,15 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       let target: URL;
       try { target = new URL(rawUrl, window.location.href); } catch { return; }
       if (target.origin !== new URL(GAME_HUB_URL).origin) return;
-      try {
-        const fresh = await refreshSession(session, true);
-        if (!canAccessGameHub(fresh.member.role)) return;
-        setSession(fresh);
-        const fragment = new URLSearchParams({
-          [BRIDGE_FLAG]: "1",
-          access_token: fresh.accessToken,
-          refresh_token: fresh.refreshToken,
-        });
-        target.hash = fragment.toString();
-        await transitionBeforeAppNavigation(target.toString());
-        window.location.assign(target.toString());
-      } catch {
-        // Keep the member on the ecosystem if the staff session cannot be refreshed.
-      }
+      // The ecosystem session was already refreshed during auth bootstrap.
+      // Do not block this tap on a second forced token refresh or the long
+      // cross-app exit animation; Game Hub verifies/refreshes the bridge itself.
+      target.hash = new URLSearchParams({
+        [BRIDGE_FLAG]: "1",
+        access_token: session.accessToken,
+        refresh_token: session.refreshToken,
+      }).toString();
+      window.location.assign(target.toString());
     },
     refreshLearningProgress,
     openStaffConsole: () => {
