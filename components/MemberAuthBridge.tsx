@@ -575,7 +575,7 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
 
   return <>
     <button className={styles.accountButton} type="button" onClick={() => setOpen(true)} aria-label={member ? `Tài khoản ${member.fullName}` : "Đăng nhập thành viên"}>
-      <i className={styles.avatar}>{member?.avatarUrl ? <img src={member.avatarUrl} alt="" /> : (initials || "HIU")}</i>
+      <i className={styles.avatar}>{member?.avatarUrl ? <img src={member.avatarUrl} alt="" loading="lazy" /> : (initials || "HIU")}</i>
       <span>
         <strong>{member ? member.fullName : "Thành viên YHCT"}</strong>
         <small>{!ready ? "Đang kiểm tra phiên…" : member ? `${member.title} · Đã đồng bộ Study OS` : "Đăng nhập bằng tài khoản Study OS"}</small>
@@ -587,7 +587,7 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
         <button className={styles.close} type="button" onClick={() => setOpen(false)} aria-label="Đóng">×</button>
         {member ? <>
           <div className={styles.memberCard}>
-            <i className={styles.avatarLarge}>{member.avatarUrl ? <img src={member.avatarUrl} alt="" /> : initials}</i>
+            <i className={styles.avatarLarge}>{member.avatarUrl ? <img src={member.avatarUrl} alt="" loading="lazy" /> : initials}</i>
             <span><small>THÀNH VIÊN ĐÃ ĐỒNG BỘ</small><strong>{member.fullName}</strong><em>{member.studentCode || "HIU YHCT"} · {member.title}</em></span>
           </div>
           <p>Phiên đăng nhập trang chủ dùng cùng hệ tài khoản với Study OS. Quyền Admin/Mod được xác minh lại tại máy chủ trước khi mở khu vực quản trị.</p>
