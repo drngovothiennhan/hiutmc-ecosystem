@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260927-01",
+  "release": "HIU-YHCT-ECOSYSTEM-20260927-02",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP34",
-  "base_checkpoint_sha": "3dc46585f47dcc3c07164712a9fda4c270dd038c",
+  "checkpoint": "CP35",
+  "base_checkpoint_sha": "cbaeda7a688b1b37da7adf989f1760cd2628bce2",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP34 adds a working CLB registration email CTA, describes Atlas and A.I Thiệt Chẩn from the live app registry, and links to the isolated one-case Y Quán trial. Keep CI, Worker dry-run, Cloudflare deployment, anonymous-denial checks, public registry smoke and production smoke mandatory."
+  "verification": "CP35 exposes Study OS self-registration only to signed-out visitors; preserve CI, Worker dry-run, Cloudflare deployment, anonymous-denial checks, public registry smoke and production smoke."
 }

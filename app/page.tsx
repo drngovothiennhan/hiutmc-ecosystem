@@ -32,6 +32,8 @@ function HomeContent() {
   const apps = useHubRegistry();
   const { openStudyOs, openGameHub, member, ready, learningProgress, learningProgressReady } = useMemberAuth();
   const studyOsUrl = apps.find((app) => app.slug === "study-os")?.launchUrl ?? "/learn/";
+  const registerUrl = new URL(studyOsUrl, "https://hiutmc.com");
+  registerUrl.searchParams.set("auth", "register");
   const atlasApp = apps.find((app) => app.slug === "atlas");
   const atlasUrl = atlasApp?.launchUrl ?? "/ecosystem/atlas/";
   const thietChanApp = apps.find((app) => app.slug === "ai-thiet-chan");
@@ -106,10 +108,10 @@ function HomeContent() {
           <h1>Chào mừng trở lại, <span>{member?.fullName || "HIU YHCT"}!</span></h1>
           <p>Một điểm vào thống nhất cho học tập, Atlas 3D, AI, Trung Y Văn và hoạt động học thuật của cộng đồng HIU.</p>
           <div className={styles.heroCtas}>
-            <a className={styles.heroJoin} href="mailto:clb.yhoccotruyen.hiu@gmail.com?subject=%C4%90%C4%83ng%20k%C3%BD%20tham%20gia%20HIU%20CLB%20YHCT">Đăng ký tham gia CLB <span aria-hidden="true">↗</span></a>
+            {ready && !member && <StudyOsLink className={styles.heroJoin} href={registerUrl.toString()}>Đăng ký thành viên <span aria-hidden="true">↗</span></StudyOsLink>}
             <a className={styles.heroTry} href={trialGameUrl}>Chơi thử Y Quán <span aria-hidden="true">→</span></a>
           </div>
-          <small className={styles.heroNote}>Yêu cầu được gửi đến email chính thức của CLB; CLB phản hồi cách tham gia.</small>
+          
           <div className={styles.heroMark}>Dưỡng Tâm<br />Học Thuật<br />Hành Y Đạo</div>
         </section>
 
