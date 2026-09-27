@@ -1,0 +1,124 @@
+name: Spirit visual-v2 browser smoke
+
+on:
+  push:
+    branches:
+      - browser-test/spirit-v2-20260927
+    paths:
+      - ".github/workflows/spirit-visual-browser-smoke.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Playwright
+        run: |
+          python -m pip install --disable-pip-version-check playwright==1.55.0
+          python -m playwright install --with-deps chromium
+
+      - name: Test live spirit visual-v2 in Chromium
+        run: |
+          python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+
+          BASE = "https://hiutmc.com/"
+          PETS = [
+              ("dragon", "Thanh Long"),
+              ("phoenix", "Chu Tước"),
+              ("sphinx", "Kim Sư"),
+          ]
+          out = Path("browser-artifacts")
+          out.mkdir(exist_ok=True)
+
+          with sync_playwright() as p:
+              browser = p.chromium.launch(headless=True)
+              page = browser.new_page(viewport={"width": 1440, "height": 1100})
+              page.goto(BASE, wait_until="domcontentloaded", timeout=60000)
+
+              results = []
+              for kind, display_name in PETS:
+                  page.evaluate(
+                      "(kind) => localStorage.setItem('hiutmc-spirit-pet-v1', kind)",
+                      kind,
+                  )
+                  page.reload(wait_until="domcontentloaded", timeout=60000)
+
+                  launcher = page.get_by_role("button", name=re.compile(rf"Mở linh thú {re.escape(display_name)}"))
+                  launcher.wait_for(state="visible", timeout=30000)
+                  launcher.click()
+
+                  evolution = page.get_by_role("button", name=re.compile("Xem tiến hóa"))
+                  evolution.wait_for(state="visible", timeout=15000)
+                  evolution.click()
+
+                  section = page.locator(f'section[aria-label="Xem trước tiến hóa {display_name}"]')
+                  section.wait_for(state="visible", timeout=15000)
+
+                  stage_results = []
+                  for stage in (1, 2, 3, 4):
+                      stage_button = section.get_by_role("button", name=re.compile(rf"Preview {stage}"))
+                      stage_button.click()
+                      page.wait_for_timeout(150)
+
+                      expected = f"/spirit-pets/visual-v2/{kind}-stage-{stage}-"
+                      matching = section.locator(
+                          f'img[data-visual-version="spirit-visual-v2-20260927"][data-preview-stage="{stage}"]'
+                      )
+                      count = matching.count()
+                      if count < 1:
+                          raise AssertionError(f"{display_name} stage {stage}: no visual-v2 image found")
+
+                      image_states = matching.evaluate_all(
+                          """(imgs) => imgs.map(img => ({
+                            src: img.getAttribute('src'),
+                            complete: img.complete,
+                            naturalWidth: img.naturalWidth,
+                            naturalHeight: img.naturalHeight
+                          }))"""
+                      )
+                      valid = [
+                          item for item in image_states
+                          if item["src"]
+                          and expected in item["src"]
+                          and item["complete"]
+                          and item["naturalWidth"] > 0
+                          and item["naturalHeight"] > 0
+                      ]
+                      if not valid:
+                          raise AssertionError(
+                              f"{display_name} stage {stage}: image did not load correctly: {json.dumps(image_states)}"
+                          )
+                      stage_results.append({"stage": stage, "images": valid})
+
+                  page.screenshot(path=str(out / f"{kind}-evolution.png"), full_page=True)
+                  results.append({"kind": kind, "name": display_name, "stages": stage_results})
+
+                  page.get_by_role("button", name="Đóng").click()
+
+              print("BROWSER_SMOKE_RESULTS=" + json.dumps(results, ensure_ascii=False))
+              browser.close()
+          PY
+
+      - name: Upload browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: spirit-visual-v2-browser-smoke
+          path: browser-artifacts
+          if-no-files-found: warn
+          retention-days: 7
