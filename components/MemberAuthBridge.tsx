@@ -111,43 +111,35 @@ const SPIRIT_PET_DB_TO_CLIENT: Record<string, string> = Object.fromEntries(
   Object.entries(SPIRIT_PET_CLIENT_TO_DB).map(([client, database]) => [database, client]),
 );
 
-function requestedSpiritPetSpecies() {
+function readLegacySpiritPetSpecies(): string | null {
   try {
     const saved = window.localStorage.getItem(SPIRIT_PET_STORAGE_KEY) || "";
-    if (SPIRIT_PET_CLIENT_TO_DB[saved]) return SPIRIT_PET_CLIENT_TO_DB[saved];
-  } catch {}
-  const choices = Object.values(SPIRIT_PET_CLIENT_TO_DB);
-  return choices[Math.floor(Math.random() * choices.length)];
-}
-
-function rememberSpiritPetSpecies(species: string) {
-  const clientSpecies = SPIRIT_PET_DB_TO_CLIENT[species];
-  if (!clientSpecies) throw new Error("Máy chủ trả về species Linh Thú không hợp lệ.");
-  try { window.localStorage.setItem(SPIRIT_PET_STORAGE_KEY, clientSpecies); } catch {}
-  return species;
+    return SPIRIT_PET_CLIENT_TO_DB[saved] || null;
+  } catch {
+    return null;
+  }
 }
 
 async function loadSpiritPetProfile(session: StoredSession): Promise<string> {
-  const requested = requestedSpiritPetSpecies();
-  try {
-    const response = await fetch(SUPABASE_URL + "/rest/v1/rpc/spirit_pet_profile_initialize", {
-      method: "POST",
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: "Bearer " + session.accessToken,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ p_requested_species: requested }),
-      cache: "no-store",
-    });
-    if (!response.ok) throw new Error("spirit_profile_unavailable");
-    const body = await response.json() as { species?: unknown };
-    const species = String(body?.species || "");
-    return rememberSpiritPetSpecies(species);
-  } catch {
-    const fallback = session.member.role.toLowerCase() === "admin" ? "thanh_long" : requested;
-    return rememberSpiritPetSpecies(fallback);
-  }
+  const requested = readLegacySpiritPetSpecies();
+  const response = await fetch(SUPABASE_URL + "/rest/v1/rpc/spirit_pet_profile_initialize", {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: "Bearer " + session.accessToken,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ p_requested_species: requested }),
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error("spirit_profile_unavailable");
+  const body = await response.json() as { species?: unknown };
+  const species = String(body?.species || "");
+  if (!SPIRIT_PET_DB_TO_CLIENT[species]) throw new Error("invalid_server_spirit_species");
+  // Keep the legacy device choice only long enough to initialize a missing server profile.
+  // Once the server confirms the canonical profile, the server is the only durable source.
+  try { window.localStorage.removeItem(SPIRIT_PET_STORAGE_KEY); } catch {}
+  return species;
 }
 
 
@@ -479,6 +471,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       setSpiritPetReady(true);
       return () => { live = false; };
     }
+    setSpiritPetSpecies(null);
     setSpiritPetReady(false);
     void loadSpiritPetProfile(session).then((species) => {
       if (!live) return;
@@ -486,16 +479,8 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       setSpiritPetReady(true);
     }).catch(() => {
       if (!live) return;
-      const fallback = session.member.role.toLowerCase() === "admin"
-        ? "thanh_long"
-        : requestedSpiritPetSpecies();
-      try {
-        const saved = window.localStorage.getItem(SPIRIT_PET_STORAGE_KEY) || "";
-        const species = SPIRIT_PET_CLIENT_TO_DB[saved] || fallback;
-        setSpiritPetSpecies(species);
-      } catch {
-        setSpiritPetSpecies(fallback);
-      }
+      // Do not present a stale device value as a server-synced profile.
+      setSpiritPetSpecies(null);
       setSpiritPetReady(true);
     });
     return () => { live = false; };

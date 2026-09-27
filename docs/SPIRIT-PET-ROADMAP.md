@@ -7,7 +7,11 @@
 - Client không gửi role và không thể ghi species khác cho tài khoản admin. RLS khóa ghi trực tiếp; RPC duy nhất cập nhật species tự đọc role từ hồ sơ club_members và từ chối giá trị khác thanh_long khi role là admin.
 - Migration backfill chuẩn hóa hồ sơ của admin hiện hữu. Migration chỉ chạy một lần theo cơ chế migration; role update sau đó không gọi trigger đổi species.
 - Đổi role không tự sửa species của hồ sơ đã tồn tại. Nếu role được nâng/hạ sau đó, hồ sơ hiện hữu giữ nguyên; quy tắc admin chỉ áp dụng cho hồ sơ được tạo lần đầu hoặc backfill migration.
-- Các khóa cấp thật, XP, thân mật, vật phẩm và phần thưởng không nằm trong hồ sơ species này; vẫn FROZEN/REVIEW.
+- Hồ sơ species dùng `spirit_pet_profiles.member_id` làm khóa chuẩn trên máy chủ; member đã đăng nhập nhận cùng một hồ sơ khi đổi thiết bị. Server RPC là nguồn dữ liệu duy nhất cho loài đã đồng bộ.
+- Trong lần đăng nhập đầu sau nâng cấp, client có thể gửi loài hợp lệ từ khóa localStorage cũ `hiutmc-spirit-pet-v1` để khởi tạo hồ sơ chưa có. RPC chỉ dùng giá trị này khi chưa có hồ sơ; admin vẫn luôn nhận `thanh_long`. Sau khi server trả hồ sơ hợp lệ, khóa cũ được xóa khỏi thiết bị. Nếu mạng hoặc RPC lỗi, ứng dụng không trình bày dữ liệu cục bộ như hồ sơ đã đồng bộ và sẽ thử lại ở lần tải sau.
+- Không ghi species hồ sơ member vào localStorage sau khi đồng bộ. Bản xem trước loài cho khách chưa đăng nhập chỉ tồn tại trong bộ nhớ và không đồng bộ cho tới khi đăng nhập.
+- Hiện chỉ species là dữ liệu Linh Thú được lưu bền vững. Cấp preview chỉ là trạng thái giao diện tạm thời; cấp thật, XP, thân mật, vật phẩm và phần thưởng chưa có dữ liệu hồ sơ và vẫn FROZEN/REVIEW.
+- Không backfill hàng loạt member không phải admin về một loài mặc định: lựa chọn cũ có thể chỉ còn trên thiết bị. Hồ sơ cũ được chuyển dần khi mỗi người đăng nhập, để không ghi đè lựa chọn đó.
 
 ## Giai đoạn 1 — Hồ sơ dùng chung
 
@@ -20,7 +24,9 @@ Tiêu chí nghiệm thu:
 - RPC ghi loài từ chối species không phải thanh_long nếu role hiện tại là admin.
 - Ghi trực tiếp vào bảng bị từ chối với anon/authenticated.
 - Cập nhật role trên một hồ sơ đã có không tự đổi species.
-- Member không phải admin giữ species đã có; hồ sơ mới dùng loài mà client yêu cầu hợp lệ.
+- Member không phải admin giữ species đã có; hồ sơ mới dùng loài cũ hợp lệ chỉ trong lần nhập chuyển tiếp, hoặc server chọn mặc định khi không có giá trị cũ.
+- Hồ sơ loài đã xác nhận từ máy chủ hoạt động sau đăng nhập trên thiết bị khác; không còn bản sao species đăng nhập nào được ghi ở localStorage.
+- Khóa localStorage cũ chỉ được đọc để khởi tạo hồ sơ thiếu, rồi xóa sau phản hồi thành công từ server; lỗi server không được biến thành fallback cục bộ.
 - Giai đoạn 1 có contract test trong scripts/validate-spirit-pet-admin.mjs và được chạy trong CI.
 
 ## Giai đoạn 2 — Artwork và bản xem trước
@@ -41,7 +47,7 @@ Trợ lý có thể đọc hồ sơ species đã xác thực để cá nhân hó
 
 ## Giai đoạn 6 — Đồng bộ hệ sinh thái
 
-Các ứng dụng HIU TMC dùng member identity và species canonical từ hồ sơ chung. Không tạo profile trùng theo từng thiết bị; không thay species khi role đổi; mọi endpoint/RPC mới phải kế thừa ràng buộc admin Thanh Long và được kiểm thử trước khi cutover.
+Các ứng dụng HIU TMC dùng member identity và species canonical từ hồ sơ chung. Không tạo profile trùng theo từng thiết bị; không thay species khi role đổi; mọi endpoint/RPC mới phải kế thừa ràng buộc admin Thanh Long và được kiểm thử trước khi cutover. Dữ liệu loài đã đồng bộ phải tiếp tục dùng được khi đổi máy. Chỉ mở đồng bộ cấp thật, XP, thân mật, vật phẩm hoặc phần thưởng sau khi có duyệt riêng và thiết kế quyền ghi server-side.
 
 ## Vết kiểm tra
 
