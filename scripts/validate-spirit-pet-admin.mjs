@@ -66,8 +66,8 @@ if (!migration.includes("grant select on table public.spirit_pet_profiles to aut
 for (const marker of [
   "/rest/v1/rpc/spirit_pet_profile_initialize",
   "p_requested_species",
-  'thanh_long: "dragon"',
-  'khong_tuoc: "peacock"',
+  'dragon: "thanh_long"',
+  'peacock: "khong_tuoc"',
 ]) {
   if (!auth.includes(marker)) errors.push("signed-in profile bridge missing: " + marker);
 }
