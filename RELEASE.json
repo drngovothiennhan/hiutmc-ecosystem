@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260927-02",
+  "release": "HIU-YHCT-ECOSYSTEM-20260927-03",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP35",
-  "base_checkpoint_sha": "cbaeda7a688b1b37da7adf989f1760cd2628bce2",
+  "checkpoint": "CP36",
+  "base_checkpoint_sha": "982426e0452e7cb537dbfd801b3a0e5bcbe862bb",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP35 exposes Study OS self-registration only to signed-out visitors; preserve CI, Worker dry-run, Cloudflare deployment, anonymous-denial checks, public registry smoke and production smoke."
+  "verification": "CP36 adds member-specific learning recommendations on the home page from the authenticated Study OS learning snapshot and adaptive review schedule, with truthful empty states and no fabricated lesson or Y Quan performance data. Full validation, Worker dry-run, Cloudflare deployment, anonymous-denial checks, public registry smoke and production smoke are mandatory."
 }
