@@ -127,8 +127,8 @@ function PetArtwork({
     <img
       src={compact ? visual.icon : visual.full}
       alt={visual.alt}
-      width={compact ? 96 : 320}
-      height={compact ? 96 : 320}
+      width={compact ? 64 : 128}
+      height={compact ? 64 : 128}
       draggable={false}
       decoding="async"
       loading={compact ? "eager" : "lazy"}
