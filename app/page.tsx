@@ -30,8 +30,10 @@ const events = [
 
 function HomeContent() {
   const apps = useHubRegistry();
-  const { openStudyOs, openGameHub, member, learningProgress, learningProgressReady } = useMemberAuth();
+  const { openStudyOs, openGameHub, member, ready, learningProgress, learningProgressReady } = useMemberAuth();
   const studyOsUrl = apps.find((app) => app.slug === "study-os")?.launchUrl ?? "/learn/";
+  const registerUrl = new URL(studyOsUrl, "https://hiutmc.com");
+  registerUrl.searchParams.set("auth", "register");
   const atlasUrl = apps.find((app) => app.slug === "atlas")?.launchUrl ?? "/ecosystem/atlas/";
   const synced = Boolean(member && learningProgressReady && learningProgress?.hasSync);
   const latestScore = synced ? learningProgress?.lastExamScore ?? null : null;
@@ -92,6 +94,7 @@ function HomeContent() {
           <small>HIU YHCT DIGITAL CAMPUS</small>
           <h1>Chào mừng trở lại, <span>{member?.fullName || "HIU YHCT"}!</span></h1>
           <p>Một điểm vào thống nhất cho học tập, Atlas 3D, AI, Trung Y Văn và hoạt động học thuật của cộng đồng HIU.</p>
+          {ready && !member && <div className={styles.heroActions}><StudyOsLink className={styles.registerCta} href={registerUrl.toString()}><span>Đăng ký thành viên</span><span aria-hidden="true">↗</span></StudyOsLink></div>}
           <div className={styles.heroMark}>Dưỡng Tâm<br />Học Thuật<br />Hành Y Đạo</div>
         </section>
 
