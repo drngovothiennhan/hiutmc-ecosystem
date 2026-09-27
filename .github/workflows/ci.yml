@@ -51,6 +51,9 @@ jobs:
       - name: Install
         run: npm install --no-audit --no-fund
 
+      - name: Materialize spirit pet assets
+        run: npm run materialize:spirit-assets
+
       - name: Validate repository boundary
         run: npm run validate:repo
 
