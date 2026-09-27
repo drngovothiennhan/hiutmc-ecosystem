@@ -14,7 +14,7 @@ for (const asset of ["/academy-world.webp", "/academy-mobile.webp", "/ecosystem-
   }
 }
 
-const petSpecies = ["dragon", "qilin", "fox", "peacock", "sphinx"];
+const petSpecies = ["dragon", "phoenix", "qilin", "fox", "peacock", "sphinx"];
 const petStages = [1, 2, 3, 4];
 const petVariants = ["full", "icon"];
 let petAssetBytes = 0;
@@ -51,4 +51,4 @@ for (const forbidden of ["actual_level", "actualLevel", "setActualLevel", "setPe
   if (companion.includes(forbidden)) throw new Error(`Visual-only phase must not touch progression/backend: ${forbidden}`);
 }
 
-console.log(`Illustrated map validated (${Math.round(image.length / 1024)} KB); spirit visual-v2 validated (40 WebP assets, ${Math.round(petAssetBytes / 1024)} KB total).`);
+console.log(`Illustrated map validated (${Math.round(image.length / 1024)} KB); spirit visual-v2 validated (48 WebP assets; Thanh Long/Chu Tuoc/Kim Su complete, ${Math.round(petAssetBytes / 1024)} KB total).`);
