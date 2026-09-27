@@ -408,6 +408,7 @@
 .personalizedThumb{min-height:230px;border-radius:14px;background:linear-gradient(145deg,#4b251e22,#b5653a12),url("/academy-mobile.webp") center/cover no-repeat}
 .personalizedContent{display:grid;align-content:start;gap:10px;min-width:0}
 .personalizedContent .personalizedHeader{margin-bottom:2px}
+.personalizedContinueLabel{color:#9e1e3b;font-size:10px;font-weight:900;letter-spacing:.08em}
 .personalizedContent .personalizedPlan{margin:0}
 .personalizedContent .personalizedEmpty{margin:0}
 .personalizedContent .personalizedSummary{margin:0}

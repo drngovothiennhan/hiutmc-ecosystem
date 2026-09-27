@@ -154,6 +154,7 @@ function HomeContent() {
                     <span><small>CÁ NHÂN HÓA HỌC TẬP</small><h2 id="personalized-learning-title">Hôm nay nên ôn gì</h2></span>
                     <span className={styles.personalizedBadge}>Theo tiến độ đã đồng bộ</span>
                   </header>
+                  <small className={styles.personalizedContinueLabel}>TIẾP TỤC HỌC TẬP</small>
                   {!member ? (
                     <p className={styles.personalizedEmpty}>Đăng nhập thành viên để xem gợi ý dựa trên tiến độ học tập của bạn.</p>
                   ) : personalLearningSnapshotStatus === "loading" ? (
