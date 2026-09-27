@@ -44,6 +44,15 @@ export type LearningProgress = {
   sourceVersion?: string | null;
 };
 
+export type MemberNotification = {
+  id: string;
+  title: string;
+  body: string;
+  kind: string;
+  created_at: string;
+  read_at: string | null;
+};
+
 export type StaffAccess = {
   authorized: boolean;
   role?: string;
@@ -72,12 +81,16 @@ type AuthContextValue = {
   personalLearningSnapshot: PersonalLearningSnapshot | null;
   personalLearningSnapshotStatus: "loading" | "ready" | "empty" | "error";
   learningProgressReady: boolean;
+  notifications: MemberNotification[];
+  unreadNotificationCount: number;
+  notificationsStatus: "loading" | "ready" | "error";
   ready: boolean;
   login: (studentCode: string, password: string) => Promise<StaffAccess | null>;
   logout: () => Promise<void>;
   openStudyOs: (url: string) => Promise<void>;
   openGameHub: (url: string) => Promise<void>;
   refreshLearningProgress: () => Promise<void>;
+  markAllNotificationsRead: () => Promise<void>;
   openStaffConsole: () => void;
 };
 
@@ -236,6 +249,39 @@ async function fetchPersonalLearningSnapshot(accessToken: string): Promise<{ sna
   }
 }
 
+async function fetchNotificationInbox(accessToken: string): Promise<{ notifications: MemberNotification[]; unreadCount: number }> {
+  const headers = { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` };
+  const params = new URLSearchParams({
+    select: "id,title,body,kind,created_at,read_at",
+    order: "created_at.desc",
+    limit: "20",
+  });
+  const unreadParams = new URLSearchParams({ select: "id", read_at: "is.null" });
+  const [rowsResponse, countResponse] = await Promise.all([
+    fetch(`${SUPABASE_URL}/rest/v1/notifications?${params}`, { headers, cache: "no-store" }),
+    fetch(`${SUPABASE_URL}/rest/v1/notifications?${unreadParams}`, {
+      method: "HEAD",
+      headers: { ...headers, Prefer: "count=exact", "Range-Unit": "items", Range: "0-0" },
+      cache: "no-store",
+    }),
+  ]);
+  if (!rowsResponse.ok || !countResponse.ok) throw new Error("Không tải được hộp thông báo.");
+  const notifications = (await rowsResponse.json()) as MemberNotification[];
+  const contentRange = countResponse.headers.get("content-range") || "";
+  const unreadCount = Number(contentRange.match(/\/(\d+)$/)?.[1] ?? notifications.filter((item) => !item.read_at).length);
+  return { notifications, unreadCount: Number.isFinite(unreadCount) ? unreadCount : 0 };
+}
+
+async function markAllMemberNotificationsRead(accessToken: string) {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/notifications_mark_all_read_v1`, {
+    method: "POST",
+    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+    body: "{}",
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error("Chưa thể đánh dấu thông báo đã đọc.");
+}
+
 async function refreshSession(current: StoredSession): Promise<StoredSession> {
   const refresh = async () => {
     // Re-read after acquiring the shared origin lock; another tab may have
@@ -322,6 +368,9 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
   const [personalLearningSnapshot, setPersonalLearningSnapshot] = useState<PersonalLearningSnapshot | null>(null);
   const [personalLearningSnapshotStatus, setPersonalLearningSnapshotStatus] = useState<"loading" | "ready" | "empty" | "error">("loading");
   const [learningProgressReady, setLearningProgressReady] = useState(false);
+  const [notifications, setNotifications] = useState<MemberNotification[]>([]);
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
+  const [notificationsStatus, setNotificationsStatus] = useState<"loading" | "ready" | "error">("loading");
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -371,6 +420,9 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     setPersonalLearningSnapshot(null);
     setPersonalLearningSnapshotStatus("loading");
     setLearningProgressReady(false);
+    setNotifications([]);
+    setUnreadNotificationCount(0);
+    setNotificationsStatus(session?.accessToken ? "loading" : "ready");
     const refresh = async () => {
       if (!session?.accessToken) {
         if (live) {
@@ -401,31 +453,58 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
         setPersonalLearningSnapshotStatus(result.status);
       }
     };
-    const refreshSyncedLearningData = async () => {
+    const refreshNotificationInbox = async () => {
       if (!session?.accessToken) {
-        await refresh();
-        await refreshSnapshot();
+        if (live) {
+          setNotifications([]);
+          setUnreadNotificationCount(0);
+          setNotificationsStatus("ready");
+        }
         return;
       }
-      const [progress, snapshot] = await Promise.all([
+      try {
+        const inbox = await fetchNotificationInbox(session.accessToken);
+        if (!live) return;
+        setNotifications(inbox.notifications);
+        setUnreadNotificationCount(inbox.unreadCount);
+        setNotificationsStatus("ready");
+      } catch {
+        if (live) setNotificationsStatus("error");
+      }
+    };
+    const refreshSyncedLearningData = async () => {
+      if (!session?.accessToken) {
+        await Promise.all([refresh(), refreshSnapshot(), refreshNotificationInbox()]);
+        return;
+      }
+      const [progress, snapshot, inbox] = await Promise.all([
         fetchLearningProgress(session.accessToken),
         fetchPersonalLearningSnapshot(session.accessToken),
+        fetchNotificationInbox(session.accessToken).catch(() => null),
       ]);
       if (!live) return;
       setLearningProgress(progress);
       setLearningProgressReady(true);
       setPersonalLearningSnapshot(snapshot.snapshot);
       setPersonalLearningSnapshotStatus(snapshot.status);
+      if (inbox) {
+        setNotifications(inbox.notifications);
+        setUnreadNotificationCount(inbox.unreadCount);
+        setNotificationsStatus("ready");
+      } else {
+        setNotificationsStatus("error");
+      }
     };
     void refresh();
     void refreshSnapshot();
+    void refreshNotificationInbox();
     const onFocus = () => { void refreshSyncedLearningData(); };
     const onVisible = () => { if (document.visibilityState === "visible") void refreshSyncedLearningData(); };
-    let channel: ReturnType<typeof realtimeClient.channel> | null = null;
+    const channels: ReturnType<typeof realtimeClient.channel>[] = [];
     if (session?.accessToken && session.member.id) {
       void realtimeClient.realtime.setAuth(session.accessToken).then(() => {
         if (!live) return;
-        channel = realtimeClient
+        const learningChannel = realtimeClient
           .channel(`learning-sync-stats:${session.member.id}`)
           .on("postgres_changes", {
             event: "*",
@@ -434,6 +513,16 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
             filter: `member_id=eq.${session.member.id}`,
           }, () => { void refreshSyncedLearningData(); })
           .subscribe();
+        const notificationChannel = realtimeClient
+          .channel(`notifications:${session.member.id}`)
+          .on("postgres_changes", {
+            event: "*",
+            schema: "public",
+            table: "notifications",
+            filter: `member_id=eq.${session.member.id}`,
+          }, () => { void refreshNotificationInbox(); })
+          .subscribe();
+        channels.push(learningChannel, notificationChannel);
       }).catch(() => {
         // The polling fallback below keeps the dashboard current if Realtime is unavailable.
       });
@@ -444,7 +533,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     return () => {
       live = false;
       window.clearInterval(timer);
-      if (channel) void realtimeClient.removeChannel(channel);
+      for (const channel of channels) void realtimeClient.removeChannel(channel);
       window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onVisible);
     };
@@ -456,6 +545,9 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       setPersonalLearningSnapshot(null);
       setPersonalLearningSnapshotStatus("empty");
       setLearningProgressReady(true);
+      setNotifications([]);
+      setUnreadNotificationCount(0);
+      setNotificationsStatus("ready");
       return;
     }
     setLearningProgressReady(false);
@@ -469,6 +561,15 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     setLearningProgressReady(true);
   };
 
+  const markAllNotificationsRead = async () => {
+    if (!session?.accessToken) return;
+    await markAllMemberNotificationsRead(session.accessToken);
+    const inbox = await fetchNotificationInbox(session.accessToken);
+    setNotifications(inbox.notifications);
+    setUnreadNotificationCount(inbox.unreadCount);
+    setNotificationsStatus("ready");
+  };
+
   const value = useMemo<AuthContextValue>(() => ({
     member: session?.member ?? null,
     staffAccess,
@@ -476,6 +577,9 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     personalLearningSnapshot,
     personalLearningSnapshotStatus,
     learningProgressReady,
+    notifications,
+    unreadNotificationCount,
+    notificationsStatus,
     ready,
     login: async (studentCode, password) => {
       const next = await loginMember(studentCode, password);
@@ -499,6 +603,9 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       setPersonalLearningSnapshot(null);
       setPersonalLearningSnapshotStatus("empty");
       setLearningProgressReady(true);
+      setNotifications([]);
+      setUnreadNotificationCount(0);
+      setNotificationsStatus("ready");
       await clearStaffSession();
       if (accessToken) {
         void fetch(`${SUPABASE_URL}/auth/v1/logout?scope=local`, {
@@ -553,11 +660,12 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       window.location.assign(target.toString());
     },
     refreshLearningProgress,
+    markAllNotificationsRead,
     openStaffConsole: () => {
       if (!staffAccess?.authorized) return;
       window.location.assign(staffAccess.canAdmin ? "/admin/" : "/mod/");
     },
-  }), [ready, session, staffAccess, learningProgress, personalLearningSnapshot, personalLearningSnapshotStatus, learningProgressReady]);
+  }), [ready, session, staffAccess, learningProgress, personalLearningSnapshot, personalLearningSnapshotStatus, learningProgressReady, notifications, unreadNotificationCount, notificationsStatus]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

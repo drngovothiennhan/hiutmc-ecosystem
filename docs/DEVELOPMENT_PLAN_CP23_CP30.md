@@ -121,4 +121,4 @@ Acceptance:
 9. Update checkpoint + Drive manifest only after live smoke passes.
 
 ## Current execution
-CP23 Stage 1 passed its shadow storage/API checks. The 2026-09-25 shared publication release completes Stage 2 for Hub registry and Admin/Mod workflows; learning progress, events and search remain future stages.
+CP23 Stage 1 passed its shadow storage/API checks. The 2026-09-25 shared publication release completes Stage 2 for Hub registry and Admin/Mod workflows. The homepage member inbox now reads RLS-protected notification rows, uses the approved mark-read RPC, and refreshes from member-filtered Realtime events; Admin/Mod event publishing, CLB events and push notifications remain future Stage 4 work. Learning progress and search retain their staged status.

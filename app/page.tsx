@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import HomeIcon, { type HomeIconName } from "@/components/HomeIcon";
 import DailyMissions from "@/components/DailyMissions";
 import DisplayModeToggle from "@/components/DisplayModeToggle";
@@ -29,9 +29,16 @@ const events = [
   { day: "—", month: "Cộng đồng", title: "Thông báo cộng đồng", meta: "Chỉ hiển thị nội dung đã được xác thực." },
 ];
 
+function formatNotificationTime(value: string) {
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return "Thời điểm không xác định";
+  return new Intl.DateTimeFormat("vi-VN", { dateStyle: "short", timeStyle: "short" }).format(date);
+}
+
 function HomeContent() {
   const apps = useHubRegistry();
-  const { openStudyOs, openGameHub, member, ready, learningProgress, learningProgressReady, personalLearningSnapshot, personalLearningSnapshotStatus } = useMemberAuth();
+  const { openStudyOs, openGameHub, member, ready, learningProgress, learningProgressReady, personalLearningSnapshot, personalLearningSnapshotStatus, notifications, unreadNotificationCount, notificationsStatus, markAllNotificationsRead } = useMemberAuth();
+  const [notificationActionError, setNotificationActionError] = useState(false);
   const studyOsUrl = apps.find((app) => app.slug === "study-os")?.launchUrl ?? "/learn/";
   const registerUrl = new URL(studyOsUrl, "https://hiutmc.com");
   registerUrl.searchParams.set("auth", "register");
@@ -99,7 +106,10 @@ function HomeContent() {
           <div className={styles.crumb}><b>Trang chủ</b><span>›</span><span>Tổng quan</span></div>
           <a className={styles.search} href="/search/" aria-label="Tìm kiếm toàn hệ sinh thái">⌕ <span>Tìm kiếm bài học, vị thuốc, huyệt, hội chứng, tài liệu...</span></a>
           <div className={styles.topActions}>
-            <a className={styles.bell} href="#missions" aria-label="Thông báo">♢</a>
+            <a className={styles.bell} href="#notifications" aria-label={unreadNotificationCount ? `Thông báo, ${unreadNotificationCount} chưa đọc` : "Thông báo"}>
+              ♢
+              {unreadNotificationCount > 0 && <span className={styles.bellBadge} aria-hidden="true">{unreadNotificationCount > 99 ? "99+" : unreadNotificationCount}</span>}
+            </a>
             <DisplayModeToggle />
             <MemberAccount studyOsUrl={studyOsUrl} />
           </div>
@@ -253,13 +263,30 @@ function HomeContent() {
               <DailyMissions apps={apps} />
             </section>
 
-            <section className={styles.noticeCard}>
-              <h3>Thông báo gần đây</h3>
-              <ul>
-                <li><i>✓</i><span>Nhắc tiếp tục bài học đang dở trong Study OS.</span></li>
-                <li><i>◎</i><span>Khám phá một mô hình kinh lạc mới trong Atlas 3D.</span></li>
-                <li><i>✦</i><span>Linh thú sẽ gom nhắc học và hoạt động quan trọng vào một góc nhỏ.</span></li>
-              </ul>
+            <section id="notifications" className={styles.noticeCard} aria-labelledby="notifications-title">
+              <header className={styles.noticeHeader}>
+                <h3 id="notifications-title">Thông báo gần đây</h3>
+                {unreadNotificationCount > 0 && <button type="button" onClick={() => { setNotificationActionError(false); void markAllNotificationsRead().catch(() => setNotificationActionError(true)); }}>Đánh dấu tất cả đã đọc</button>}
+              </header>
+              {!member ? (
+                <p className={styles.notificationState}>Đăng nhập thành viên để xem thông báo đã đồng bộ theo tài khoản.</p>
+              ) : notificationsStatus === "loading" ? (
+                <p className={styles.notificationState} role="status">Đang tải thông báo đã đồng bộ…</p>
+              ) : notificationsStatus === "error" ? (
+                <p className={styles.notificationState} role="alert">Chưa tải được thông báo từ máy chủ. Hãy thử tải lại trang.</p>
+              ) : notifications.length === 0 ? (
+                <p className={styles.notificationState}>Chưa có thông báo nào được đồng bộ cho tài khoản này.</p>
+              ) : (
+                <ul>
+                  {notifications.map((notification) => (
+                    <li key={notification.id} className={notification.read_at ? styles.notificationRead : styles.notificationUnread}>
+                      <i aria-hidden="true">{notification.read_at ? "✓" : "•"}</i>
+                      <span><strong>{notification.title}</strong><span>{notification.body}</span><small>{formatNotificationTime(notification.created_at)}</small></span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {notificationActionError && <p className={styles.notificationError} role="alert">Chưa đánh dấu được thông báo. Hãy thử lại.</p>}
             </section>
           </aside>
         </div>
