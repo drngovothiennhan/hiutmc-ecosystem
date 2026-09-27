@@ -15,9 +15,18 @@ for (const [path, label] of [
 }
 
 const home = fs.existsSync(homePath) ? fs.readFileSync(homePath, "utf8") : "";
+const homeSource = fs.readFileSync("app/page.tsx", "utf8");
 const admin = fs.existsSync(adminPath) ? fs.readFileSync(adminPath, "utf8") : "";
 const mod = fs.existsSync(modPath) ? fs.readFileSync(modPath, "utf8") : "";
 const staffConsole = fs.existsSync(consoleSourcePath) ? fs.readFileSync(consoleSourcePath, "utf8") : "";
+
+for (const marker of [
+  "{ready && !member &&",
+  'registerUrl.searchParams.set("auth", "register")',
+  'className={styles.registerCta} href={registerUrl.toString()}',
+]) {
+  if (!homeSource.includes(marker)) errors.push(`homepage registration CTA source missing: ${marker}`);
+}
 
 for (const marker of [
   "HIU YHCT DIGITAL CAMPUS",
