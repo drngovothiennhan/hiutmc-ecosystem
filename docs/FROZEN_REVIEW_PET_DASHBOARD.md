@@ -18,13 +18,13 @@ Các mục sau mới chỉ được phép hiển thị ở trạng thái khóa h
 - Cho ăn/chăm sóc bằng vật phẩm.
 - Quà thưởng có giá trị.
 - Tiến hóa thật theo cấp/backend. Riêng Chu Tước được phép có **preview artwork 4 bậc** để thẩm định; preview không thay đổi cấp thật.
-- Đồng bộ pet với tài khoản thành viên.
+- Đồng bộ species-only cho hồ sơ thành viên được phép ở Giai đoạn 1; cấp thật, XP, thân mật và vật phẩm vẫn FROZEN/REVIEW.
 - Notification server/push.
 - Marketplace/vật phẩm/gacha bổ sung.
 - Bảng xếp hạng pet.
 
 ## ACTIVE / ALLOWED
-- Nhận ngẫu nhiên đúng một linh thú trên thiết bị lần đầu.
+- Chưa đăng nhập: nhận ngẫu nhiên một linh thú trên thiết bị lần đầu. Thành viên đã đăng nhập: lấy species từ hồ sơ dùng chung; role admin được máy chủ gán Thanh Long.
 - Lưu loài pet bằng localStorage.
 - Idle animation khác nhau theo loài.
 - Chu Tước dùng SVG riêng: Ấu Điểu → Hỏa Vũ Điểu → Phượng Hoàng Linh → Chu Tước Thánh Điểu.
@@ -33,6 +33,12 @@ Các mục sau mới chỉ được phép hiển thị ở trạng thái khóa h
 - Hiển thị số nhiệm vụ còn lại và gợi ý nhiệm vụ kế tiếp.
 - Điều hướng sang Nhiệm vụ/Cộng đồng.
 - Responsive launcher nhỏ, không chiếm layout chính.
+
+## Ràng buộc hồ sơ dùng chung
+- Admin được máy chủ gán species = thanh_long khi tạo hồ sơ mới hoặc backfill migration.
+- Chỉ admin mới tại thời điểm khởi tạo/migration được chuẩn hóa; đổi role không tự đổi species của hồ sơ đã tồn tại.
+- Direct table writes bị khóa; RPC ghi species phải đọc role từ club_members phía server và từ chối species khác thanh_long với admin.
+- Các giai đoạn sau chỉ đọc/giữ nguyên species này; xem docs/SPIRIT-PET-ROADMAP.md.
 
 ## Điều kiện để gỡ FROZEN
 1. Visual QA dashboard được duyệt.

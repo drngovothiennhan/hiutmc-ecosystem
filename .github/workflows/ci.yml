@@ -78,6 +78,9 @@ jobs:
       - name: Validate server staff authorization
         run: npm run validate:staff-auth
 
+      - name: Validate admin spirit-pet profile invariant
+        run: npm run validate:spirit-pet-admin
+
       - name: Validate Admin/Mod shadow backend
         run: npm run validate:admin-shadow
 

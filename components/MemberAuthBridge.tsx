@@ -53,8 +53,63 @@ type StoredSession = {
   member: Member;
 };
 
+const SPIRIT_PET_STORAGE_KEY = "hiutmc-spirit-pet-v1";
+const SPIRIT_PET_CLIENT_TO_DB: Record<string, string> = {
+  dragon: "thanh_long",
+  phoenix: "chu_tuoc",
+  sphinx: "kim_su",
+  qilin: "ky_lan",
+  peacock: "khong_tuoc",
+  fox: "ho_ly",
+};
+const SPIRIT_PET_DB_TO_CLIENT: Record<string, string> = Object.fromEntries(
+  Object.entries(SPIRIT_PET_CLIENT_TO_DB).map(([client, database]) => [database, client]),
+);
+
+function requestedSpiritPetSpecies() {
+  try {
+    const saved = window.localStorage.getItem(SPIRIT_PET_STORAGE_KEY) || "";
+    if (SPIRIT_PET_CLIENT_TO_DB[saved]) return SPIRIT_PET_CLIENT_TO_DB[saved];
+  } catch {}
+  const choices = Object.values(SPIRIT_PET_CLIENT_TO_DB);
+  return choices[Math.floor(Math.random() * choices.length)];
+}
+
+function rememberSpiritPetSpecies(species: string) {
+  const clientSpecies = SPIRIT_PET_DB_TO_CLIENT[species];
+  if (!clientSpecies) throw new Error("Máy chủ trả về species Linh Thú không hợp lệ.");
+  try { window.localStorage.setItem(SPIRIT_PET_STORAGE_KEY, clientSpecies); } catch {}
+  return species;
+}
+
+async function loadSpiritPetProfile(session: StoredSession): Promise<string> {
+  const requested = requestedSpiritPetSpecies();
+  try {
+    const response = await fetch(SUPABASE_URL + "/rest/v1/rpc/spirit_pet_profile_initialize", {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: "Bearer " + session.accessToken,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ p_requested_species: requested }),
+      cache: "no-store",
+    });
+    if (!response.ok) throw new Error("spirit_profile_unavailable");
+    const body = await response.json() as { species?: unknown };
+    const species = String(body?.species || "");
+    return rememberSpiritPetSpecies(species);
+  } catch {
+    const fallback = session.member.role.toLowerCase() === "admin" ? "thanh_long" : requested;
+    return rememberSpiritPetSpecies(fallback);
+  }
+}
+
+
 type AuthContextValue = {
   member: Member | null;
+  spiritPetSpecies: string | null;
+  spiritPetReady: boolean;
   staffAccess: StaffAccess | null;
   learningProgress: LearningProgress | null;
   learningProgressReady: boolean;
@@ -252,6 +307,8 @@ async function consumeIncomingBridge(): Promise<StoredSession | null> {
 export function MemberAuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<StoredSession | null>(null);
   const [staffAccess, setStaffAccess] = useState<StaffAccess | null>(null);
+  const [spiritPetSpecies, setSpiritPetSpecies] = useState<string | null>(null);
+  const [spiritPetReady, setSpiritPetReady] = useState(false);
   const [learningProgress, setLearningProgress] = useState<LearningProgress | null>(null);
   const [learningProgressReady, setLearningProgressReady] = useState(false);
   const [ready, setReady] = useState(false);
@@ -262,23 +319,34 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       try {
         const bridged = await consumeIncomingBridge();
         if (bridged) {
-          const access = await syncStaffSession(bridged.accessToken);
+          const [access, petSpecies] = await Promise.all([
+            syncStaffSession(bridged.accessToken),
+            loadSpiritPetProfile(bridged),
+          ]);
           if (live) {
             setSession(bridged);
             setStaffAccess(access?.authorized ? access : null);
+            setSpiritPetSpecies(petSpecies);
+            setSpiritPetReady(true);
           }
           return;
         }
         const cached = readStored();
         if (!cached) {
           await clearStaffSession();
+          if (live) setSpiritPetReady(true);
           return;
         }
         const refreshed = await refreshSession(cached);
-        const access = await syncStaffSession(refreshed.accessToken);
+        const [access, petSpecies] = await Promise.all([
+          syncStaffSession(refreshed.accessToken),
+          loadSpiritPetProfile(refreshed),
+        ]);
         if (live) {
           setSession(refreshed);
           setStaffAccess(access?.authorized ? access : null);
+          setSpiritPetSpecies(petSpecies);
+          setSpiritPetReady(true);
         }
       } catch {
         saveStored(null);
@@ -286,6 +354,8 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
         if (live) {
           setSession(null);
           setStaffAccess(null);
+          setSpiritPetSpecies(null);
+          setSpiritPetReady(true);
         }
       } finally {
         if (live) setReady(true);
@@ -339,15 +409,22 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AuthContextValue>(() => ({
     member: session?.member ?? null,
+    spiritPetSpecies,
+    spiritPetReady,
     staffAccess,
     learningProgress,
     learningProgressReady,
     ready,
     login: async (studentCode, password) => {
       const next = await loginMember(studentCode, password);
-      const access = await syncStaffSession(next.accessToken);
+      const [access, petSpecies] = await Promise.all([
+        syncStaffSession(next.accessToken),
+        loadSpiritPetProfile(next),
+      ]);
       setSession(next);
       setStaffAccess(access?.authorized ? access : null);
+      setSpiritPetSpecies(petSpecies);
+      setSpiritPetReady(true);
       return access;
     },
     logout: async () => {
@@ -355,6 +432,8 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       saveStored(null);
       setSession(null);
       setStaffAccess(null);
+      setSpiritPetSpecies(null);
+      setSpiritPetReady(true);
       setLearningProgress(null);
       setLearningProgressReady(true);
       await clearStaffSession();
@@ -427,7 +506,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       if (!staffAccess?.authorized) return;
       window.location.assign(staffAccess.canAdmin ? "/admin/" : "/mod/");
     },
-  }), [ready, session, staffAccess, learningProgress, learningProgressReady]);
+  }), [ready, session, staffAccess, spiritPetSpecies, spiritPetReady, learningProgress, learningProgressReady]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
