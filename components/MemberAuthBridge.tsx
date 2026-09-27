@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type FormEvent
 import { useDisplayMode, type DisplayMode } from "./DisplayModeToggle";
 import { transitionBeforeAppNavigation } from "./NavigationTransitions";
 import styles from "./MemberAuthBridge.module.css";
+import { normalizePersonalLearningSnapshot, type PersonalLearningSnapshot } from "@/data/personalized-learning";
 
 const SUPABASE_URL = "https://gzmpnsrwqjpsbklyflqr.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG";
@@ -64,6 +65,8 @@ type AuthContextValue = {
   member: Member | null;
   staffAccess: StaffAccess | null;
   learningProgress: LearningProgress | null;
+  personalLearningSnapshot: PersonalLearningSnapshot | null;
+  personalLearningSnapshotStatus: "loading" | "ready" | "empty" | "error";
   learningProgressReady: boolean;
   ready: boolean;
   login: (studentCode: string, password: string) => Promise<StaffAccess | null>;
@@ -211,6 +214,24 @@ async function fetchLearningProgress(accessToken: string): Promise<LearningProgr
   }
 }
 
+async function fetchPersonalLearningSnapshot(accessToken: string): Promise<{ snapshot: PersonalLearningSnapshot | null; status: "ready" | "empty" | "error" }> {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/learning-sync?snapshot=1`, {
+      method: "GET",
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    });
+    if (!response.ok) return { snapshot: null, status: "error" };
+    const body = (await response.json().catch(() => null)) as Record<string, unknown> | null;
+    if (!body) return { snapshot: null, status: "error" };
+    if (body.hasSync !== true) return { snapshot: null, status: "empty" };
+    const snapshot = normalizePersonalLearningSnapshot(body.snapshot);
+    return snapshot ? { snapshot, status: "ready" } : { snapshot: null, status: "error" };
+  } catch {
+    return { snapshot: null, status: "error" };
+  }
+}
+
 async function refreshSession(current: StoredSession): Promise<StoredSession> {
   const refresh = async () => {
     // Re-read after acquiring the shared origin lock; another tab may have
@@ -294,6 +315,8 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<StoredSession | null>(null);
   const [staffAccess, setStaffAccess] = useState<StaffAccess | null>(null);
   const [learningProgress, setLearningProgress] = useState<LearningProgress | null>(null);
+  const [personalLearningSnapshot, setPersonalLearningSnapshot] = useState<PersonalLearningSnapshot | null>(null);
+  const [personalLearningSnapshotStatus, setPersonalLearningSnapshotStatus] = useState<"loading" | "ready" | "empty" | "error">("loading");
   const [learningProgressReady, setLearningProgressReady] = useState(false);
   const [ready, setReady] = useState(false);
 
@@ -341,10 +364,14 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let live = true;
+    setPersonalLearningSnapshot(null);
+    setPersonalLearningSnapshotStatus("loading");
+    setLearningProgressReady(false);
     const refresh = async () => {
       if (!session?.accessToken) {
         if (live) {
           setLearningProgress(null);
+          setPersonalLearningSnapshot(null);
           setLearningProgressReady(true);
         }
         return;
@@ -356,8 +383,23 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       }
     };
     setLearningProgressReady(false);
+    const refreshSnapshot = async () => {
+      if (!session?.accessToken) {
+        if (live) {
+          setPersonalLearningSnapshot(null);
+          setPersonalLearningSnapshotStatus("empty");
+        }
+        return;
+      }
+      const result = await fetchPersonalLearningSnapshot(session.accessToken);
+      if (live) {
+        setPersonalLearningSnapshot(result.snapshot);
+        setPersonalLearningSnapshotStatus(result.status);
+      }
+    };
     void refresh();
-    const onFocus = () => void refresh();
+    void refreshSnapshot();
+    const onFocus = () => { void refresh(); void refreshSnapshot(); };
     const onVisible = () => { if (document.visibilityState === "visible") void refresh(); };
     window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onVisible);
@@ -373,12 +415,17 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
   const refreshLearningProgress = async () => {
     if (!session?.accessToken) {
       setLearningProgress(null);
+      setPersonalLearningSnapshot(null);
+      setPersonalLearningSnapshotStatus("empty");
       setLearningProgressReady(true);
       return;
     }
     setLearningProgressReady(false);
     const progress = await fetchLearningProgress(session.accessToken);
+    const snapshot = await fetchPersonalLearningSnapshot(session.accessToken);
     setLearningProgress(progress);
+    setPersonalLearningSnapshot(snapshot.snapshot);
+    setPersonalLearningSnapshotStatus(snapshot.status);
     setLearningProgressReady(true);
   };
 
@@ -386,6 +433,8 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     member: session?.member ?? null,
     staffAccess,
     learningProgress,
+    personalLearningSnapshot,
+    personalLearningSnapshotStatus,
     learningProgressReady,
     ready,
     login: async (studentCode, password) => {
@@ -407,6 +456,8 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       setSession(null);
       setStaffAccess(null);
       setLearningProgress(null);
+      setPersonalLearningSnapshot(null);
+      setPersonalLearningSnapshotStatus("empty");
       setLearningProgressReady(true);
       await clearStaffSession();
       if (accessToken) {
@@ -466,7 +517,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       if (!staffAccess?.authorized) return;
       window.location.assign(staffAccess.canAdmin ? "/admin/" : "/mod/");
     },
-  }), [ready, session, staffAccess, learningProgress, learningProgressReady]);
+  }), [ready, session, staffAccess, learningProgress, personalLearningSnapshot, personalLearningSnapshotStatus, learningProgressReady]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

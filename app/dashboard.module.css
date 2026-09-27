@@ -388,3 +388,17 @@
 .entryCard>b{margin-top:3px;color:#8f1935;font-size:10px}
 @media(max-width:900px){.entryCards{grid-template-columns:1fr 1fr}.entryCard:last-child{grid-column:1/-1}}
 @media(max-width:680px){.heroCtas{gap:7px}.heroJoin,.heroTry{min-height:38px;padding:0 11px;font-size:10.5px}.heroNote{max-width:280px}.entryShowcase{padding:13px;margin-top:10px}.entryShowcaseHead{align-items:flex-start;flex-direction:column;gap:3px}.entryShowcaseHead>span:last-child{text-align:left}.entryCards{grid-template-columns:1fr}.entryCard:last-child{grid-column:auto}.entryCard{padding:12px}.entryCard p{font-size:11px}}
+
+.personalizedPanel{margin:0 0 16px;padding:18px 20px;border:1px solid rgba(42,91,66,.18);border-radius:18px;background:linear-gradient(135deg,#f7f8ec,#fffdf8 68%);box-shadow:0 9px 24px rgba(47,73,47,.07)}
+.personalizedHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+.personalizedHeader small,.personalizedPlan>small{color:#53734f;font-size:10px;font-weight:850;letter-spacing:.12em}
+.personalizedHeader h2{margin:4px 0 0;color:#243d32;font-family:Georgia,serif;font-size:22px}
+.personalizedBadge{padding:6px 9px;border:1px solid #d7e2d1;border-radius:999px;color:#526d51;background:#f5f8ef;font-size:10px;font-weight:700}
+.personalizedPlan{display:grid;gap:5px;padding:13px 15px;border-radius:13px;background:#fff;border:1px solid #e9e5d9}
+.personalizedPlan strong{color:#243d32;font-size:15px}
+.personalizedPlan p,.personalizedSummary p,.personalizedEmpty{margin:0;color:#536159;font-size:12px;line-height:1.6}
+.personalizedLink{justify-self:start;margin-top:5px;padding:8px 12px;border-radius:9px;background:#244f3e;color:#fff;font-size:11px;font-weight:800}
+.personalizedLink:focus-visible{outline:3px solid #b57922;outline-offset:3px}
+.personalizedSummary{display:grid;gap:4px;margin-top:10px}
+.personalizedEmpty{padding:12px 14px;border:1px dashed #d7d1bf;border-radius:12px;background:#fffdf8}
+@media(max-width:760px){.personalizedPanel{padding:14px;border-radius:14px}.personalizedHeader h2{font-size:18px}.personalizedBadge{font-size:8px}.personalizedPlan p,.personalizedSummary p,.personalizedEmpty{font-size:11px}}

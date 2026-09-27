@@ -7,6 +7,7 @@ import DisplayModeToggle from "@/components/DisplayModeToggle";
 import SpiritCompanion from "@/components/SpiritCompanion";
 import { canAccessGameHub, GameHubLink, MemberAccount, MemberAuthProvider, StudyOsLink, useMemberAuth } from "@/components/MemberAuthBridge";
 import { useHubRegistry } from "@/components/hub-registry";
+import { createLearningPlan } from "@/data/personalized-learning";
 import styles from "./dashboard.module.css";
 
 const hubMeta: Record<string, { icon: HomeIconName; tone: string }> = {
@@ -30,7 +31,7 @@ const events = [
 
 function HomeContent() {
   const apps = useHubRegistry();
-  const { openStudyOs, openGameHub, member, ready, learningProgress, learningProgressReady } = useMemberAuth();
+  const { openStudyOs, openGameHub, member, ready, learningProgress, learningProgressReady, personalLearningSnapshot, personalLearningSnapshotStatus } = useMemberAuth();
   const studyOsUrl = apps.find((app) => app.slug === "study-os")?.launchUrl ?? "/learn/";
   const registerUrl = new URL(studyOsUrl, "https://hiutmc.com");
   registerUrl.searchParams.set("auth", "register");
@@ -69,6 +70,7 @@ function HomeContent() {
   const ringStyle = synced && latestScore !== null
     ? ({ background: `conic-gradient(#219d6e 0 ${latestScore}%,#e6dfd2 ${latestScore}%)` } as CSSProperties)
     : undefined;
+  const learningPlan = createLearningPlan(personalLearningSnapshot);
 
   return (
     <main className={styles.shell}>
@@ -144,6 +146,38 @@ function HomeContent() {
 
         <div className={styles.grid}>
           <section className={styles.mainColumn}>
+            <section className={styles.personalizedPanel} aria-labelledby="personalized-learning-title">
+              <header className={styles.personalizedHeader}>
+                <span><small>CÁ NHÂN HÓA HỌC TẬP</small><h2 id="personalized-learning-title">Hôm nay nên ôn gì</h2></span>
+                <span className={styles.personalizedBadge}>Theo tiến độ đã đồng bộ</span>
+              </header>
+              {!member ? (
+                <p className={styles.personalizedEmpty}>Đăng nhập thành viên để xem gợi ý dựa trên tiến độ học tập của bạn.</p>
+              ) : personalLearningSnapshotStatus === "loading" ? (
+                <p className={styles.personalizedEmpty} role="status">Đang đọc tiến độ học tập đã đồng bộ…</p>
+              ) : personalLearningSnapshotStatus === "error" ? (
+                <p className={styles.personalizedEmpty} role="alert">Chưa đọc được tiến độ học tập từ máy chủ. Hãy thử tải lại trang hoặc mở Study OS.</p>
+              ) : (
+                <>
+                  <article className={styles.personalizedPlan}>
+                    <small>BÀI HỌC TIẾP THEO</small>
+                    <strong>{learningPlan.nextTitle}</strong>
+                    <p>{learningPlan.nextDetail}</p>
+                    <StudyOsLink className={styles.personalizedLink} href={studyOsUrl}>
+                      Mở Study OS <span aria-hidden="true">→</span>
+                    </StudyOsLink>
+                  </article>
+                  {personalLearningSnapshotStatus === "ready" && learningPlan.summaryState === "ready" ? (
+                    <div className={styles.personalizedSummary} aria-live="polite">
+                      {learningPlan.summary.map((sentence) => <p key={sentence}>{sentence}</p>)}
+                    </div>
+                  ) : (
+                    <p className={styles.personalizedEmpty}>{personalLearningSnapshotStatus === "empty" ? "Tài khoản chưa có snapshot tiến độ được đồng bộ. Chưa thể tạo tóm tắt học tập cá nhân hôm nay." : "Chưa đủ lịch sử ôn theo chủ đề để tạo tóm tắt hôm nay. Khi Study OS đồng bộ thẻ ôn có chủ đề, gợi ý sẽ xuất hiện tại đây."}</p>
+                  )}
+                </>
+              )}
+            </section>
+
             <article className={styles.continueCard}>
               <div className={styles.lessonThumb} aria-hidden="true" />
               <div className={styles.continueCopy}>
