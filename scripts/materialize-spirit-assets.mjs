@@ -3,10 +3,10 @@ import path from "node:path";
 import sharp from "sharp";
 import { renderPhoenixStageSvg } from "../asset-sources/spirit-v2/phoenix-vectors.mjs";
 import { renderSphinxStageSvg } from "../asset-sources/spirit-v2/sphinx-vectors.mjs";
-import { renderPeacockStageSvg } from "../asset-sources/spirit-v2/peacock-vectors.mjs";
 
 const packedSourceDir = path.join(process.cwd(), "asset-sources", "spirit-v2-packed");
 const outputDir = path.join(process.cwd(), "public", "spirit-pets", "visual-v2");
+const peacockSourceDir = path.join(process.cwd(), "asset-sources", "spirit-v2");
 const stages = [1, 2, 3, 4];
 const variants = ["full", "icon"];
 
@@ -86,7 +86,24 @@ async function writeVectorSpecies(species, renderSvg) {
 
 await writeVectorSpecies("phoenix", renderPhoenixStageSvg);
 await writeVectorSpecies("sphinx", renderSphinxStageSvg);
-await writeVectorSpecies("peacock", renderPeacockStageSvg);
+await writePainterlyPeacockSpecies();
+
+
+async function writePainterlyPeacockSpecies() {
+  for (const stage of stages) {
+    const sourcePath = path.join(peacockSourceDir, `peacock-painterly-stage-${stage}.webp`);
+    if (!fs.existsSync(sourcePath)) throw new Error(`Missing painterly Peacock source: ${sourcePath}`);
+    const source = fs.readFileSync(sourcePath);
+    await sharp(source)
+      .resize(256, 256, { fit: "contain" })
+      .webp({ quality: 84, effort: 6, alphaQuality: 90 })
+      .toFile(path.join(outputDir, `peacock-stage-${stage}-full.webp`));
+    await sharp(source)
+      .resize(96, 96, { fit: "contain" })
+      .webp({ quality: 80, effort: 6, alphaQuality: 88 })
+      .toFile(path.join(outputDir, `peacock-stage-${stage}-icon.webp`));
+  }
+}
 
 const expectedCount = approvedSpecies.length * stages.length * variants.length;
 const generated = fs.readdirSync(outputDir).filter((name) => name.endsWith(".webp"));

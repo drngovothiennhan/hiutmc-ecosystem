@@ -41,3 +41,9 @@ Các mục sau mới chỉ được phép hiển thị ở trạng thái khóa h
 4. Có chính sách chống reset/random lại pet ngoài ý muốn.
 5. Có test migration và rollback.
 6. Có duyệt riêng trước khi xóa legacy code.
+
+## Ràng buộc hồ sơ dùng chung
+- Admin được máy chủ gán species = thanh_long khi tạo hồ sơ mới hoặc backfill migration.
+- Chỉ admin tại thời điểm khởi tạo/migration được chuẩn hóa; đổi role không tự đổi species hồ sơ đã có.
+- Direct table writes bị khóa; RPC ghi species phải đọc role từ club_members phía server và từ chối loài khác thanh_long với admin.
+- Các giai đoạn sau chỉ đọc/giữ nguyên species này; xem docs/SPIRIT-PET-ROADMAP.md.
