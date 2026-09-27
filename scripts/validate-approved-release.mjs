@@ -22,7 +22,7 @@ const staffConsole = fs.existsSync(consoleSourcePath) ? fs.readFileSync(consoleS
 
 for (const marker of [
   "{ready && !member &&",
-  'target.searchParams.set("auth", "register")',
+  'registerUrl.searchParams.set("auth", "register")',
   'className={styles.registerCta} href={registerUrl.toString()}',
 ]) {
   if (!homeSource.includes(marker)) errors.push(`homepage registration CTA source missing: ${marker}`);
@@ -96,10 +96,10 @@ for (const asset of [
   if (!fs.existsSync(asset)) errors.push(`missing approved visual asset: ${asset}`);
 }
 
-const cssHrefs = [...home.matchAll(/href="([^"]+\.css[^"]*)"/g)].map((match) => match[1]);
+const cssHrefs = [...home.matchAll(/href="([^"]+\\.css[^"]*)"/g)].map((match) => match[1]);
 const css = cssHrefs
-  .map((href) => fs.readFileSync(`out/${href.replace(/^\//, "").split("?")[0]}`, "utf8"))
-  .join("\n");
+  .map((href) => fs.readFileSync(`out/${href.replace(/^\\//, "").split("?")[0]}`, "utf8"))
+  .join("\\n");
 
 if (!css.includes("grid-template-columns:218px")) errors.push("desktop dashboard sidebar layout is missing");
 if (!css.includes("grid-template-columns:repeat(5,1fr)")) errors.push("mobile five-item taskbar layout is missing");
