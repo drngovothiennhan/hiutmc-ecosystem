@@ -117,6 +117,8 @@ function GenericPetArt({ pet }: { pet: PetSpecies }) {
   );
 }
 
+const VISUAL_V2_ACTIVE_SPECIES = new Set<PetKind>(["dragon", "phoenix", "sphinx"]);
+
 function PetArtwork({
   pet,
   stage = BASELINE_VISUAL_STAGE,
@@ -126,6 +128,8 @@ function PetArtwork({
   stage?: SpiritEvolutionStage;
   compact?: boolean;
 }) {
+  if (!VISUAL_V2_ACTIVE_SPECIES.has(pet.kind)) return <GenericPetArt pet={pet} />;
+
   const visual = resolveSpiritPetVisual(pet.kind, stage);
   if (!visual) return <GenericPetArt pet={pet} />;
 
@@ -218,7 +222,7 @@ export default function SpiritCompanion() {
   const stageMeta = pet.kind === "phoenix"
     ? phoenixPreviewStages[renderedStage - 1]
     : genericPreviewStages[renderedStage - 1];
-  const visualVersion = SPIRIT_VISUAL_VERSION;
+  const visualVersion = VISUAL_V2_ACTIVE_SPECIES.has(pet.kind) ? SPIRIT_VISUAL_VERSION : "legacy-frozen";
 
   return (
     <aside className={styles.wrap} style={theme} aria-label="Linh thú đồng hành">
