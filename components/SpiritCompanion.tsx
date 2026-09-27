@@ -12,7 +12,6 @@ import {
   resolveSpiritPetVisual,
   type SpiritEvolutionStage,
 } from "@/data/spirit-pet-visuals";
-import ChuTuocMascot, { chuTuocStages, type ChuTuocStage } from "./ChuTuocMascot";
 import styles from "./SpiritCompanion.module.css";
 
 type PetKind = "dragon" | "phoenix" | "sphinx" | "qilin" | "peacock" | "fox";
@@ -39,6 +38,17 @@ const genericPreviewStages: Array<{
   { stage: 2, short: "Thành hình", description: "Silhouette rõ hơn, tư thế và các chi tiết đặc trưng bắt đầu hoàn thiện." },
   { stage: 3, short: "Linh thể", description: "Dáng trưởng thành hơn, chi tiết loài và nhịp chuyển động nổi bật hơn." },
   { stage: 4, short: "Viên mãn", description: "Artwork hoàn thiện nhất trong bộ preview visual hiện tại." },
+];
+
+const phoenixPreviewStages: Array<{
+  stage: SpiritEvolutionStage;
+  short: string;
+  description: string;
+}> = [
+  { stage: 1, short: "Ấu Điểu", description: "Chim lửa non tròn nhỏ, cánh ngắn, mắt lớn và mào lửa vàng." },
+  { stage: 2, short: "Hỏa Vũ", description: "Thân thanh hơn, cánh mở rộng, đuôi hỏa vũ dài và aura ấm." },
+  { stage: 3, short: "Phượng Linh", description: "Dáng phượng thanh thoát, sải cánh rộng, linh quang và vũ lửa rõ nét." },
+  { stage: 4, short: "Thánh Điểu", description: "Thánh điểu uy nghi với cánh tầng, thần hỏa, kim sức và hào quang linh khí." },
 ];
 
 const species: PetSpecies[] = [
@@ -116,10 +126,6 @@ function PetArtwork({
   stage?: SpiritEvolutionStage;
   compact?: boolean;
 }) {
-  if (pet.kind === "phoenix") {
-    return <ChuTuocMascot stage={stage as ChuTuocStage} compact={compact} />;
-  }
-
   const visual = resolveSpiritPetVisual(pet.kind, stage);
   if (!visual) return <GenericPetArt pet={pet} />;
 
@@ -210,12 +216,9 @@ export default function SpiritCompanion() {
   const badgeText = dayKey ? String(remaining) : "…";
   const renderedStage = previewStage ?? BASELINE_VISUAL_STAGE;
   const stageMeta = pet.kind === "phoenix"
-    ? {
-        short: chuTuocStages[renderedStage - 1].short,
-        description: chuTuocStages[renderedStage - 1].description,
-      }
+    ? phoenixPreviewStages[renderedStage - 1]
     : genericPreviewStages[renderedStage - 1];
-  const visualVersion = pet.kind === "phoenix" ? "chu-tuoc-svg-v1" : SPIRIT_VISUAL_VERSION;
+  const visualVersion = SPIRIT_VISUAL_VERSION;
 
   return (
     <aside className={styles.wrap} style={theme} aria-label="Linh thú đồng hành">
@@ -270,10 +273,7 @@ export default function SpiritCompanion() {
               <div className={styles.evolutionStages}>
                 {genericPreviewStages.map((item) => {
                   const meta = pet.kind === "phoenix"
-                    ? {
-                        short: chuTuocStages[item.stage - 1].short,
-                        description: chuTuocStages[item.stage - 1].description,
-                      }
+                    ? phoenixPreviewStages[item.stage - 1]
                     : item;
                   return (
                     <button
