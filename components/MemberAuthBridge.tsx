@@ -753,7 +753,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       if (!staffAccess?.authorized) return;
       window.location.assign(staffAccess.canAdmin ? "/admin/" : "/mod/");
     },
-  }), [ready, session, staffAccess, learningProgress, personalLearningSnapshot, personalLearningSnapshotStatus, learningProgressReady, notifications, unreadNotificationCount, notificationsStatus]);
+  }), [ready, session, spiritPetSpecies, spiritPetReady, staffAccess, learningProgress, personalLearningSnapshot, personalLearningSnapshotStatus, learningProgressReady, notifications, unreadNotificationCount, notificationsStatus]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
