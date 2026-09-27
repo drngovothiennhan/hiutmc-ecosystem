@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
+import { createClient } from "@supabase/supabase-js";
 import { useDisplayMode, type DisplayMode } from "./DisplayModeToggle";
 import { transitionBeforeAppNavigation } from "./NavigationTransitions";
 import styles from "./MemberAuthBridge.module.css";
@@ -8,6 +9,9 @@ import { normalizePersonalLearningSnapshot, type PersonalLearningSnapshot } from
 
 const SUPABASE_URL = "https://gzmpnsrwqjpsbklyflqr.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG";
+const realtimeClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+});
 const STORAGE_KEY = "hiutmc-member-session-v1";
 const SESSION_REFRESH_LOCK = "hiutmc-supabase-session-refresh-v1";
 const BRIDGE_FLAG = "ecosystem_sso";
@@ -397,16 +401,50 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
         setPersonalLearningSnapshotStatus(result.status);
       }
     };
+    const refreshSyncedLearningData = async () => {
+      if (!session?.accessToken) {
+        await refresh();
+        await refreshSnapshot();
+        return;
+      }
+      const [progress, snapshot] = await Promise.all([
+        fetchLearningProgress(session.accessToken),
+        fetchPersonalLearningSnapshot(session.accessToken),
+      ]);
+      if (!live) return;
+      setLearningProgress(progress);
+      setLearningProgressReady(true);
+      setPersonalLearningSnapshot(snapshot.snapshot);
+      setPersonalLearningSnapshotStatus(snapshot.status);
+    };
     void refresh();
     void refreshSnapshot();
-    const onFocus = () => { void refresh(); void refreshSnapshot(); };
-    const onVisible = () => { if (document.visibilityState === "visible") void refresh(); };
+    const onFocus = () => { void refreshSyncedLearningData(); };
+    const onVisible = () => { if (document.visibilityState === "visible") void refreshSyncedLearningData(); };
+    let channel: ReturnType<typeof realtimeClient.channel> | null = null;
+    if (session?.accessToken && session.member.id) {
+      void realtimeClient.realtime.setAuth(session.accessToken).then(() => {
+        if (!live) return;
+        channel = realtimeClient
+          .channel(`learning-sync-stats:${session.member.id}`)
+          .on("postgres_changes", {
+            event: "*",
+            schema: "public",
+            table: "learning_sync_stats",
+            filter: `member_id=eq.${session.member.id}`,
+          }, () => { void refreshSyncedLearningData(); })
+          .subscribe();
+      }).catch(() => {
+        // The polling fallback below keeps the dashboard current if Realtime is unavailable.
+      });
+    }
     window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onVisible);
-    const timer = window.setInterval(() => void refresh(), 60_000);
+    const timer = window.setInterval(() => void refreshSyncedLearningData(), 60_000);
     return () => {
       live = false;
       window.clearInterval(timer);
+      if (channel) void realtimeClient.removeChannel(channel);
       window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onVisible);
     };
@@ -421,8 +459,10 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     setLearningProgressReady(false);
-    const progress = await fetchLearningProgress(session.accessToken);
-    const snapshot = await fetchPersonalLearningSnapshot(session.accessToken);
+    const [progress, snapshot] = await Promise.all([
+      fetchLearningProgress(session.accessToken),
+      fetchPersonalLearningSnapshot(session.accessToken),
+    ]);
     setLearningProgress(progress);
     setPersonalLearningSnapshot(snapshot.snapshot);
     setPersonalLearningSnapshotStatus(snapshot.status);

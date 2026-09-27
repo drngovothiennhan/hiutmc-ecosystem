@@ -172,9 +172,9 @@ function HomeContent() {
                         <div className={styles.personalizedSummary} aria-live="polite">
                           {learningPlan.summary.map((sentence) => <p key={sentence}>{sentence}</p>)}
                         </div>
-                      ) : (
-                        <p className={styles.personalizedEmpty}>{personalLearningSnapshotStatus === "empty" ? "Tài khoản chưa có snapshot tiến độ được đồng bộ. Chưa thể tạo tóm tắt học tập cá nhân hôm nay." : "Chưa đủ lịch sử ôn theo chủ đề để tạo tóm tắt hôm nay. Khi Study OS đồng bộ thẻ ôn có chủ đề, gợi ý sẽ xuất hiện tại đây."}</p>
-                      )}
+                      ) : personalLearningSnapshotStatus === "empty" ? (
+                        <p className={styles.personalizedEmpty}>Tài khoản chưa có snapshot tiến độ được đồng bộ. Chưa thể tạo tóm tắt học tập cá nhân hôm nay.</p>
+                      ) : null}
                     </>
                   )}
                   <StudyOsLink className={styles.personalizedLink} href={studyOsUrl}>
@@ -243,7 +243,9 @@ function HomeContent() {
 
           <aside className={styles.rightRail}>
             <section className={styles.progressCard}>
-              <div className={ringClass} style={ringStyle}><strong>{ringLabel}</strong></div>
+              <div className={ringClass} style={ringStyle}>
+                {synced && latestScore === null ? <span className={styles.progressEmblem} aria-label="Biểu trưng Study OS"><HomeIcon name="study-os" /></span> : <strong>{ringLabel}</strong>}
+              </div>
               <div className={styles.progressText}><small>Tiến độ học tập</small><strong>{progressTitle}</strong><span>{progressDetail}</span></div>
             </section>
 
