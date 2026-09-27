@@ -76,8 +76,8 @@ function cardLabel(card: ReviewCardProgress): string {
 export function createLearningPlan(snapshot: PersonalLearningSnapshot | null, now = Date.now()): LearningPlan {
   if (!snapshot) {
     return {
-      nextTitle: "Bắt đầu lộ trình chuẩn trong Study OS",
-      nextDetail: "Chưa có dữ liệu tiến độ cá nhân được đồng bộ cho tài khoản này.",
+      nextTitle: "Mở Study OS để tiếp tục lộ trình học",
+      nextDetail: "Chưa có dữ liệu chi tiết để chỉ định bài học kế tiếp.",
       nextReason: "standard-path",
       summary: [],
       summaryState: "empty",
@@ -92,7 +92,7 @@ export function createLearningPlan(snapshot: PersonalLearningSnapshot | null, no
     .sort((a, b) => a.due - b.due);
   const active = recentActivity(snapshot, now);
 
-  let nextTitle = "Bắt đầu lộ trình chuẩn trong Study OS";
+  let nextTitle = "Mở Study OS để tiếp tục lộ trình học";
   let nextDetail = "Không có chủ đề cần củng cố hoặc hoạt động gần đây trong dữ liệu đã đồng bộ.";
   let nextReason: LearningPlan["nextReason"] = "standard-path";
 

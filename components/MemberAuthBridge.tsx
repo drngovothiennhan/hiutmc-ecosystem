@@ -66,6 +66,7 @@ type AuthContextValue = {
   staffAccess: StaffAccess | null;
   learningProgress: LearningProgress | null;
   personalLearningSnapshot: PersonalLearningSnapshot | null;
+  personalLearningSnapshotStatus: "loading" | "ready" | "empty" | "error";
   learningProgressReady: boolean;
   ready: boolean;
   login: (studentCode: string, password: string) => Promise<StaffAccess | null>;
@@ -213,19 +214,21 @@ async function fetchLearningProgress(accessToken: string): Promise<LearningProgr
   }
 }
 
-async function fetchPersonalLearningSnapshot(accessToken: string): Promise<PersonalLearningSnapshot | null> {
+async function fetchPersonalLearningSnapshot(accessToken: string): Promise<{ snapshot: PersonalLearningSnapshot | null; status: "ready" | "empty" | "error" }> {
   try {
     const response = await fetch(`${SUPABASE_URL}/functions/v1/learning-sync?snapshot=1`, {
       method: "GET",
       headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` },
       cache: "no-store",
     });
-    if (!response.ok) return null;
+    if (!response.ok) return { snapshot: null, status: "error" };
     const body = (await response.json().catch(() => null)) as Record<string, unknown> | null;
-    if (body?.hasSync !== true) return null;
-    return normalizePersonalLearningSnapshot(body.snapshot);
+    if (!body) return { snapshot: null, status: "error" };
+    if (body.hasSync !== true) return { snapshot: null, status: "empty" };
+    const snapshot = normalizePersonalLearningSnapshot(body.snapshot);
+    return snapshot ? { snapshot, status: "ready" } : { snapshot: null, status: "error" };
   } catch {
-    return null;
+    return { snapshot: null, status: "error" };
   }
 }
 
@@ -313,6 +316,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
   const [staffAccess, setStaffAccess] = useState<StaffAccess | null>(null);
   const [learningProgress, setLearningProgress] = useState<LearningProgress | null>(null);
   const [personalLearningSnapshot, setPersonalLearningSnapshot] = useState<PersonalLearningSnapshot | null>(null);
+  const [personalLearningSnapshotStatus, setPersonalLearningSnapshotStatus] = useState<"loading" | "ready" | "empty" | "error">("loading");
   const [learningProgressReady, setLearningProgressReady] = useState(false);
   const [ready, setReady] = useState(false);
 
@@ -361,6 +365,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let live = true;
     setPersonalLearningSnapshot(null);
+    setPersonalLearningSnapshotStatus("loading");
     setLearningProgressReady(false);
     const refresh = async () => {
       if (!session?.accessToken) {
@@ -380,11 +385,17 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     setLearningProgressReady(false);
     const refreshSnapshot = async () => {
       if (!session?.accessToken) {
-        if (live) setPersonalLearningSnapshot(null);
+        if (live) {
+          setPersonalLearningSnapshot(null);
+          setPersonalLearningSnapshotStatus("empty");
+        }
         return;
       }
-      const snapshot = await fetchPersonalLearningSnapshot(session.accessToken);
-      if (live) setPersonalLearningSnapshot(snapshot);
+      const result = await fetchPersonalLearningSnapshot(session.accessToken);
+      if (live) {
+        setPersonalLearningSnapshot(result.snapshot);
+        setPersonalLearningSnapshotStatus(result.status);
+      }
     };
     void refresh();
     void refreshSnapshot();
@@ -405,6 +416,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     if (!session?.accessToken) {
       setLearningProgress(null);
       setPersonalLearningSnapshot(null);
+      setPersonalLearningSnapshotStatus("empty");
       setLearningProgressReady(true);
       return;
     }
@@ -412,7 +424,8 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     const progress = await fetchLearningProgress(session.accessToken);
     const snapshot = await fetchPersonalLearningSnapshot(session.accessToken);
     setLearningProgress(progress);
-    setPersonalLearningSnapshot(snapshot);
+    setPersonalLearningSnapshot(snapshot.snapshot);
+    setPersonalLearningSnapshotStatus(snapshot.status);
     setLearningProgressReady(true);
   };
 
@@ -421,6 +434,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     staffAccess,
     learningProgress,
     personalLearningSnapshot,
+    personalLearningSnapshotStatus,
     learningProgressReady,
     ready,
     login: async (studentCode, password) => {
@@ -443,6 +457,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       setStaffAccess(null);
       setLearningProgress(null);
       setPersonalLearningSnapshot(null);
+      setPersonalLearningSnapshotStatus("empty");
       setLearningProgressReady(true);
       await clearStaffSession();
       if (accessToken) {
@@ -502,7 +517,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       if (!staffAccess?.authorized) return;
       window.location.assign(staffAccess.canAdmin ? "/admin/" : "/mod/");
     },
-  }), [ready, session, staffAccess, learningProgress, personalLearningSnapshot, learningProgressReady]);
+  }), [ready, session, staffAccess, learningProgress, personalLearningSnapshot, personalLearningSnapshotStatus, learningProgressReady]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

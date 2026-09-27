@@ -6,6 +6,7 @@
 - `data/personalized-learning.ts` xác thực và giới hạn các trường snapshot được dùng. Gợi ý ưu tiên hoạt động Study OS gần đây nếu có `journey.updatedAt` và `journey.lastModule` trong 7 ngày; tiếp theo là thẻ có `streak=0` và `lastAttempt`; sau đó là lối vào lộ trình Study OS. Gợi ý gần nhất không khẳng định người dùng còn dở một bài cụ thể, vì schema hiện tại không có cờ/ID bài học đang dở.
 - Tóm tắt hiển thị tối đa ba chủ đề đến hạn hoặc đến hạn trong ba ngày theo `reviewCards.due`, cùng chủ đề có streak 0 khi có. Không có thẻ ôn hợp lệ thì hiển thị trạng thái thiếu dữ liệu thay vì câu tóm tắt chung giả dạng cá nhân hóa.
 - Snapshot chỉ tải khi đăng nhập, khi mở trang, khi quay lại tab bằng focus và khi người dùng chủ động làm mới tiến độ. Aggregate stats hiện tại vẫn được tải định kỳ riêng; snapshot không bị tải mỗi phút.
+- Trạng thái giao diện tách đang tải, tải lỗi, chưa có snapshot và snapshot đã tải nhưng chưa đủ dữ liệu theo chủ đề; lỗi mạng không bị trình bày thành lịch sử học rỗng.
 
 ## Dữ liệu có và giới hạn
 

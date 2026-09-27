@@ -31,7 +31,7 @@ const events = [
 
 function HomeContent() {
   const apps = useHubRegistry();
-  const { openStudyOs, openGameHub, member, ready, learningProgress, learningProgressReady, personalLearningSnapshot } = useMemberAuth();
+  const { openStudyOs, openGameHub, member, ready, learningProgress, learningProgressReady, personalLearningSnapshot, personalLearningSnapshotStatus } = useMemberAuth();
   const studyOsUrl = apps.find((app) => app.slug === "study-os")?.launchUrl ?? "/learn/";
   const registerUrl = new URL(studyOsUrl, "https://hiutmc.com");
   registerUrl.searchParams.set("auth", "register");
@@ -153,8 +153,10 @@ function HomeContent() {
               </header>
               {!member ? (
                 <p className={styles.personalizedEmpty}>Đăng nhập thành viên để xem gợi ý dựa trên tiến độ học tập của bạn.</p>
-              ) : !learningProgressReady ? (
+              ) : personalLearningSnapshotStatus === "loading" ? (
                 <p className={styles.personalizedEmpty} role="status">Đang đọc tiến độ học tập đã đồng bộ…</p>
+              ) : personalLearningSnapshotStatus === "error" ? (
+                <p className={styles.personalizedEmpty} role="alert">Chưa đọc được tiến độ học tập từ máy chủ. Hãy thử tải lại trang hoặc mở Study OS.</p>
               ) : (
                 <>
                   <article className={styles.personalizedPlan}>
@@ -165,12 +167,12 @@ function HomeContent() {
                       Mở Study OS <span aria-hidden="true">→</span>
                     </StudyOsLink>
                   </article>
-                  {learningPlan.summaryState === "ready" ? (
+                  {personalLearningSnapshotStatus === "ready" && learningPlan.summaryState === "ready" ? (
                     <div className={styles.personalizedSummary} aria-live="polite">
                       {learningPlan.summary.map((sentence) => <p key={sentence}>{sentence}</p>)}
                     </div>
                   ) : (
-                    <p className={styles.personalizedEmpty}>Chưa đủ lịch sử ôn theo chủ đề để tạo tóm tắt hôm nay. Khi Study OS đồng bộ thẻ ôn có chủ đề, gợi ý sẽ xuất hiện tại đây.</p>
+                    <p className={styles.personalizedEmpty}>{personalLearningSnapshotStatus === "empty" ? "Tài khoản chưa có snapshot tiến độ được đồng bộ. Chưa thể tạo tóm tắt học tập cá nhân hôm nay." : "Chưa đủ lịch sử ôn theo chủ đề để tạo tóm tắt hôm nay. Khi Study OS đồng bộ thẻ ôn có chủ đề, gợi ý sẽ xuất hiện tại đây."}</p>
                   )}
                 </>
               )}
