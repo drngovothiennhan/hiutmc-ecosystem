@@ -6,7 +6,7 @@ import { renderSphinxStageSvg } from "../asset-sources/spirit-v2/sphinx-vectors.
 
 const packedSourceDir = path.join(process.cwd(), "asset-sources", "spirit-v2-packed");
 const outputDir = path.join(process.cwd(), "public", "spirit-pets", "visual-v2");
-const peacockSourceDir = path.join(process.cwd(), "asset-sources", "spirit-v2");
+const painterlySourceDir = path.join(process.cwd(), "asset-sources", "spirit-v2");
 const stages = [1, 2, 3, 4];
 const variants = ["full", "icon"];
 
@@ -48,7 +48,7 @@ while ((match = pairPattern.exec(packedText)) !== null) {
   recovered.set(match[1], match[2]);
 }
 
-const approvedSpecies = ["dragon", "phoenix", "sphinx", "peacock"];
+const approvedSpecies = ["dragon", "phoenix", "sphinx", "peacock", "qilin", "fox"];
 const requiredDragon = [];
 for (const stage of stages) {
   for (const variant of variants) requiredDragon.push(`dragon-stage-${stage}-${variant}.webp`);
@@ -86,22 +86,24 @@ async function writeVectorSpecies(species, renderSvg) {
 
 await writeVectorSpecies("phoenix", renderPhoenixStageSvg);
 await writeVectorSpecies("sphinx", renderSphinxStageSvg);
-await writePainterlyPeacockSpecies();
+await writePainterlySpecies("peacock");
+await writePainterlySpecies("qilin");
+await writePainterlySpecies("fox");
 
 
-async function writePainterlyPeacockSpecies() {
+async function writePainterlySpecies(species) {
   for (const stage of stages) {
-    const sourcePath = path.join(peacockSourceDir, `peacock-painterly-stage-${stage}.webp`);
-    if (!fs.existsSync(sourcePath)) throw new Error(`Missing painterly Peacock source: ${sourcePath}`);
+    const sourcePath = path.join(painterlySourceDir, `${species}-painterly-stage-${stage}.webp`);
+    if (!fs.existsSync(sourcePath)) throw new Error(`Missing painterly ${species} source: ${sourcePath}`);
     const source = fs.readFileSync(sourcePath);
     await sharp(source)
       .resize(256, 256, { fit: "contain" })
       .webp({ quality: 84, effort: 6, alphaQuality: 90 })
-      .toFile(path.join(outputDir, `peacock-stage-${stage}-full.webp`));
+      .toFile(path.join(outputDir, `${species}-stage-${stage}-full.webp`));
     await sharp(source)
       .resize(96, 96, { fit: "contain" })
       .webp({ quality: 80, effort: 6, alphaQuality: 88 })
-      .toFile(path.join(outputDir, `peacock-stage-${stage}-icon.webp`));
+      .toFile(path.join(outputDir, `${species}-stage-${stage}-icon.webp`));
   }
 }
 
@@ -111,4 +113,4 @@ if (generated.length !== expectedCount) {
   throw new Error(`Expected ${expectedCount} approved visual-v2 assets, got ${generated.length}`);
 }
 
-console.log(`Materialized ${expectedCount} approved spirit visual-v2 WebP assets for Thanh Long, Chu Tuoc, Kim Su and Khong Tuoc.`);
+console.log(`Materialized ${expectedCount} approved spirit visual-v2 WebP assets for Thanh Long, Chu Tuoc, Kim Su, Khong Tuoc, Ky Lan and Ho Ly.`);
