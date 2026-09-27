@@ -34,6 +34,7 @@ for (const marker of [
   "v_species := 'thanh_long'",
   "on conflict (member_id) do nothing",
   "p_requested_species",
+  "on conflict (member_id) do nothing",
 ]) {
   if (!initialization.includes(marker)) errors.push("server-derived admin initialization missing: " + marker);
 }
@@ -89,6 +90,38 @@ for (const marker of [
   "thanh_long",
 ]) {
   if (!roadmap.includes(marker)) errors.push("roadmap missing invariant marker: " + marker);
+}
+
+for (const marker of [
+  "function readLegacySpiritPetSpecies()",
+  "p_requested_species: requested",
+  "window.localStorage.removeItem(SPIRIT_PET_STORAGE_KEY)",
+  "setSpiritPetSpecies(null)",
+]) {
+  if (!auth.includes(marker)) errors.push("server-authoritative pet sync contract missing: " + marker);
+}
+if (auth.includes("localStorage.setItem(SPIRIT_PET_STORAGE_KEY")) {
+  errors.push("synced pet species must not be persisted back to device storage");
+}
+if (auth.includes("requestedSpiritPetSpecies()")) {
+  errors.push("authenticated pet sync must not randomly create a client species fallback");
+}
+for (const marker of [
+  "Signed-out visitors get an in-memory preview only",
+  "member && !spiritPetReady",
+  "Linh thú khách chỉ là bản xem thử tạm thời",
+]) {
+  if (!companion.includes(marker)) errors.push("device-independent pet display contract missing: " + marker);
+}
+if (/localStorage\.(?:getItem|setItem|removeItem)\([^)]*spirit-pet/i.test(companion)) {
+  errors.push("companion must not persist pet profile data in device storage");
+}
+for (const marker of [
+  "đổi thiết bị",
+  "không trình bày dữ liệu cục bộ",
+  "Không backfill hàng loạt",
+]) {
+  if (!roadmap.includes(marker)) errors.push("cross-device sync documentation missing: " + marker);
 }
 
 for (const dangerous of [

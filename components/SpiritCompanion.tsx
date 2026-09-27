@@ -25,7 +25,6 @@ type PetSpecies = {
   motion: string;
 };
 
-const PET_STORAGE_KEY = "hiutmc-spirit-pet-v1";
 const DATABASE_SPECIES_TO_KIND: Record<string, PetKind> = {
   thanh_long: "dragon",
   chu_tuoc: "phoenix",
@@ -167,33 +166,18 @@ export default function SpiritCompanion() {
     setDayKey(localDayKey(new Date()));
     setProgress(readLocalProgress());
 
-    if (member && spiritPetSpecies) {
-      const kind = DATABASE_SPECIES_TO_KIND[spiritPetSpecies];
-      const found = species.find((item) => item.kind === kind);
-      if (found) {
-        try { window.localStorage.setItem(PET_STORAGE_KEY, found.kind); } catch {}
-        setPet(found);
-        setIsNew(false);
-        return;
-      }
+    if (member) {
+      const kind = spiritPetSpecies ? DATABASE_SPECIES_TO_KIND[spiritPetSpecies] : null;
+      const found = species.find((item) => item.kind === kind) || null;
+      setPet(found);
+      setIsNew(false);
+      return;
     }
 
-    try {
-      const saved = window.localStorage.getItem(PET_STORAGE_KEY);
-      if (saved) {
-        const found = species.find((item) => item.kind === saved);
-        if (found) {
-          setPet(found);
-          return;
-        }
-      }
-      const next = species[Math.floor(Math.random() * species.length)];
-      window.localStorage.setItem(PET_STORAGE_KEY, next.kind);
-      setPet(next);
-      setIsNew(true);
-    } catch {
-      setPet(species[3]);
-    }
+    // Signed-out visitors get an in-memory preview only; it is not saved on this device.
+    const next = species[Math.floor(Math.random() * species.length)];
+    setPet(next);
+    setIsNew(true);
   }, [authReady, member?.id, spiritPetReady, spiritPetSpecies]);
 
   useEffect(() => {
@@ -215,14 +199,15 @@ export default function SpiritCompanion() {
   const nextMission = missions.find((mission) => !completedToday.has(mission.id));
 
   const message = useMemo(() => {
+    if (!member) return "Linh thú khách chỉ là bản xem thử tạm thời. Đăng nhập để đồng bộ hồ sơ Linh Thú giữa các thiết bị.";
     if (isNew) return "Bạn vừa gặp linh thú đồng hành đầu tiên. Mình sẽ nhắc các nhiệm vụ học tập đang lưu trên thiết bị này.";
     if (!dayKey) return "Mình đang đồng bộ nhiệm vụ học tập trên thiết bị.";
     if (remaining === 0) return "Ba nhiệm vụ hôm nay đã được đánh dấu hoàn thành. Tiến độ này hiện chỉ lưu trên thiết bị.";
     if (nextMission) return `Bạn còn ${remaining} nhiệm vụ hôm nay. Gợi ý tiếp theo: ${nextMission.title}.`;
     return "Mình ở đây để gom nhắc học và hoạt động quan trọng vào một góc nhỏ.";
-  }, [dayKey, isNew, nextMission, remaining]);
+  }, [dayKey, isNew, member, nextMission, remaining]);
 
-  if (!pet) return <button className={styles.placeholder} aria-label="Linh thú đồng hành" type="button">✦</button>;
+  if (!pet || (member && !spiritPetReady)) return <button className={styles.placeholder} aria-label={member ? "Linh thú đang chờ máy chủ đồng bộ" : "Linh thú đồng hành"} title={member ? "Không tải được hồ sơ Linh Thú từ máy chủ." : undefined} type="button">✦</button>;
 
   const theme = { "--pet-a": pet.primary, "--pet-b": pet.secondary } as CSSProperties;
   const badgeText = dayKey ? String(remaining) : "…";
@@ -319,8 +304,9 @@ export default function SpiritCompanion() {
           )}
 
           <small className={styles.note}>
-            Visual {visualVersion}. Preview chỉ thay asset hiển thị; progression, cấp thật, XP, thân mật, vật phẩm và đồng bộ tài khoản vẫn FROZEN/REVIEW.
+            Hồ sơ loài của thành viên được lưu trên máy chủ để dùng khi đổi thiết bị. Preview là tạm thời; cấp thật, XP, thân mật, vật phẩm và phần thưởng vẫn FROZEN/REVIEW.
           </small>
+          {!member && <small className={styles.note}>Đăng nhập thành viên để lưu hồ sơ Linh Thú trên máy chủ và tiếp tục dùng khi đổi thiết bị.</small>}
         </section>
       )}
       <button type="button" className={styles.launcher} onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-label={"Mở linh thú " + pet.name}>
