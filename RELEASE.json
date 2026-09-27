@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260926-01",
+  "release": "HIU-YHCT-ECOSYSTEM-20260927-01",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP33",
-  "base_checkpoint_sha": "1b49bc48b1139f50b9cea776f53b5502acec9c0e",
+  "checkpoint": "CP34",
+  "base_checkpoint_sha": "3dc46585f47dcc3c07164712a9fda4c270dd038c",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP33 fixes Game Hub launch responsiveness: the allowlisted launch hands off the already validated HIU TMC session immediately, while Game Hub validates or refreshes that session during bootstrap. CI, Worker dry-run, Cloudflare deployment, anonymous-denial smoke, public registry smoke and production smoke are mandatory."
+  "verification": "CP34 adds a working CLB registration email CTA, describes Atlas and A.I Thiệt Chẩn from the live app registry, and links to the isolated one-case Y Quán trial. Keep CI, Worker dry-run, Cloudflare deployment, anonymous-denial checks, public registry smoke and production smoke mandatory."
 }

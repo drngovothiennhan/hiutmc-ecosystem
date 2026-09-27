@@ -32,7 +32,11 @@ function HomeContent() {
   const apps = useHubRegistry();
   const { openStudyOs, openGameHub, member, ready, learningProgress, learningProgressReady } = useMemberAuth();
   const studyOsUrl = apps.find((app) => app.slug === "study-os")?.launchUrl ?? "/learn/";
-  const atlasUrl = apps.find((app) => app.slug === "atlas")?.launchUrl ?? "/ecosystem/atlas/";
+  const atlasApp = apps.find((app) => app.slug === "atlas");
+  const atlasUrl = atlasApp?.launchUrl ?? "/ecosystem/atlas/";
+  const thietChanApp = apps.find((app) => app.slug === "ai-thiet-chan");
+  const thietChanUrl = thietChanApp?.launchUrl ?? "/apps/thietchan/";
+  const trialGameUrl = "/apps/game-hub/y-quan-live/interview/?trial=1";
   const gameHubUrl = "/apps/game-hub/";
   useEffect(() => {
     if (!ready || !member || !canAccessGameHub(member.role)) return;
@@ -101,7 +105,39 @@ function HomeContent() {
           <small>HIU YHCT DIGITAL CAMPUS</small>
           <h1>Chào mừng trở lại, <span>{member?.fullName || "HIU YHCT"}!</span></h1>
           <p>Một điểm vào thống nhất cho học tập, Atlas 3D, AI, Trung Y Văn và hoạt động học thuật của cộng đồng HIU.</p>
+          <div className={styles.heroCtas}>
+            <a className={styles.heroJoin} href="mailto:clb.yhoccotruyen.hiu@gmail.com?subject=%C4%90%C4%83ng%20k%C3%BD%20tham%20gia%20HIU%20CLB%20YHCT">Đăng ký tham gia CLB <span aria-hidden="true">↗</span></a>
+            <a className={styles.heroTry} href={trialGameUrl}>Chơi thử Y Quán <span aria-hidden="true">→</span></a>
+          </div>
+          <small className={styles.heroNote}>Yêu cầu được gửi đến email chính thức của CLB; CLB phản hồi cách tham gia.</small>
           <div className={styles.heroMark}>Dưỡng Tâm<br />Học Thuật<br />Hành Y Đạo</div>
+        </section>
+
+        <section className={styles.entryShowcase} aria-labelledby="entry-showcase-title">
+          <header className={styles.entryShowcaseHead}>
+            <span><small>TRẢI NGHIỆM HỆ SINH THÁI</small><h2 id="entry-showcase-title">Xem trước công cụ đang có</h2></span>
+            <span>Thông tin lấy từ cấu hình ứng dụng hiện hành</span>
+          </header>
+          <div className={styles.entryCards}>
+            <a className={styles.entryCard} href={atlasUrl}>
+              <span className={styles.entryKind}>3D ATLAS · {atlasApp?.status ?? "Preview"}</span>
+              <strong>{atlasApp?.name ?? "3D Atlas"}</strong>
+              <p>{atlasApp?.description ?? "Mô hình tương tác để học huyệt vị, kinh lạc và các mốc giải phẫu."}</p>
+              <b>Mở Atlas 3D →</b>
+            </a>
+            <a className={styles.entryCard} href={thietChanUrl}>
+              <span className={styles.entryKind}>CÔNG CỤ HỌC TẬP · {thietChanApp?.status ?? "Production"}</span>
+              <strong>{thietChanApp?.name ?? "A.I Thiệt Chẩn"}</strong>
+              <p>{thietChanApp?.description ?? "Học quan sát và đối chiếu đặc điểm lưỡi trong bối cảnh giáo dục YHCT."}</p>
+              <b>Mở A.I Thiệt Chẩn →</b>
+            </a>
+            <a className={styles.entryCard} href={trialGameUrl}>
+              <span className={styles.entryKind}>GAME HUB · DÙNG THỬ</span>
+              <strong>Y Quán · Luyện Thập vấn</strong>
+              <p>Thử một ca mô phỏng có sẵn trên Game Hub, không cần đăng nhập. Bản dùng thử không lưu tiến độ.</p>
+              <b>Chơi thử một ca →</b>
+            </a>
+          </div>
         </section>
 
         <div className={styles.grid}>
