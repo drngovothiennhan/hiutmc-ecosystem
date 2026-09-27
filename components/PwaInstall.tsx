@@ -81,7 +81,7 @@ export default function PwaInstall() {
   return <>
     {!visible && mode && <button className="pwaReopen" onClick={() => setVisible(true)}>＋ Cài HIU TMC</button>}
     {visible && <aside className="pwaInstall" aria-label="Cài đặt HIU TMC" aria-live="polite">
-      <img src="/icons/icon-192.png" width="48" height="48" alt="" />
+      <img src="/icons/icon-192.png" width="48" height="48" alt="" loading="lazy" />
       <div><strong>HIU TMC trên màn hình chính</strong>
         <p>{mode === "ios" ? "Mở trong Safari, chọn Chia sẻ → Thêm vào Màn hình chính → Thêm." : "Cài ứng dụng để mở nhanh bản đồ và các công cụ học tập."}</p>
         {message && <p role="status">{message}</p>}
