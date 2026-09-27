@@ -55,10 +55,10 @@ export const SPIRIT_VISUAL_ASSETS: Record<
     4: asset("fox", 4, "Hồ Ly · hình thái preview 4"),
   },
   peacock: {
-    1: asset("peacock", 1, "Khổng Tước · hình thái preview 1"),
-    2: asset("peacock", 2, "Khổng Tước · hình thái preview 2"),
-    3: asset("peacock", 3, "Khổng Tước · hình thái preview 3"),
-    4: asset("peacock", 4, "Khổng Tước · hình thái preview 4"),
+    1: asset("peacock", 1, "Khổng Tước · Mầm linh"),
+    2: asset("peacock", 2, "Khổng Tước · Thành hình"),
+    3: asset("peacock", 3, "Khổng Tước · Linh thể"),
+    4: asset("peacock", 4, "Khổng Tước · Viên mãn"),
   },
   sphinx: {
     1: asset("sphinx", 1, "Kim Sư · hình thái preview 1"),

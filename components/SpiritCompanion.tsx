@@ -51,6 +51,17 @@ const phoenixPreviewStages: Array<{
   { stage: 4, short: "Thánh Điểu", description: "Thánh điểu uy nghi với cánh tầng, thần hỏa, kim sức và hào quang linh khí." },
 ];
 
+const peacockPreviewStages: Array<{
+  stage: SpiritEvolutionStage;
+  short: string;
+  description: string;
+}> = [
+  { stage: 1, short: "Mầm linh", description: "Khổng Tước non đứng thẳng, thân nhỏ, mào lông vừa nhú và vài lông đuôi ngắn." },
+  { stage: 2, short: "Thành hình", description: "Mào lông rõ hơn; những vệt lông đầu tiên bắt đầu mở ra phía sau." },
+  { stage: 3, short: "Linh thể", description: "Đuôi dài hơn, các lông mắt công hiện rõ và đường nét chim trưởng thành." },
+  { stage: 4, short: "Viên mãn", description: "Khổng Tước đứng uy nghi với đuôi xòe hoàn chỉnh, họa tiết lông và linh quang." },
+];
+
 const species: PetSpecies[] = [
   { kind: "dragon", name: "Thanh Long", title: "Rồng · Nghị lực", primary: "#2f8e8a", secondary: "#d5b260", motion: "float" },
   { kind: "phoenix", name: "Chu Tước", title: "Phụng Hoàng · Tái sinh", primary: "#c64b3d", secondary: "#f0b44d", motion: "flare" },
@@ -101,15 +112,7 @@ function GenericPetArt({ pet }: { pet: PetSpecies }) {
           <path d="M33 26 28 15l12 7M63 26l5-11-12 7" fill={pet.primary} />
         </>
       )}
-      {pet.kind === "peacock" && (
-        <>
-          <g opacity=".34">
-            <circle cx="48" cy="39" r="31" fill="none" stroke={pet.primary} strokeWidth="7" strokeDasharray="4 7" />
-            <circle cx="48" cy="39" r="22" fill="none" stroke={pet.secondary} strokeWidth="5" strokeDasharray="3 6" />
-          </g>
-          <path d="M48 20 43 9M48 20 53 9M48 20 48 7" stroke={pet.secondary} strokeWidth="3" strokeLinecap="round" />
-        </>
-      )}
+      
       <circle cx="41" cy="38" r="2.6" fill="#1b2735" />
       <circle cx="55" cy="38" r="2.6" fill="#1b2735" />
       <path d="M44 47c2.5 2.5 5.5 2.5 8 0" fill="none" stroke="#7d3443" strokeWidth="2.4" strokeLinecap="round" />
@@ -117,7 +120,7 @@ function GenericPetArt({ pet }: { pet: PetSpecies }) {
   );
 }
 
-const VISUAL_V2_ACTIVE_SPECIES = new Set<PetKind>(["dragon", "phoenix", "sphinx"]);
+const VISUAL_V2_ACTIVE_SPECIES = new Set<PetKind>(["dragon", "phoenix", "sphinx", "peacock"]);
 
 function PetArtwork({
   pet,
@@ -131,7 +134,7 @@ function PetArtwork({
   if (!VISUAL_V2_ACTIVE_SPECIES.has(pet.kind)) return <GenericPetArt pet={pet} />;
 
   const visual = resolveSpiritPetVisual(pet.kind, stage);
-  if (!visual) return <GenericPetArt pet={pet} />;
+  if (!visual) return null;
 
   return (
     <img
@@ -221,7 +224,9 @@ export default function SpiritCompanion() {
   const renderedStage = previewStage ?? BASELINE_VISUAL_STAGE;
   const stageMeta = pet.kind === "phoenix"
     ? phoenixPreviewStages[renderedStage - 1]
-    : genericPreviewStages[renderedStage - 1];
+    : pet.kind === "peacock"
+      ? peacockPreviewStages[renderedStage - 1]
+      : genericPreviewStages[renderedStage - 1];
   const visualVersion = VISUAL_V2_ACTIVE_SPECIES.has(pet.kind) ? SPIRIT_VISUAL_VERSION : "legacy-frozen";
 
   return (
@@ -278,7 +283,9 @@ export default function SpiritCompanion() {
                 {genericPreviewStages.map((item) => {
                   const meta = pet.kind === "phoenix"
                     ? phoenixPreviewStages[item.stage - 1]
-                    : item;
+                    : pet.kind === "peacock"
+                      ? peacockPreviewStages[item.stage - 1]
+                      : item;
                   return (
                     <button
                       key={item.stage}

@@ -1,5 +1,6 @@
 import "./validate-pwa.mjs";
 import fs from "node:fs";
+import { createHash } from "node:crypto";
 
 const image = fs.readFileSync("public/academy-world.webp");
 if (image.toString("ascii", 0, 4) !== "RIFF" || image.toString("ascii", 8, 12) !== "WEBP" || image.length < 50000) {
@@ -14,7 +15,8 @@ for (const asset of ["/academy-world.webp", "/academy-mobile.webp", "/ecosystem-
   }
 }
 
-const petSpecies = ["dragon", "phoenix", "sphinx"];
+const petSpecies = ["dragon", "phoenix", "sphinx", "peacock"];
+const uniquePeacockStages = { full: new Set(), icon: new Set() };
 const petStages = [1, 2, 3, 4];
 const petVariants = ["full", "icon"];
 let petAssetBytes = 0;
@@ -30,8 +32,17 @@ for (const species of petSpecies) {
       }
       const budget = variant === "icon" ? 24000 : 90000;
       if (bytes.length > budget) throw new Error(`Spirit pet asset exceeds ${budget} byte budget: ${file}`);
+      if (species === "peacock") {
+        uniquePeacockStages[variant].add(createHash("sha256").update(bytes).digest("hex"));
+      }
       petAssetBytes += bytes.length;
     }
+  }
+}
+
+for (const variant of petVariants) {
+  if (uniquePeacockStages[variant].size !== petStages.length) {
+    throw new Error(`Khong Tuoc ${variant} artwork must be unique at all four preview stages`);
   }
 }
 
@@ -44,7 +55,7 @@ for (const species of petSpecies) {
 }
 
 const companion = fs.readFileSync("components/SpiritCompanion.tsx", "utf8");
-if (!companion.includes('VISUAL_V2_ACTIVE_SPECIES = new Set<PetKind>(["dragon", "phoenix", "sphinx"])')) {
+if (!companion.includes('VISUAL_V2_ACTIVE_SPECIES = new Set<PetKind>(["dragon", "phoenix", "sphinx", "peacock"])')) {
   throw new Error("Visual-v2 runtime allowlist must remain limited to Thanh Long, Chu Tuoc and Kim Su");
 }
 
@@ -55,4 +66,4 @@ for (const forbidden of ["actual_level", "actualLevel", "setActualLevel", "setPe
   if (companion.includes(forbidden)) throw new Error(`Visual-only phase must not touch progression/backend: ${forbidden}`);
 }
 
-console.log(`Illustrated map validated (${Math.round(image.length / 1024)} KB); spirit visual-v2 validated (24 WebP assets; Thanh Long/Chu Tuoc/Kim Su complete, ${Math.round(petAssetBytes / 1024)} KB total).`);
+console.log(`Illustrated map validated (${Math.round(image.length / 1024)} KB); spirit visual-v2 validated (32 WebP assets; Thanh Long/Chu Tuoc/Kim Su/Khong Tuoc complete with four unique Peacock stages, ${Math.round(petAssetBytes / 1024)} KB total).`);
