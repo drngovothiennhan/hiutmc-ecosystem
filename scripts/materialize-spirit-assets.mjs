@@ -3,24 +3,47 @@ import path from "node:path";
 import sharp from "sharp";
 import { renderPhoenixStageSvg } from "../asset-sources/spirit-v2/phoenix-vectors.mjs";
 
-const sourceDir = path.join(process.cwd(), "asset-sources", "spirit-v2");
+const vectorSourceDir = path.join(process.cwd(), "asset-sources", "spirit-v2");
+const packedSourceDir = path.join(process.cwd(), "asset-sources", "spirit-v2-packed");
 const outputDir = path.join(process.cwd(), "public", "spirit-pets", "visual-v2");
 
-if (!fs.existsSync(sourceDir)) {
-  throw new Error("Spirit visual-v2 source bundle is missing");
+if (!fs.existsSync(packedSourceDir)) {
+  throw new Error("Packed spirit visual-v2 source bundle is missing");
 }
 
-const parts = fs.readdirSync(sourceDir)
+const parts = fs.readdirSync(packedSourceDir)
   .filter((name) => /^part-\d+\.txt$/.test(name))
   .sort();
 
-if (parts.length === 0) throw new Error("Spirit visual-v2 source bundle has no parts");
+if (parts.length === 0) throw new Error("Packed spirit visual-v2 source bundle has no parts");
 
-const bundleText = parts
-  .map((name) => fs.readFileSync(path.join(sourceDir, name), "utf8"))
-  .join("");
+function suffixPrefixOverlap(left, right) {
+  const tail = left.slice(-Math.min(left.length, right.length));
+  const probe = right + "\u0000" + tail;
+  const prefix = new Array(probe.length).fill(0);
+  for (let i = 1; i < probe.length; i += 1) {
+    let j = prefix[i - 1];
+    while (j > 0 && probe[i] !== probe[j]) j = prefix[j - 1];
+    if (probe[i] === probe[j]) j += 1;
+    prefix[i] = j;
+  }
+  return Math.min(prefix[prefix.length - 1], right.length);
+}
 
-const bundle = JSON.parse(bundleText);
+let bundleText = "";
+for (const name of parts) {
+  const chunk = fs.readFileSync(path.join(packedSourceDir, name), "utf8");
+  const overlap = bundleText ? suffixPrefixOverlap(bundleText, chunk) : 0;
+  if (overlap > 0) console.log(`De-overlap ${name}: ${overlap} duplicated chars`);
+  bundleText += chunk.slice(overlap);
+}
+
+let bundle;
+try {
+  bundle = JSON.parse(bundleText);
+} catch (error) {
+  throw new Error(`Packed spirit visual-v2 bundle is incomplete or invalid after ${parts.length} parts: ${error.message}`);
+}
 const bundledSpecies = ["dragon", "qilin", "fox", "peacock", "sphinx"];
 const stages = [1, 2, 3, 4];
 const variants = ["full", "icon"];
@@ -68,4 +91,4 @@ for (const stage of stages) {
     .toFile(path.join(outputDir, iconName));
 }
 
-console.log(`Materialized ${bundledExpected.size + 8} spirit visual-v2 WebP assets: 40 bundled + 8 Chu Tuoc conversions.`);
+console.log(`Materialized ${bundledExpected.size + 8} spirit visual-v2 WebP assets from ${parts.length} packed parts: 40 bundled + 8 Chu Tuoc conversions.`);
