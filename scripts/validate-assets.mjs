@@ -14,7 +14,7 @@ for (const asset of ["/academy-world.webp", "/academy-mobile.webp", "/ecosystem-
   }
 }
 
-const petSpecies = ["dragon", "phoenix", "qilin", "fox", "peacock", "sphinx"];
+const petSpecies = ["dragon", "phoenix", "sphinx"];
 const petStages = [1, 2, 3, 4];
 const petVariants = ["full", "icon"];
 let petAssetBytes = 0;
@@ -44,6 +44,10 @@ for (const species of petSpecies) {
 }
 
 const companion = fs.readFileSync("components/SpiritCompanion.tsx", "utf8");
+if (!companion.includes('VISUAL_V2_ACTIVE_SPECIES = new Set<PetKind>(["dragon", "phoenix", "sphinx"])')) {
+  throw new Error("Visual-v2 runtime allowlist must remain limited to Thanh Long, Chu Tuoc and Kim Su");
+}
+
 for (const required of ["previewStage", "BASELINE_VISUAL_STAGE", "resolveSpiritPetVisual", "data-visual-version"]) {
   if (!companion.includes(required)) throw new Error(`Spirit companion visual contract missing: ${required}`);
 }
@@ -51,4 +55,4 @@ for (const forbidden of ["actual_level", "actualLevel", "setActualLevel", "setPe
   if (companion.includes(forbidden)) throw new Error(`Visual-only phase must not touch progression/backend: ${forbidden}`);
 }
 
-console.log(`Illustrated map validated (${Math.round(image.length / 1024)} KB); spirit visual-v2 validated (48 WebP assets; Thanh Long/Chu Tuoc/Kim Su complete, ${Math.round(petAssetBytes / 1024)} KB total).`);
+console.log(`Illustrated map validated (${Math.round(image.length / 1024)} KB); spirit visual-v2 validated (24 WebP assets; Thanh Long/Chu Tuoc/Kim Su complete, ${Math.round(petAssetBytes / 1024)} KB total).`);
