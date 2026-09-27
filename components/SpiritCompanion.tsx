@@ -13,6 +13,7 @@ import {
   type SpiritEvolutionStage,
 } from "@/data/spirit-pet-visuals";
 import styles from "./SpiritCompanion.module.css";
+import { useMemberAuth } from "./MemberAuthBridge";
 
 type PetKind = "dragon" | "phoenix" | "sphinx" | "qilin" | "peacock" | "fox";
 type PetSpecies = {
@@ -25,6 +26,14 @@ type PetSpecies = {
 };
 
 const PET_STORAGE_KEY = "hiutmc-spirit-pet-v1";
+const DATABASE_SPECIES_TO_KIND: Record<string, PetKind> = {
+  thanh_long: "dragon",
+  chu_tuoc: "phoenix",
+  kim_su: "sphinx",
+  ky_lan: "qilin",
+  khong_tuoc: "peacock",
+  ho_ly: "fox",
+};
 const PROGRESS_STORAGE_KEY = "hiutmc-learning-progress-v1";
 const PROGRESS_EVENT = "hiutmc:learning-progress-changed";
 const BASELINE_VISUAL_STAGE: SpiritEvolutionStage = 1;
@@ -161,6 +170,7 @@ function PetArtwork({
 }
 
 export default function SpiritCompanion() {
+  const { member, ready: authReady, spiritPetSpecies, spiritPetReady } = useMemberAuth();
   const [pet, setPet] = useState<PetSpecies | null>(null);
   const [open, setOpen] = useState(false);
   const [isNew, setIsNew] = useState(false);
@@ -170,8 +180,20 @@ export default function SpiritCompanion() {
   const [previewStage, setPreviewStage] = useState<SpiritEvolutionStage | null>(null);
 
   useEffect(() => {
+    if (!authReady || (member && !spiritPetReady)) return;
     setDayKey(localDayKey(new Date()));
     setProgress(readLocalProgress());
+
+    if (member && spiritPetSpecies) {
+      const kind = DATABASE_SPECIES_TO_KIND[spiritPetSpecies];
+      const found = species.find((item) => item.kind === kind);
+      if (found) {
+        try { window.localStorage.setItem(PET_STORAGE_KEY, found.kind); } catch {}
+        setPet(found);
+        setIsNew(false);
+        return;
+      }
+    }
 
     try {
       const saved = window.localStorage.getItem(PET_STORAGE_KEY);
@@ -189,7 +211,7 @@ export default function SpiritCompanion() {
     } catch {
       setPet(species[3]);
     }
-  }, []);
+  }, [authReady, member?.id, spiritPetReady, spiritPetSpecies]);
 
   useEffect(() => {
     const sync = () => setProgress(readLocalProgress());

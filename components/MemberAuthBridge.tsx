@@ -76,6 +76,8 @@ type StoredSession = {
 
 type AuthContextValue = {
   member: Member | null;
+  spiritPetSpecies: string | null;
+  spiritPetReady: boolean;
   staffAccess: StaffAccess | null;
   learningProgress: LearningProgress | null;
   personalLearningSnapshot: PersonalLearningSnapshot | null;
@@ -95,6 +97,59 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+const SPIRIT_PET_STORAGE_KEY = "hiutmc-spirit-pet-v1";
+const SPIRIT_PET_CLIENT_TO_DB: Record<string, string> = {
+  dragon: "thanh_long",
+  phoenix: "chu_tuoc",
+  sphinx: "kim_su",
+  qilin: "ky_lan",
+  peacock: "khong_tuoc",
+  fox: "ho_ly",
+};
+const SPIRIT_PET_DB_TO_CLIENT: Record<string, string> = Object.fromEntries(
+  Object.entries(SPIRIT_PET_CLIENT_TO_DB).map(([client, database]) => [database, client]),
+);
+
+function requestedSpiritPetSpecies() {
+  try {
+    const saved = window.localStorage.getItem(SPIRIT_PET_STORAGE_KEY) || "";
+    if (SPIRIT_PET_CLIENT_TO_DB[saved]) return SPIRIT_PET_CLIENT_TO_DB[saved];
+  } catch {}
+  const choices = Object.values(SPIRIT_PET_CLIENT_TO_DB);
+  return choices[Math.floor(Math.random() * choices.length)];
+}
+
+function rememberSpiritPetSpecies(species: string) {
+  const clientSpecies = SPIRIT_PET_DB_TO_CLIENT[species];
+  if (!clientSpecies) throw new Error("Máy chủ trả về species Linh Thú không hợp lệ.");
+  try { window.localStorage.setItem(SPIRIT_PET_STORAGE_KEY, clientSpecies); } catch {}
+  return species;
+}
+
+async function loadSpiritPetProfile(session: StoredSession): Promise<string> {
+  const requested = requestedSpiritPetSpecies();
+  try {
+    const response = await fetch(SUPABASE_URL + "/rest/v1/rpc/spirit_pet_profile_initialize", {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: "Bearer " + session.accessToken,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ p_requested_species: requested }),
+      cache: "no-store",
+    });
+    if (!response.ok) throw new Error("spirit_profile_unavailable");
+    const body = await response.json() as { species?: unknown };
+    const species = String(body?.species || "");
+    return rememberSpiritPetSpecies(species);
+  } catch {
+    const fallback = session.member.role.toLowerCase() === "admin" ? "thanh_long" : requested;
+    return rememberSpiritPetSpecies(fallback);
+  }
+}
+
 
 function base64UrlJson(value: string): Record<string, unknown> {
   try {
@@ -372,6 +427,8 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
   const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
   const [notificationsStatus, setNotificationsStatus] = useState<"loading" | "ready" | "error">("loading");
   const [ready, setReady] = useState(false);
+  const [spiritPetSpecies, setSpiritPetSpecies] = useState<string | null>(null);
+  const [spiritPetReady, setSpiritPetReady] = useState(false);
 
   useEffect(() => {
     let live = true;
@@ -414,6 +471,35 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     })();
     return () => { live = false; };
   }, []);
+
+  useEffect(() => {
+    let live = true;
+    if (!session) {
+      setSpiritPetSpecies(null);
+      setSpiritPetReady(true);
+      return () => { live = false; };
+    }
+    setSpiritPetReady(false);
+    void loadSpiritPetProfile(session).then((species) => {
+      if (!live) return;
+      setSpiritPetSpecies(species);
+      setSpiritPetReady(true);
+    }).catch(() => {
+      if (!live) return;
+      const fallback = session.member.role.toLowerCase() === "admin"
+        ? "thanh_long"
+        : requestedSpiritPetSpecies();
+      try {
+        const saved = window.localStorage.getItem(SPIRIT_PET_STORAGE_KEY) || "";
+        const species = SPIRIT_PET_CLIENT_TO_DB[saved] || fallback;
+        setSpiritPetSpecies(species);
+      } catch {
+        setSpiritPetSpecies(fallback);
+      }
+      setSpiritPetReady(true);
+    });
+    return () => { live = false; };
+  }, [session?.member.id, session?.accessToken]);
 
   useEffect(() => {
     let live = true;
@@ -572,6 +658,8 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AuthContextValue>(() => ({
     member: session?.member ?? null,
+    spiritPetSpecies,
+    spiritPetReady,
     staffAccess,
     learningProgress,
     personalLearningSnapshot,
