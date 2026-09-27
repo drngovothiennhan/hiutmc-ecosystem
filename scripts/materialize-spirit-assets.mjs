@@ -3,6 +3,7 @@ import path from "node:path";
 import sharp from "sharp";
 import { renderPhoenixStageSvg } from "../asset-sources/spirit-v2/phoenix-vectors.mjs";
 import { renderSphinxStageSvg } from "../asset-sources/spirit-v2/sphinx-vectors.mjs";
+import { renderPeacockStageSvg } from "../asset-sources/spirit-v2/peacock-vectors.mjs";
 
 const packedSourceDir = path.join(process.cwd(), "asset-sources", "spirit-v2-packed");
 const outputDir = path.join(process.cwd(), "public", "spirit-pets", "visual-v2");
@@ -47,7 +48,7 @@ while ((match = pairPattern.exec(packedText)) !== null) {
   recovered.set(match[1], match[2]);
 }
 
-const approvedSpecies = ["dragon", "phoenix", "sphinx"];
+const approvedSpecies = ["dragon", "phoenix", "sphinx", "peacock"];
 const requiredDragon = [];
 for (const stage of stages) {
   for (const variant of variants) requiredDragon.push(`dragon-stage-${stage}-${variant}.webp`);
@@ -85,6 +86,7 @@ async function writeVectorSpecies(species, renderSvg) {
 
 await writeVectorSpecies("phoenix", renderPhoenixStageSvg);
 await writeVectorSpecies("sphinx", renderSphinxStageSvg);
+await writeVectorSpecies("peacock", renderPeacockStageSvg);
 
 const expectedCount = approvedSpecies.length * stages.length * variants.length;
 const generated = fs.readdirSync(outputDir).filter((name) => name.endsWith(".webp"));
@@ -92,4 +94,4 @@ if (generated.length !== expectedCount) {
   throw new Error(`Expected ${expectedCount} approved visual-v2 assets, got ${generated.length}`);
 }
 
-console.log(`Materialized ${expectedCount} approved spirit visual-v2 WebP assets for Thanh Long, Chu Tuoc and Kim Su.`);
+console.log(`Materialized ${expectedCount} approved spirit visual-v2 WebP assets for Thanh Long, Chu Tuoc, Kim Su and Khong Tuoc.`);
