@@ -62,6 +62,20 @@ async function getWithRetry(url, attempts = 12) {
   throw last || new Error(`Unable to fetch ${url}`);
 }
 
+const petVisualAssets = ["dragon", "phoenix", "sphinx", "peacock", "qilin", "fox"]
+  .flatMap((species) => [1, 2, 3, 4].flatMap((stage) => ["full", "icon"]
+    .map((variant) => `/spirit-pets/visual-v2/${species}-stage-${stage}-${variant}.webp`)));
+const petVisualResults = await Promise.all(petVisualAssets.map(async (path) => {
+  const url = new URL(path, base).toString();
+  const response = await fetchHeaders(url);
+  const contentType = response.headers.get("content-type") || "";
+  if (!response.ok || !contentType.includes("image/webp")) {
+    throw new Error(`Spirit pet visual asset failed production smoke: ${path} (HTTP ${response.status}, ${contentType})`);
+  }
+  return path;
+}));
+console.log(`PASS ${petVisualResults.length} production spirit visual-v2 WebP assets (all six species / four stages)`);
+
 let liveHtmlFromRoute = "";
 for (const [route, marker] of routes) {
   const url = new URL(route, base).toString();

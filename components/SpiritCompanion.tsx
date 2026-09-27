@@ -75,9 +75,9 @@ const species: PetSpecies[] = [
   { kind: "dragon", name: "Thanh Long", title: "Rồng · Nghị lực", primary: "#2f8e8a", secondary: "#d5b260", motion: "float" },
   { kind: "phoenix", name: "Chu Tước", title: "Phụng Hoàng · Tái sinh", primary: "#c64b3d", secondary: "#f0b44d", motion: "flare" },
   { kind: "sphinx", name: "Kim Sư", title: "Kim Sư · Kiên định", primary: "#b97b35", secondary: "#e3c57a", motion: "breathe" },
-  { kind: "qilin", name: "Kỳ Lân", title: "Kỳ Lân · Cát tường", primary: "#d06d5f", secondary: "#f1d9a7", motion: "hop" },
+  { kind: "qilin", name: "Kỳ Lân", title: "Kỳ Lân · Cát tường", primary: "#568c80", secondary: "#e9dfbd", motion: "hop" },
   { kind: "peacock", name: "Khổng Tước", title: "Khổng Tước · Thanh cao", primary: "#237a77", secondary: "#73bfc5", motion: "sway" },
-  { kind: "fox", name: "Hồ Ly", title: "Hồ Ly · Linh hoạt", primary: "#d97c64", secondary: "#f7ded0", motion: "bounce" },
+  { kind: "fox", name: "Hồ Ly", title: "Hồ Ly · Linh hoạt", primary: "#b85d34", secondary: "#f1d7ab", motion: "bounce" },
 ];
 
 function readLocalProgress(): LearningProgress {
@@ -90,46 +90,29 @@ function readLocalProgress(): LearningProgress {
   }
 }
 
-function GenericPetArt({ pet }: { pet: PetSpecies }) {
-  return (
-    <svg viewBox="0 0 96 96" role="img" aria-label={pet.name} className={styles.petSvg}>
-      <defs>
-        <linearGradient id={"pet-" + pet.kind} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor={pet.secondary} />
-          <stop offset="1" stopColor={pet.primary} />
-        </linearGradient>
-      </defs>
-      <ellipse cx="48" cy="63" rx="24" ry="19" fill={"url(#pet-" + pet.kind + ")"} />
-      <circle cx="48" cy="38" r="20" fill={"url(#pet-" + pet.kind + ")"} />
-      {pet.kind === "fox" && (
-        <>
-          <path d="M32 25 25 8 43 21Z" fill={pet.primary} />
-          <path d="m64 25 7-17-18 13Z" fill={pet.primary} />
-          <path d="M69 63c22-6 21 19 5 20-7 0-11-4-13-7 13 2 16-7 8-13Z" fill={pet.secondary} />
-        </>
-      )}
-      {pet.kind === "dragon" && (
-        <>
-          <path d="m34 23-5-14 12 10M62 23l5-14-12 10" fill="none" stroke={pet.secondary} strokeWidth="5" strokeLinecap="round" />
-          <path d="M70 60c18-6 22 10 12 18-5 4-12 3-16 0" fill="none" stroke={pet.primary} strokeWidth="7" strokeLinecap="round" />
-        </>
-      )}
-      {pet.kind === "sphinx" && <path d="M27 34c2-18 40-18 42 0l-5 11H32Z" fill={pet.secondary} opacity=".72" />}
-      {pet.kind === "qilin" && (
-        <>
-          <path d="M48 20 54 5l5 18" fill={pet.secondary} />
-          <path d="M33 26 28 15l12 7M63 26l5-11-12 7" fill={pet.primary} />
-        </>
-      )}
-      
-      <circle cx="41" cy="38" r="2.6" fill="#1b2735" />
-      <circle cx="55" cy="38" r="2.6" fill="#1b2735" />
-      <path d="M44 47c2.5 2.5 5.5 2.5 8 0" fill="none" stroke="#7d3443" strokeWidth="2.4" strokeLinecap="round" />
-    </svg>
-  );
-}
+const VISUAL_V2_ACTIVE_SPECIES = new Set<PetKind>(["dragon", "phoenix", "sphinx", "qilin", "peacock", "fox"]);
 
-const VISUAL_V2_ACTIVE_SPECIES = new Set<PetKind>(["dragon", "phoenix", "sphinx", "peacock"]);
+const qilinPreviewStages: Array<{
+  stage: SpiritEvolutionStage;
+  short: string;
+  description: string;
+}> = [
+  { stage: 1, short: "Mầm linh", description: "Kỳ Lân non nhỏ, sừng mới nhú, bờm ngắn trên dáng bốn chân thanh mảnh." },
+  { stage: 2, short: "Thành hình", description: "Sừng và bờm rõ hơn; thân Kỳ Lân bắt đầu hiện các vệt vảy ngọc." },
+  { stage: 3, short: "Linh thể", description: "Dáng chạy linh hoạt với bờm dài, đuôi bay và vảy xếp lớp." },
+  { stage: 4, short: "Viên mãn", description: "Kỳ Lân trưởng thành với sừng hoàn chỉnh, bờm lượn và hoa văn ngọc kim tinh xảo." },
+];
+
+const foxPreviewStages: Array<{
+  stage: SpiritEvolutionStage;
+  short: string;
+  description: string;
+}> = [
+  { stage: 1, short: "Mầm linh", description: "Hồ Ly con với tai vểnh, mõm cáo và một chiếc đuôi bông nhỏ." },
+  { stage: 2, short: "Thành hình", description: "Hồ Ly trẻ linh hoạt, hai chiếc đuôi riêng biệt bắt đầu xòe sau thân." },
+  { stage: 3, short: "Linh thể", description: "Cáo trưởng thành đang bật nhảy, nhiều đuôi dài mở thành quạt." },
+  { stage: 4, short: "Viên mãn", description: "Hồ Ly chín đuôi múa giữa không trung với bộ lông và đuôi hoàn chỉnh." },
+];
 
 function PetArtwork({
   pet,
@@ -140,7 +123,7 @@ function PetArtwork({
   stage?: SpiritEvolutionStage;
   compact?: boolean;
 }) {
-  if (!VISUAL_V2_ACTIVE_SPECIES.has(pet.kind)) return <GenericPetArt pet={pet} />;
+
 
   const visual = resolveSpiritPetVisual(pet.kind, stage);
   if (!visual) return null;
@@ -248,7 +231,11 @@ export default function SpiritCompanion() {
     ? phoenixPreviewStages[renderedStage - 1]
     : pet.kind === "peacock"
       ? peacockPreviewStages[renderedStage - 1]
-      : genericPreviewStages[renderedStage - 1];
+      : pet.kind === "qilin"
+        ? qilinPreviewStages[renderedStage - 1]
+        : pet.kind === "fox"
+          ? foxPreviewStages[renderedStage - 1]
+          : genericPreviewStages[renderedStage - 1];
   const visualVersion = VISUAL_V2_ACTIVE_SPECIES.has(pet.kind) ? SPIRIT_VISUAL_VERSION : "legacy-frozen";
 
   return (
@@ -307,7 +294,11 @@ export default function SpiritCompanion() {
                     ? phoenixPreviewStages[item.stage - 1]
                     : pet.kind === "peacock"
                       ? peacockPreviewStages[item.stage - 1]
-                      : item;
+                      : pet.kind === "qilin"
+                        ? qilinPreviewStages[item.stage - 1]
+                        : pet.kind === "fox"
+                          ? foxPreviewStages[item.stage - 1]
+                          : item;
                   return (
                     <button
                       key={item.stage}
