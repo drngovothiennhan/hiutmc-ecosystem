@@ -108,6 +108,39 @@ for (const [route, marker] of sameOriginDeepRoutes) {
   console.log(`PASS deep same-origin route ${response.status} ${url} (attempt ${attempt})`);
 }
 
+const thietChanHealthUrl = new URL('/apps/thietchan/api/health', base).toString();
+const { response: thietChanHealthResponse, text: thietChanHealthText } = await getWithRetry(thietChanHealthUrl, 6);
+const thietChanHealth = JSON.parse(thietChanHealthText || '{}');
+if (!thietChanHealthResponse.ok || thietChanHealth.ok !== true || thietChanHealth.vision?.provider !== 'local') {
+  throw new Error(`A.I Thiệt Chẩn health through HIU TMC gateway is not ready: ${thietChanHealthResponse.status}`);
+}
+console.log('PASS A.I Thiệt Chẩn health through HIU TMC gateway');
+
+const { text: thietChanAppJs } = await getWithRetry(new URL('/apps/thietchan/app.js?hiutmc_smoke=1', base).toString(), 6);
+if (!thietChanAppJs.includes('ensureInlineVisualVerification')) throw new Error('HIU TMC gateway is serving stale A.I Thiệt Chẩn app.js');
+console.log('PASS A.I Thiệt Chẩn current analysis runtime through HIU TMC gateway');
+
+const { text: thietChanAdminHtml } = await getWithRetry(new URL('/apps/thietchan/admin-center.html', base).toString(), 6);
+if (!thietChanAdminHtml.includes('Admin Center · A.I THIỆT CHẨN') || !thietChanAdminHtml.includes('không phải Admin Center HIU TMC')) {
+  throw new Error('A.I Thiệt Chẩn Admin Center identity is incorrect through HIU TMC gateway');
+}
+console.log('PASS A.I Thiệt Chẩn Admin Center identity through HIU TMC gateway');
+
+const rootAdminFromThietChan = await fetchHeaders(new URL('/admin-center.html', base).toString(), {
+  redirect: 'manual',
+  headers: {
+    referer: new URL('/apps/thietchan/', base).toString(),
+    accept: 'text/html',
+    'sec-fetch-dest': 'document',
+    'user-agent': 'HIU-YHCT-release-smoke/1.0',
+  },
+});
+const rootAdminLocation = rootAdminFromThietChan.headers.get('location') || '';
+if (![301,302,303,307,308].includes(rootAdminFromThietChan.status) || !rootAdminLocation.includes('/apps/thietchan/admin-center.html')) {
+  throw new Error(`A.I Thiệt Chẩn document navigation escaped its app prefix: ${rootAdminFromThietChan.status} ${rootAdminLocation}`);
+}
+console.log('PASS A.I Thiệt Chẩn document navigation stays inside its gateway prefix');
+
 async function expectStaffRedirect(route, required) {
   const url = new URL(route, base).toString();
   const response = await fetchHeaders(url, {
