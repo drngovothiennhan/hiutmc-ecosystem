@@ -1,6 +1,6 @@
 export const SPIRIT_VISUAL_VERSION = "spirit-visual-v2-20260927" as const;
 
-export type SpiritVisualSpecies = "dragon" | "sphinx" | "qilin" | "peacock" | "fox";
+export type SpiritVisualSpecies = "dragon" | "phoenix" | "sphinx" | "qilin" | "peacock" | "fox";
 export type SpiritEvolutionStage = 1 | 2 | 3 | 4;
 export type SpiritVisualVariant = "full" | "icon";
 
@@ -35,6 +35,12 @@ export const SPIRIT_VISUAL_ASSETS: Record<
     2: asset("dragon", 2, "Thanh Long · hình thái preview 2"),
     3: asset("dragon", 3, "Thanh Long · hình thái preview 3"),
     4: asset("dragon", 4, "Thanh Long · hình thái preview 4"),
+  },
+  phoenix: {
+    1: asset("phoenix", 1, "Chu Tước · Ấu Điểu"),
+    2: asset("phoenix", 2, "Chu Tước · Hỏa Vũ"),
+    3: asset("phoenix", 3, "Chu Tước · Phượng Linh"),
+    4: asset("phoenix", 4, "Chu Tước · Thánh Điểu"),
   },
   qilin: {
     1: asset("qilin", 1, "Kỳ Lân · hình thái preview 1"),
