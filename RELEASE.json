@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260927-03",
+  "release": "HIU-YHCT-ECOSYSTEM-20260927-04",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP36",
-  "base_checkpoint_sha": "982426e0452e7cb537dbfd801b3a0e5bcbe862bb",
+  "checkpoint": "CP37",
+  "base_checkpoint_sha": "504dcca453fd95238c16ef2330f042f47a2cbab1",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP36 adds member-specific learning recommendations on the home page from the authenticated Study OS learning snapshot and adaptive review schedule, with truthful empty states and no fabricated lesson or Y Quan performance data. Full validation, Worker dry-run, Cloudflare deployment, anonymous-denial checks, public registry smoke and production smoke are mandatory."
+  "verification": "CP37 hotfixes the A.I Thiệt Chẩn same-origin gateway: current runtime assets are cache-busted, nested A.I Thiệt Chẩn PWA workers are isolated from the HIU TMC shell, connected-app document navigation remains under /apps/thietchan/, and production smoke verifies gateway health, current analysis runtime, and the dedicated A.I Thiệt Chẩn Admin Center."
 }

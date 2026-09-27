@@ -11,4 +11,8 @@ for (const file of ['sw.js', 'offline.html', 'icons/apple-touch-icon.png']) if (
 if (!fs.existsSync('public/hiu-club-logo.webp')) throw Error('Missing HIU CLB logo used to prepare the branded PWA icons');
 const headers = fs.readFileSync('public/_headers','utf8');
 if (!headers.includes('/sw.js\n  Cache-Control: no-cache') || !headers.includes('/manifest.webmanifest\n  Cache-Control: no-cache')) throw Error('Missing PWA update headers');
-console.log('PWA manifest, icon dimensions, offline fallback and update headers passed.');
+const gatewayWorker = fs.readFileSync('worker.mjs','utf8');
+if (!gatewayWorker.includes('window.__HIUTMC_DISABLE_NESTED_PWA=true')) throw Error('A.I Thiệt Chẩn gateway must disable nested PWA registration');
+if (!gatewayWorker.includes('hiutmc_gateway=20260927r1')) throw Error('A.I Thiệt Chẩn gateway must cache-bust proxied runtime assets');
+if (!gatewayWorker.includes('redirected.pathname = config.prefix +')) throw Error('Proxied document navigation must stay inside the connected app prefix');
+console.log('PWA manifest, icon dimensions, offline fallback, update headers and A.I Thiệt Chẩn nested-PWA isolation passed.');
