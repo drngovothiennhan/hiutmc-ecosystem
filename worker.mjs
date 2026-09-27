@@ -12,6 +12,7 @@ const APP_PROXY_CONFIG = Object.freeze({
     prefix: "/apps/thietchan",
     upstreamOrigin: "https://ai-thiet-chan-hiu-yhct.vercel.app",
     upstreamBase: "",
+    gatewayVersion: "2026-09-27-thietchan-runtime-r1",
   },
   trungyvan: {
     prefix: "/apps/trungyvan",
@@ -323,7 +324,7 @@ function rewriteProxyLocation(location, config) {
 
 function proxyBridgeScript(prefix) {
   const encoded = JSON.stringify(prefix);
-  return `<script>(()=>{const P=${encoded};const m=v=>typeof v==="string"&&v.startsWith("/")&&!v.startsWith("//")&&!v.startsWith(P+"/")?P+v:v;const f=window.fetch.bind(window);window.fetch=(input,init)=>{if(typeof input==="string")return f(m(input),init);if(input instanceof Request){try{const u=new URL(input.url);if(u.origin===location.origin&&!u.pathname.startsWith(P+"/")&&u.pathname!==P){const next=P+u.pathname+u.search+u.hash;input=new Request(next,input)}}catch{}}return f(input,init)};const xo=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(method,url,...rest){return xo.call(this,method,m(String(url)),...rest)};for(const k of ["pushState","replaceState"]){const o=history[k].bind(history);history[k]=function(state,title,url){return o(state,title,typeof url==="string"?m(url):url)}}document.addEventListener("click",e=>{if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;const a=e.target instanceof Element?e.target.closest("a[href]"):null;if(!a)return;const raw=a.getAttribute("href")||"";if(raw.startsWith("/")&&!raw.startsWith("//")&&!raw.startsWith(P+"/")){e.preventDefault();location.assign(P+raw)}},true);try{const sw=navigator.serviceWorker;if(sw&&sw.register){const r=sw.register.bind(sw);sw.register=(url,opt={})=>r(m(String(url)),{...opt,scope:opt.scope?m(String(opt.scope)):P+"/"})}}catch{}})();</script>`;
+  return `<script>(()=>{const P=${encoded};const T=P==="/apps/thietchan";window.__HIUTMC_APP_PREFIX=P;if(T)window.__HIUTMC_DISABLE_NESTED_PWA=true;const m=v=>typeof v==="string"&&v.startsWith("/")&&!v.startsWith("//")&&!v.startsWith(P+"/")?P+v:v;const f=window.fetch.bind(window);window.fetch=(input,init)=>{if(typeof input==="string")return f(m(input),init);if(input instanceof Request){try{const u=new URL(input.url);if(u.origin===location.origin&&!u.pathname.startsWith(P+"/")&&u.pathname!==P){const next=P+u.pathname+u.search+u.hash;input=new Request(next,input)}}catch{}}return f(input,init)};const xo=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(method,url,...rest){return xo.call(this,method,m(String(url)),...rest)};for(const k of ["pushState","replaceState"]){const o=history[k].bind(history);history[k]=function(state,title,url){return o(state,title,typeof url==="string"?m(url):url)}}document.addEventListener("click",e=>{if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;const a=e.target instanceof Element?e.target.closest("a[href]"):null;if(!a)return;const raw=a.getAttribute("href")||"";if(raw.startsWith("/")&&!raw.startsWith("//")&&!raw.startsWith(P+"/")){e.preventDefault();location.assign(P+raw)}},true);try{const sw=navigator.serviceWorker;if(sw){if(T){sw.getRegistrations?.().then(rs=>rs.filter(r=>String(r.scope||"").includes(location.origin+P+"/")).forEach(r=>r.unregister())).catch(()=>{})}else if(sw.register){const r=sw.register.bind(sw);sw.register=(url,opt={})=>r(m(String(url)),{...opt,scope:opt.scope?m(String(opt.scope)):P+"/"})}}}catch{}})();</script>`;
 }
 
 class ProxyUrlRewriter {
@@ -332,7 +333,11 @@ class ProxyUrlRewriter {
     for (const name of ["href", "src", "action", "poster"]) {
       const value = element.getAttribute(name);
       if (value && value.startsWith("/") && !value.startsWith("//") && !value.startsWith(this.prefix + "/")) {
-        element.setAttribute(name, this.prefix + value);
+        let next = this.prefix + value;
+        if (this.prefix === "/apps/thietchan" && /\.(?:js|css)(?:\?|$)/i.test(next)) {
+          next += (next.includes("?") ? "&" : "?") + "hiutmc_gateway=20260927r1";
+        }
+        element.setAttribute(name, next);
       }
     }
     const srcset = element.getAttribute("srcset");
@@ -570,8 +575,14 @@ export default {
 
     const referredProxy = proxyConfigFromReferer(request);
     if (referredProxy && !reservedMainPath(pathname)) {
+      const config = referredProxy[1];
       const isDocument = request.headers.get("sec-fetch-dest") === "document" || request.headers.get("accept")?.includes("text/html");
-      if (!isDocument) return proxyEcosystemApp(request, url, referredProxy[1], url.pathname);
+      if (isDocument) {
+        const redirected = new URL(request.url);
+        redirected.pathname = config.prefix + (url.pathname.startsWith("/") ? url.pathname : "/" + url.pathname);
+        return Response.redirect(redirected.toString(), 302);
+      }
+      return proxyEcosystemApp(request, url, config, url.pathname);
     }
 
     if (pathname === "/admin") {
