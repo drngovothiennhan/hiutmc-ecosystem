@@ -78,6 +78,7 @@ function HomeContent() {
     ? ({ background: `conic-gradient(#219d6e 0 ${latestScore}%,#e6dfd2 ${latestScore}%)` } as CSSProperties)
     : undefined;
   const learningPlan = createLearningPlan(personalLearningSnapshot);
+  const showNotificationInbox = Boolean(member && (notificationsStatus !== "ready" || unreadNotificationCount > 0));
 
   return (
     <main className={styles.shell}>
@@ -106,10 +107,9 @@ function HomeContent() {
           <div className={styles.crumb}><b>Trang chủ</b><span>›</span><span>Tổng quan</span></div>
           <a className={styles.search} href="/search/" aria-label="Tìm kiếm toàn hệ sinh thái">⌕ <span>Tìm kiếm bài học, vị thuốc, huyệt, hội chứng, tài liệu...</span></a>
           <div className={styles.topActions}>
-            <a className={styles.bell} href="#notifications" aria-label={unreadNotificationCount ? `Thông báo, ${unreadNotificationCount} chưa đọc` : "Thông báo"}>
-              ♢
-              {unreadNotificationCount > 0 && <span className={styles.bellBadge} aria-hidden="true">{unreadNotificationCount > 99 ? "99+" : unreadNotificationCount}</span>}
-            </a>
+            {showNotificationInbox && <a className={styles.bell} href="#notifications" aria-label={`Thông báo, ${unreadNotificationCount} chưa đọc`}>
+              ♢<span className={styles.bellBadge} aria-hidden="true">{unreadNotificationCount > 99 ? "99+" : unreadNotificationCount}</span>
+            </a>}
             <DisplayModeToggle />
             <MemberAccount studyOsUrl={studyOsUrl} />
           </div>
@@ -263,31 +263,27 @@ function HomeContent() {
               <DailyMissions apps={apps} />
             </section>
 
-            <section id="notifications" className={styles.noticeCard} aria-labelledby="notifications-title">
+            {showNotificationInbox && <section id="notifications" className={styles.noticeCard} aria-labelledby="notifications-title">
               <header className={styles.noticeHeader}>
                 <h3 id="notifications-title">Thông báo gần đây</h3>
-                {unreadNotificationCount > 0 && <button type="button" onClick={() => { setNotificationActionError(false); void markAllNotificationsRead().catch(() => setNotificationActionError(true)); }}>Đánh dấu tất cả đã đọc</button>}
+                {unreadNotificationCount > 0 && <button type="button" onClick={() => { setNotificationActionError(false); void markAllNotificationsRead().catch(() => setNotificationActionError(true)); }}>Đánh dấu đã đọc tất cả</button>}
               </header>
-              {!member ? (
-                <p className={styles.notificationState}>Đăng nhập thành viên để xem thông báo đã đồng bộ theo tài khoản.</p>
-              ) : notificationsStatus === "loading" ? (
+              {notificationsStatus === "loading" ? (
                 <p className={styles.notificationState} role="status">Đang tải thông báo đã đồng bộ…</p>
               ) : notificationsStatus === "error" ? (
                 <p className={styles.notificationState} role="alert">Chưa tải được thông báo từ máy chủ. Hãy thử tải lại trang.</p>
-              ) : notifications.length === 0 ? (
-                <p className={styles.notificationState}>Chưa có thông báo nào được đồng bộ cho tài khoản này.</p>
               ) : (
                 <ul>
-                  {notifications.map((notification) => (
-                    <li key={notification.id} className={notification.read_at ? styles.notificationRead : styles.notificationUnread}>
-                      <i aria-hidden="true">{notification.read_at ? "✓" : "•"}</i>
+                  {notifications.filter((notification) => !notification.read_at).slice(0, 3).map((notification) => (
+                    <li key={notification.id} className={styles.notificationUnread}>
+                      <i aria-hidden="true">•</i>
                       <span><strong>{notification.title}</strong><span>{notification.body}</span><small>{formatNotificationTime(notification.created_at)}</small></span>
                     </li>
                   ))}
                 </ul>
               )}
               {notificationActionError && <p className={styles.notificationError} role="alert">Chưa đánh dấu được thông báo. Hãy thử lại.</p>}
-            </section>
+            </section>}
           </aside>
         </div>
 
