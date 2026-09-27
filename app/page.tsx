@@ -147,46 +147,41 @@ function HomeContent() {
         <div className={styles.grid}>
           <section className={styles.mainColumn}>
             <section className={styles.personalizedPanel} aria-labelledby="personalized-learning-title">
-              <header className={styles.personalizedHeader}>
-                <span><small>CÁ NHÂN HÓA HỌC TẬP</small><h2 id="personalized-learning-title">Hôm nay nên ôn gì</h2></span>
-                <span className={styles.personalizedBadge}>Theo tiến độ đã đồng bộ</span>
-              </header>
-              {!member ? (
-                <p className={styles.personalizedEmpty}>Đăng nhập thành viên để xem gợi ý dựa trên tiến độ học tập của bạn.</p>
-              ) : personalLearningSnapshotStatus === "loading" ? (
-                <p className={styles.personalizedEmpty} role="status">Đang đọc tiến độ học tập đã đồng bộ…</p>
-              ) : personalLearningSnapshotStatus === "error" ? (
-                <p className={styles.personalizedEmpty} role="alert">Chưa đọc được tiến độ học tập từ máy chủ. Hãy thử tải lại trang hoặc mở Study OS.</p>
-              ) : (
-                <>
-                  <article className={styles.personalizedPlan}>
-                    <small>BÀI HỌC TIẾP THEO</small>
-                    <strong>{learningPlan.nextTitle}</strong>
-                    <p>{learningPlan.nextDetail}</p>
-                    <StudyOsLink className={styles.personalizedLink} href={studyOsUrl}>
-                      Mở Study OS <span aria-hidden="true">→</span>
-                    </StudyOsLink>
-                  </article>
-                  {personalLearningSnapshotStatus === "ready" && learningPlan.summaryState === "ready" ? (
-                    <div className={styles.personalizedSummary} aria-live="polite">
-                      {learningPlan.summary.map((sentence) => <p key={sentence}>{sentence}</p>)}
-                    </div>
+              <div className={styles.personalizedLayout}>
+                <div className={styles.personalizedThumb} role="img" aria-label="Minh họa phong cảnh cổng làng và kiến trúc cổ" />
+                <div className={styles.personalizedContent}>
+                  <header className={styles.personalizedHeader}>
+                    <span><small>CÁ NHÂN HÓA HỌC TẬP</small><h2 id="personalized-learning-title">Hôm nay nên ôn gì</h2></span>
+                    <span className={styles.personalizedBadge}>Theo tiến độ đã đồng bộ</span>
+                  </header>
+                  {!member ? (
+                    <p className={styles.personalizedEmpty}>Đăng nhập thành viên để xem gợi ý dựa trên tiến độ học tập của bạn.</p>
+                  ) : personalLearningSnapshotStatus === "loading" ? (
+                    <p className={styles.personalizedEmpty} role="status">Đang đọc tiến độ học tập đã đồng bộ…</p>
+                  ) : personalLearningSnapshotStatus === "error" ? (
+                    <p className={styles.personalizedEmpty} role="alert">Chưa đọc được tiến độ học tập từ máy chủ. Hãy thử tải lại trang hoặc mở Study OS.</p>
                   ) : (
-                    <p className={styles.personalizedEmpty}>{personalLearningSnapshotStatus === "empty" ? "Tài khoản chưa có snapshot tiến độ được đồng bộ. Chưa thể tạo tóm tắt học tập cá nhân hôm nay." : "Chưa đủ lịch sử ôn theo chủ đề để tạo tóm tắt hôm nay. Khi Study OS đồng bộ thẻ ôn có chủ đề, gợi ý sẽ xuất hiện tại đây."}</p>
+                    <>
+                      <article className={styles.personalizedPlan}>
+                        <small>BÀI HỌC TIẾP THEO</small>
+                        <strong>{learningPlan.nextTitle}</strong>
+                        <p>{learningPlan.nextDetail}</p>
+                      </article>
+                      {personalLearningSnapshotStatus === "ready" && learningPlan.summaryState === "ready" ? (
+                        <div className={styles.personalizedSummary} aria-live="polite">
+                          {learningPlan.summary.map((sentence) => <p key={sentence}>{sentence}</p>)}
+                        </div>
+                      ) : (
+                        <p className={styles.personalizedEmpty}>{personalLearningSnapshotStatus === "empty" ? "Tài khoản chưa có snapshot tiến độ được đồng bộ. Chưa thể tạo tóm tắt học tập cá nhân hôm nay." : "Chưa đủ lịch sử ôn theo chủ đề để tạo tóm tắt hôm nay. Khi Study OS đồng bộ thẻ ôn có chủ đề, gợi ý sẽ xuất hiện tại đây."}</p>
+                      )}
+                    </>
                   )}
-                </>
-              )}
-            </section>
-
-            <article className={styles.continueCard}>
-              <div className={styles.lessonThumb} aria-hidden="true" />
-              <div className={styles.continueCopy}>
-                <small>TIẾP TỤC HỌC TẬP</small>
-                <h2>Tiếp tục bài học gần nhất</h2>
-                <p>Mở Study OS để xem bài đang học và tiến độ thật của bạn.</p>
+                  <StudyOsLink className={styles.personalizedLink} href={studyOsUrl}>
+                    Mở Study OS <span aria-hidden="true">→</span>
+                  </StudyOsLink>
+                </div>
               </div>
-              <a className={styles.continueButton} href={studyOsUrl} aria-label="Tiếp tục trong Study OS" onClick={(event) => { event.preventDefault(); void openStudyOs(studyOsUrl); }}>Tiếp tục <span aria-hidden="true">→</span></a>
-            </article>
+            </section>
 
             <section id="ecosystem" className={styles.panel}>
               <header className={styles.panelHead}>

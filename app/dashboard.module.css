@@ -402,3 +402,21 @@
 .personalizedSummary{display:grid;gap:4px;margin-top:10px}
 .personalizedEmpty{padding:12px 14px;border:1px dashed #d7d1bf;border-radius:12px;background:#fffdf8}
 @media(max-width:760px){.personalizedPanel{padding:14px;border-radius:14px}.personalizedHeader h2{font-size:18px}.personalizedBadge{font-size:8px}.personalizedPlan p,.personalizedSummary p,.personalizedEmpty{font-size:11px}}
+
+/* One combined personalized learning and continue-learning card. */
+.personalizedLayout{display:grid;grid-template-columns:minmax(130px,20%) minmax(0,1fr);align-items:stretch;gap:18px}
+.personalizedThumb{min-height:230px;border-radius:14px;background:linear-gradient(145deg,#4b251e22,#b5653a12),url("/academy-mobile.webp") center/cover no-repeat}
+.personalizedContent{display:grid;align-content:start;gap:10px;min-width:0}
+.personalizedContent .personalizedHeader{margin-bottom:2px}
+.personalizedContent .personalizedPlan{margin:0}
+.personalizedContent .personalizedEmpty{margin:0}
+.personalizedContent .personalizedSummary{margin:0}
+.personalizedContent .personalizedLink{margin-top:0}
+@media(max-width:760px){
+  .personalizedLayout{grid-template-columns:minmax(0,1fr);gap:12px}
+  .personalizedThumb{min-height:0;height:112px;border-radius:11px;background-position:center 44%}
+  .personalizedContent{gap:9px}
+  .personalizedContent .personalizedHeader{align-items:flex-start}
+  .personalizedContent .personalizedBadge{flex:0 0 auto}
+  .personalizedContent .personalizedLink{justify-self:start}
+}
