@@ -730,6 +730,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       if (target.origin !== window.location.origin || !/^\/apps\/game-hub(?:\/|$)/.test(target.pathname)) return;
       // Same-origin proxy reads the existing session. Do not wait on refresh,
       // staff authorization, or any other optional API before navigating.
+      await transitionBeforeAppNavigation(target.toString(), { sameOrigin: true });
       window.location.assign(target.toString());
     },
     refreshLearningProgress,

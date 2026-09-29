@@ -6,7 +6,7 @@ const APP_EXIT_DURATION_MS = 1_200;
 const APP_EXIT_EVENT = "animationend";
 let pendingAppTransition: Promise<void> | null = null;
 
-export function transitionBeforeAppNavigation(destinationHref: string) {
+export function transitionBeforeAppNavigation(destinationHref: string, options: { sameOrigin?: boolean } = {}) {
   if (typeof window === "undefined" || typeof document === "undefined") return Promise.resolve();
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return Promise.resolve();
 
@@ -16,7 +16,9 @@ export function transitionBeforeAppNavigation(destinationHref: string) {
   } catch {
     return Promise.resolve();
   }
-  if (target.origin === window.location.origin) return Promise.resolve();
+  // Game Hub is reverse-proxied on this origin but is a separate app, so it
+  // opts in to the same exit effect as the cross-origin apps.
+  if (target.origin === window.location.origin && !options.sameOrigin) return Promise.resolve();
   if (pendingAppTransition) return pendingAppTransition;
 
   const root = document.documentElement;
