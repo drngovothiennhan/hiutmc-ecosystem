@@ -1,0 +1,5 @@
+hiu-serif-vi-regular.woff / hiu-serif-vi-bold.woff are subsets (24 Vietnamese
+characters: U+1EA4-1EA7, 1EAE-1EB1, 1EBE-1EC1, 1ED0-1ED3, 1EDA-1EDD, 1EE8-1EEB)
+of Liberation Serif Regular/Bold, (c) Red Hat, Inc., licensed under the SIL Open
+Font License 1.1 (https://openfontlicense.org). Subsetting is a permitted
+modification; the font is not sold by itself.
