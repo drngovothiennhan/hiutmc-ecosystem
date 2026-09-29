@@ -1,3 +1,4 @@
+import { SHELL_MODE_SCRIPT } from "./lib/shell-mode.mjs";
 const SUPABASE_URL = "https://gzmpnsrwqjpsbklyflqr.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG";
 const COOKIE_NAME = "hiutmc_staff_session";
@@ -356,7 +357,7 @@ class ProxyUrlRewriter {
 class ProxyHeadInjector {
   constructor(prefix) { this.prefix = prefix; }
   element(element) {
-    element.prepend(`<base href="${this.prefix}/">${proxyBridgeScript(this.prefix)}`, { html: true });
+    element.prepend(`<base href="${this.prefix}/">${proxyBridgeScript(this.prefix)}<script>${SHELL_MODE_SCRIPT}</script>`, { html: true });
   }
 }
 

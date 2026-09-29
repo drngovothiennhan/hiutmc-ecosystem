@@ -52,6 +52,21 @@ for (const marker of [
   if (!page.includes(marker)) errors.push(`approved homepage structure missing marker: ${marker}`);
 }
 
+const shell = fs.readFileSync("lib/shell-mode.mjs", "utf8");
+const layout = fs.readFileSync("app/layout.tsx", "utf8");
+const worker = fs.readFileSync("worker.mjs", "utf8");
+const assistant = fs.readFileSync("components/LearningAssistant.tsx", "utf8");
+const toggle = fs.readFileSync("components/DisplayModeToggle.tsx", "utf8");
+const { SHELL_MODE_SCRIPT, DISPLAY_MODE_STORAGE_KEY } = await import("../lib/shell-mode.mjs");
+try { new Function(SHELL_MODE_SCRIPT); } catch (error) { errors.push(`shell mode script is not valid JavaScript: ${error.message}`); }
+if (!toggle.includes(`"${DISPLAY_MODE_STORAGE_KEY}"`)) errors.push("DisplayModeToggle must use the storage key shared with the shell script");
+if (!shell.includes("@view-transition{navigation:auto}")) errors.push("shell script must opt every page into the shared view transition");
+if (!shell.includes('name="viewport"') && !shell.includes("meta[name=\"viewport\"]") && !shell.includes("meta[name=")) errors.push("shell script must control the viewport meta for PC mode");
+if (!layout.includes("SHELL_MODE_SCRIPT")) errors.push("root layout must inject the shell script on every portal page");
+if (!worker.includes("SHELL_MODE_SCRIPT")) errors.push("worker must inject the shell script into connected apps");
+if (!toggle.includes("__hiutmcApplyDisplayMode")) errors.push("DisplayModeToggle must delegate to the shell script");
+if (assistant.includes("currentUpstreamUrl")) errors.push("assistant links must use the same-origin launchUrl so PC mode and transitions survive navigation");
+
 if (errors.length) {
   console.error("Display mode isolation validation failed:");
   for (const error of errors) console.error(`- ${error}`);
