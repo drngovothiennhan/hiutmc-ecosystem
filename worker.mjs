@@ -12,6 +12,7 @@ const APP_PROXY_CONFIG = Object.freeze({
     prefix: "/apps/thietchan",
     upstreamOrigin: "https://ai-thiet-chan-hiu-yhct.vercel.app",
     upstreamBase: "",
+    gatewayVersion: "2026-09-27-thietchan-runtime-r1",
   },
   trungyvan: {
     prefix: "/apps/trungyvan",
@@ -22,6 +23,11 @@ const APP_PROXY_CONFIG = Object.freeze({
     prefix: "/apps/atlas",
     upstreamOrigin: "https://drngovothiennhan.github.io",
     upstreamBase: "/human-atlas",
+  },
+  gamehub: {
+    prefix: "/apps/game-hub",
+    upstreamOrigin: "https://hiutmc-game-hub.pages.dev",
+    upstreamBase: "",
   },
 });
 
@@ -144,6 +150,20 @@ async function supabaseRpc(token, name, body = {}) {
   return { response, payload };
 }
 
+async function supabasePublicRpc(name) {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_KEY,
+      "content-type": "application/json",
+      accept: "application/json",
+    },
+    body: "{}",
+  });
+  const payload = await response.json().catch(async () => ({ error: await response.text().catch(() => "") }));
+  return { response, payload };
+}
+
 function sameOriginMutation(request) {
   const origin = request.headers.get("origin");
   return !origin || origin === "https://hiutmc.com";
@@ -178,6 +198,87 @@ async function protectedAsset(request, env, requiredRole) {
   headers.set("cache-control", "private, no-store");
   headers.set("x-hiutmc-staff-role", access.role);
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
+function vietnamDateKey(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function previousDateKey(dateKey, daysAgo) {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day - daysAgo));
+  return date.toISOString().slice(0, 10);
+}
+
+function shouldCountPageView(request, url) {
+  if (request.method !== "GET" || !request.headers.get("accept")?.includes("text/html")) return false;
+  if (/prefetch/i.test(`${request.headers.get("purpose") || ""} ${request.headers.get("sec-purpose") || ""}`)) return false;
+  const destination = request.headers.get("sec-fetch-dest");
+  if (destination && destination !== "document") return false;
+  if (!/(^|\.)hiutmc\.com$/i.test(url.hostname)) return false;
+  if (/^\/(api|admin|mod)(\/|$)/.test(url.pathname)) return false;
+  return true;
+}
+
+async function recordPageView(env) {
+  if (!env.VISITS) return;
+  const stub = env.VISITS.get(env.VISITS.idFromName("hiutmc-public-pages-v1"));
+  await stub.fetch("https://traffic.internal/visit", { method: "POST" });
+}
+
+async function getTrafficStats(env) {
+  if (!env.VISITS) return null;
+  const stub = env.VISITS.get(env.VISITS.idFromName("hiutmc-public-pages-v1"));
+  const response = await stub.fetch("https://traffic.internal/stats", { method: "GET" });
+  if (!response.ok) return null;
+  return response.json();
+}
+
+export class VisitCounter {
+  constructor(ctx) {
+    this.ctx = ctx;
+  }
+
+  async fetch(request) {
+    const url = new URL(request.url);
+    if (url.pathname === "/visit" && request.method === "POST") {
+      const today = vietnamDateKey();
+      await this.ctx.storage.transaction(async (txn) => {
+        const total = Number(await txn.get("total") || 0);
+        const visitsToday = Number(await txn.get(`day:${today}`) || 0);
+        await txn.put({ total: total + 1, [`day:${today}`]: visitsToday + 1 });
+
+        if (await txn.get("lastPrunedDay") !== today) {
+          const cutoff = previousDateKey(today, 30);
+          const dayEntries = await txn.list({ prefix: "day:" });
+          for (const key of dayEntries.keys()) {
+            if (key.slice(4) < cutoff) await txn.delete(key);
+          }
+          await txn.put("lastPrunedDay", today);
+        }
+      });
+      return json({ ok: true }, 202);
+    }
+
+    if (url.pathname === "/stats" && request.method === "GET") {
+      const today = vietnamDateKey();
+      const daily = [];
+      for (let offset = 6; offset >= 0; offset -= 1) {
+        const date = previousDateKey(today, offset);
+        daily.push({ date, visits: Number(await this.ctx.storage.get(`day:${date}`) || 0) });
+      }
+      return json({ totalVisits: Number(await this.ctx.storage.get("total") || 0), todayVisits: daily.at(-1)?.visits || 0, dailyVisits: daily });
+    }
+
+    return json({ error: "Not found" }, 404);
+  }
 }
 
 
@@ -223,7 +324,7 @@ function rewriteProxyLocation(location, config) {
 
 function proxyBridgeScript(prefix) {
   const encoded = JSON.stringify(prefix);
-  return `<script>(()=>{const P=${encoded};const m=v=>typeof v==="string"&&v.startsWith("/")&&!v.startsWith("//")&&!v.startsWith(P+"/")?P+v:v;const f=window.fetch.bind(window);window.fetch=(input,init)=>{if(typeof input==="string")return f(m(input),init);if(input instanceof Request){try{const u=new URL(input.url);if(u.origin===location.origin&&!u.pathname.startsWith(P+"/")&&u.pathname!==P){const next=P+u.pathname+u.search+u.hash;input=new Request(next,input)}}catch{}}return f(input,init)};const xo=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(method,url,...rest){return xo.call(this,method,m(String(url)),...rest)};for(const k of ["pushState","replaceState"]){const o=history[k].bind(history);history[k]=function(state,title,url){return o(state,title,typeof url==="string"?m(url):url)}}document.addEventListener("click",e=>{if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;const a=e.target instanceof Element?e.target.closest("a[href]"):null;if(!a)return;const raw=a.getAttribute("href")||"";if(raw.startsWith("/")&&!raw.startsWith("//")&&!raw.startsWith(P+"/")){e.preventDefault();location.assign(P+raw)}},true);try{const sw=navigator.serviceWorker;if(sw&&sw.register){const r=sw.register.bind(sw);sw.register=(url,opt={})=>r(m(String(url)),{...opt,scope:opt.scope?m(String(opt.scope)):P+"/"})}}catch{}})();</script>`;
+  return `<script>(()=>{const P=${encoded};const T=P==="/apps/thietchan";window.__HIUTMC_APP_PREFIX=P;if(T)window.__HIUTMC_DISABLE_NESTED_PWA=true;const m=v=>typeof v==="string"&&v.startsWith("/")&&!v.startsWith("//")&&!v.startsWith(P+"/")?P+v:v;const f=window.fetch.bind(window);window.fetch=(input,init)=>{if(typeof input==="string")return f(m(input),init);if(input instanceof Request){try{const u=new URL(input.url);if(u.origin===location.origin&&!u.pathname.startsWith(P+"/")&&u.pathname!==P){const next=P+u.pathname+u.search+u.hash;input=new Request(next,input)}}catch{}}return f(input,init)};const xo=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(method,url,...rest){return xo.call(this,method,m(String(url)),...rest)};for(const k of ["pushState","replaceState"]){const o=history[k].bind(history);history[k]=function(state,title,url){return o(state,title,typeof url==="string"?m(url):url)}}document.addEventListener("click",e=>{if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;const a=e.target instanceof Element?e.target.closest("a[href]"):null;if(!a)return;const raw=a.getAttribute("href")||"";if(raw.startsWith("/")&&!raw.startsWith("//")&&!raw.startsWith(P+"/")){e.preventDefault();location.assign(P+raw)}},true);try{const sw=navigator.serviceWorker;if(sw){if(T){sw.getRegistrations?.().then(rs=>rs.filter(r=>String(r.scope||"").includes(location.origin+P+"/")).forEach(r=>r.unregister())).catch(()=>{})}else if(sw.register){const r=sw.register.bind(sw);sw.register=(url,opt={})=>r(m(String(url)),{...opt,scope:opt.scope?m(String(opt.scope)):P+"/"})}}}catch{}})();</script>`;
 }
 
 class ProxyUrlRewriter {
@@ -232,7 +333,11 @@ class ProxyUrlRewriter {
     for (const name of ["href", "src", "action", "poster"]) {
       const value = element.getAttribute(name);
       if (value && value.startsWith("/") && !value.startsWith("//") && !value.startsWith(this.prefix + "/")) {
-        element.setAttribute(name, this.prefix + value);
+        let next = this.prefix + value;
+        if (this.prefix === "/apps/thietchan" && /\.(?:js|css)(?:\?|$)/i.test(next)) {
+          next += (next.includes("?") ? "&" : "?") + "hiutmc_gateway=20260927r1";
+        }
+        element.setAttribute(name, next);
       }
     }
     const srcset = element.getAttribute("srcset");
@@ -356,7 +461,7 @@ function reservedMainPath(pathname) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const pathname = url.pathname.length > 1 ? url.pathname.replace(/\/+$/, "") : url.pathname;
 
@@ -386,6 +491,22 @@ export default {
       return json(access, access.authorized ? 200 : 401);
     }
 
+    if (pathname === "/api/admin/traffic") {
+      if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+      const gate = await shadowStaffAccess(request, "admin");
+      if (!gate.ok) return gate.response;
+      const stats = await getTrafficStats(env);
+      if (!stats) return json({ error: "Traffic counter unavailable" }, 503);
+      return json(stats);
+    }
+
+    if (pathname === "/api/hub-registry") {
+      if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+      const { response, payload } = await supabasePublicRpc("ecosystem_public_hub_registry");
+      if (!response.ok) return json({ error: "Published Hub registry unavailable" }, 503);
+      return json({ hubs: Array.isArray(payload) ? payload : [] }, 200, { "cache-control": "public, max-age=60, s-maxage=60" });
+    }
+
 
     if (pathname === "/api/staff/shadow/snapshot") {
       if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
@@ -406,6 +527,19 @@ export default {
         p_hub_slug: String(body.hubSlug || ""),
         p_draft: body.draft && typeof body.draft === "object" ? body.draft : {},
         p_expected_revision: body.expectedRevision === null || body.expectedRevision === undefined ? null : Number(body.expectedRevision),
+      });
+      return json({ shadow: "cp23", data: payload }, response.ok ? 200 : response.status);
+    }
+
+    if (pathname === "/api/staff/shadow/publish") {
+      if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+      if (!sameOriginMutation(request)) return json({ error: "Invalid origin" }, 403);
+      const gate = await shadowStaffAccess(request, "admin");
+      if (!gate.ok) return gate.response;
+      const body = await request.json().catch(() => null);
+      if (!body || typeof body !== "object") return json({ error: "Invalid JSON" }, 400);
+      const { response, payload } = await supabaseRpc(gate.token, "ecosystem_admin_publish_hub", {
+        p_hub_slug: String(body.hubSlug || ""),
       });
       return json({ shadow: "cp23", data: payload }, response.ok ? 200 : response.status);
     }
@@ -441,8 +575,14 @@ export default {
 
     const referredProxy = proxyConfigFromReferer(request);
     if (referredProxy && !reservedMainPath(pathname)) {
+      const config = referredProxy[1];
       const isDocument = request.headers.get("sec-fetch-dest") === "document" || request.headers.get("accept")?.includes("text/html");
-      if (!isDocument) return proxyEcosystemApp(request, url, referredProxy[1], url.pathname);
+      if (isDocument) {
+        const redirected = new URL(request.url);
+        redirected.pathname = config.prefix + (url.pathname.startsWith("/") ? url.pathname : "/" + url.pathname);
+        return Response.redirect(redirected.toString(), 302);
+      }
+      return proxyEcosystemApp(request, url, config, url.pathname);
     }
 
     if (pathname === "/admin") {
@@ -451,6 +591,10 @@ export default {
 
     if (pathname === "/mod") {
       return protectedAsset(request, env, "mod");
+    }
+
+    if (shouldCountPageView(request, url) && ctx?.waitUntil) {
+      ctx.waitUntil(recordPageView(env).catch(() => undefined));
     }
 
     return env.ASSETS.fetch(request);

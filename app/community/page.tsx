@@ -1,5 +1,6 @@
 import { academicRooms, communityFeatures } from "@/data/community-hub";
 import CommunityFeed from "./CommunityFeed";
+import TcmNewsFeed from "@/components/TcmNewsFeed";
 import styles from "./community.module.css";
 
 export default function CommunityPage() {
@@ -38,6 +39,8 @@ export default function CommunityPage() {
           ))}
         </div>
       </section>
+
+      <TcmNewsFeed limit={3} compact />
 
       <section className={styles.feedSection}>
         <CommunityFeed />

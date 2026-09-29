@@ -11,6 +11,8 @@ const errors = [];
 for (const marker of [
   "/api/staff/session",
   "/api/staff/access",
+  "/api/admin/traffic",
+  'shadowStaffAccess(request, "admin")',
   "validateStaff",
   "HttpOnly",
   "Secure",
@@ -26,9 +28,44 @@ for (const marker of [
   "clearStaffSession",
   'window.location.assign(access.canAdmin ? "/admin/" : "/mod/")',
   "staffAccess",
+  'const GAME_HUB_ROLES = new Set(["member", "mod", "super_mod", "leader", "admin"]);',
+  "export function canAccessGameHub",
+  "openGameHub: async",
+  "if (!session || !canAccessGameHub(session.member.role)) return;",
+  "async function refreshSession(current: StoredSession)",
+  'new URLSearchParams(window.location.search).get("open") === "game-hub"',
+  "navigateToGameHub(next)",
 ]) {
   if (!files.auth.includes(marker)) errors.push(`member auth bridge missing marker: ${marker}`);
 }
+
+const loginFlowStart = files.auth.indexOf("login: async (studentCode, password) => {");
+const loginFlowEnd = files.auth.indexOf("logout: async () => {", loginFlowStart);
+const loginFlow = loginFlowStart >= 0 && loginFlowEnd > loginFlowStart
+  ? files.auth.slice(loginFlowStart, loginFlowEnd)
+  : "";
+const gameHubReturnIndex = loginFlow.indexOf("navigateToGameHub(next)");
+const staffSyncIndex = loginFlow.indexOf("await syncStaffSession(next.accessToken)");
+if (gameHubReturnIndex < 0 || (staffSyncIndex >= 0 && staffSyncIndex < gameHubReturnIndex)) {
+  errors.push("Game Hub sign-in must hand off before optional staff-session sync can block navigation.");
+}
+
+const gameHubLaunchStart = files.auth.indexOf("openGameHub: async (rawUrl) => {");
+const gameHubLaunchEnd = files.auth.indexOf("refreshLearningProgress,", gameHubLaunchStart);
+const gameHubLaunch = gameHubLaunchStart >= 0 && gameHubLaunchEnd > gameHubLaunchStart
+  ? files.auth.slice(gameHubLaunchStart, gameHubLaunchEnd)
+  : "";
+for (const marker of [
+  "target.origin !== window.location.origin",
+  "/^\\/apps\\/game-hub(?:\\/|$)/.test(target.pathname)",
+  "window.location.assign(target.toString())",
+]) {
+  if (!gameHubLaunch.includes(marker)) errors.push(`Game Hub launch missing same-origin handoff marker: ${marker}`);
+}
+if (/access_token:\s*session\.accessToken|refresh_token:\s*session\.refreshToken/.test(gameHubLaunch)) {
+  errors.push("Game Hub launch must not copy rotating session credentials into the URL.");
+}
+if (gameHubLaunch.includes("await ")) errors.push("Game Hub launch must not wait on network or animation before navigating.");
 
 for (const marker of [
   'fetch("/api/staff/access"',

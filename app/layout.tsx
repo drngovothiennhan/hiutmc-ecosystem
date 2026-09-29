@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import NavigationTransitions from "@/components/NavigationTransitions";
 import PwaInstall from "@/components/PwaInstall";
 
 const SOCIAL_TITLE = "HIU YHCT Ecosystem – Cổng học tập Y học cổ truyền HIU";
@@ -64,7 +65,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="vi">
-      <body>{children}<PwaInstall /></body>
+      <body>{children}<NavigationTransitions /><PwaInstall /></body>
     </html>
   );
 }

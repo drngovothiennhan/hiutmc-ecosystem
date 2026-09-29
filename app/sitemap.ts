@@ -5,18 +5,31 @@ import { ecosystemApps } from "@/data/apps";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = "https://hiutmc.com";
-  const hubRoutes = ["/learn/", "/ai/", "/community/", "/discover/", "/search/"];
+  const publicRoutes = [
+    "/",
+    "/discover/",
+    "/learn/",
+    "/ai/",
+    "/community/",
+    "/search/",
+    "/apps/study/",
+    "/apps/atlas/",
+    "/apps/thietchan/",
+    "/apps/trungyvan/",
+    "/apps/game-hub/",
+    "/apps/game-hub/y-quan-live/interview/?trial=1",
+  ];
+
   return [
-    { url: base, changeFrequency: "weekly", priority: 1 },
-    ...hubRoutes.map((route) => ({
+    ...publicRoutes.map((route, index) => ({
       url: `${base}${route}`,
       changeFrequency: "weekly" as const,
-      priority: 0.9,
+      priority: index === 0 ? 1 : 0.8,
     })),
     ...ecosystemApps.map((app) => ({
       url: `${base}/ecosystem/${app.slug}/`,
       changeFrequency: "weekly" as const,
-      priority: 0.8,
+      priority: 0.7,
     })),
   ];
 }

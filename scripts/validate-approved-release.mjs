@@ -15,17 +15,20 @@ for (const [path, label] of [
 }
 
 const home = fs.existsSync(homePath) ? fs.readFileSync(homePath, "utf8") : "";
-const homeSource = fs.readFileSync("app/page.tsx", "utf8");
 const admin = fs.existsSync(adminPath) ? fs.readFileSync(adminPath, "utf8") : "";
 const mod = fs.existsSync(modPath) ? fs.readFileSync(modPath, "utf8") : "";
 const staffConsole = fs.existsSync(consoleSourcePath) ? fs.readFileSync(consoleSourcePath, "utf8") : "";
+const homeSource = fs.readFileSync("app/page.tsx", "utf8");
 
 for (const marker of [
-  "{ready && !member &&",
+  "{ready && !member && <StudyOsLink",
   'registerUrl.searchParams.set("auth", "register")',
-  'className={styles.registerCta} href={registerUrl.toString()}',
+  "Đăng ký thành viên",
 ]) {
-  if (!homeSource.includes(marker)) errors.push(`homepage registration CTA source missing: ${marker}`);
+  if (!homeSource.includes(marker)) errors.push(`homepage member-registration source missing: ${marker}`);
+}
+if (homeSource.includes("mailto:clb.yhoccotruyen.hiu@gmail.com?subject=")) {
+  errors.push("homepage member registration must open Study OS, not email");
 }
 
 for (const marker of [
@@ -60,6 +63,8 @@ for (const marker of [
   "Thành viên & vai trò",
   "Nhật ký",
   "Cấu hình",
+  "Lượt truy cập",
+  "/api/admin/traffic",
   "SERVER VERIFIED",
   'mode: "admin" | "mod"',
 ]) {

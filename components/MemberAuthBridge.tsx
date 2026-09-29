@@ -1,13 +1,25 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
-import DisplayModeToggle from "./DisplayModeToggle";
+import { createClient } from "@supabase/supabase-js";
+import { useDisplayMode, type DisplayMode } from "./DisplayModeToggle";
+import { transitionBeforeAppNavigation } from "./NavigationTransitions";
 import styles from "./MemberAuthBridge.module.css";
+import { normalizePersonalLearningSnapshot, type PersonalLearningSnapshot } from "@/data/personalized-learning";
 
 const SUPABASE_URL = "https://gzmpnsrwqjpsbklyflqr.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG";
+const realtimeClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+});
 const STORAGE_KEY = "hiutmc-member-session-v1";
+const SESSION_REFRESH_LOCK = "hiutmc-supabase-session-refresh-v1";
 const BRIDGE_FLAG = "ecosystem_sso";
+const GAME_HUB_ROLES = new Set(["member", "mod", "super_mod", "leader", "admin"]);
+
+export function canAccessGameHub(role?: string | null) {
+  return GAME_HUB_ROLES.has(String(role || "").trim().toLowerCase());
+}
 
 export type Member = {
   id: string;
@@ -30,6 +42,15 @@ export type LearningProgress = {
   aiUses: number;
   reviewCardCount: number;
   sourceVersion?: string | null;
+};
+
+export type MemberNotification = {
+  id: string;
+  title: string;
+  body: string;
+  kind: string;
+  created_at: string;
+  read_at: string | null;
 };
 
 export type StaffAccess = {
@@ -55,19 +76,72 @@ type StoredSession = {
 
 type AuthContextValue = {
   member: Member | null;
+  spiritPetSpecies: string | null;
+  spiritPetReady: boolean;
   staffAccess: StaffAccess | null;
   learningProgress: LearningProgress | null;
+  personalLearningSnapshot: PersonalLearningSnapshot | null;
+  personalLearningSnapshotStatus: "loading" | "ready" | "empty" | "error";
   learningProgressReady: boolean;
+  notifications: MemberNotification[];
+  unreadNotificationCount: number;
+  notificationsStatus: "loading" | "ready" | "error";
   ready: boolean;
   login: (studentCode: string, password: string) => Promise<StaffAccess | null>;
   logout: () => Promise<void>;
   openStudyOs: (url: string) => Promise<void>;
-  openGameHub: () => Promise<void>;
+  openGameHub: (url: string) => Promise<void>;
   refreshLearningProgress: () => Promise<void>;
+  markAllNotificationsRead: () => Promise<void>;
   openStaffConsole: () => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+const SPIRIT_PET_STORAGE_KEY = "hiutmc-spirit-pet-v1";
+const SPIRIT_PET_CLIENT_TO_DB: Record<string, string> = {
+  dragon: "thanh_long",
+  phoenix: "chu_tuoc",
+  sphinx: "kim_su",
+  qilin: "ky_lan",
+  peacock: "khong_tuoc",
+  fox: "ho_ly",
+};
+const SPIRIT_PET_DB_TO_CLIENT: Record<string, string> = Object.fromEntries(
+  Object.entries(SPIRIT_PET_CLIENT_TO_DB).map(([client, database]) => [database, client]),
+);
+
+function readLegacySpiritPetSpecies(): string | null {
+  try {
+    const saved = window.localStorage.getItem(SPIRIT_PET_STORAGE_KEY) || "";
+    return SPIRIT_PET_CLIENT_TO_DB[saved] || null;
+  } catch {
+    return null;
+  }
+}
+
+async function loadSpiritPetProfile(session: StoredSession): Promise<string> {
+  const requested = readLegacySpiritPetSpecies();
+  const response = await fetch(SUPABASE_URL + "/rest/v1/rpc/spirit_pet_profile_initialize", {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: "Bearer " + session.accessToken,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ p_requested_species: requested }),
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error("spirit_profile_unavailable");
+  const body = await response.json() as { species?: unknown };
+  const species = String(body?.species || "");
+  if (!SPIRIT_PET_DB_TO_CLIENT[species]) throw new Error("invalid_server_spirit_species");
+  // Keep the legacy device choice only long enough to initialize a missing server profile.
+  // Once the server confirms the canonical profile, the server is the only durable source.
+  try { window.localStorage.removeItem(SPIRIT_PET_STORAGE_KEY); } catch {}
+  return species;
+}
+
 
 function base64UrlJson(value: string): Record<string, unknown> {
   try {
@@ -108,6 +182,19 @@ function saveStored(session: StoredSession | null) {
   } catch {}
 }
 
+function authFailure(message: string, status: number) {
+  const error = new Error(message) as Error & { clearSession?: boolean };
+  error.clearSession = status === 401;
+  return error;
+}
+
+function navigateToGameHub(session: Pick<StoredSession, "accessToken" | "refreshToken"> | null) {
+  // Eco and the reverse-proxied Game Hub share one same-origin session store.
+  // Never copy rotating credentials into a URL fragment.
+  void session;
+  window.location.assign("/apps/game-hub/");
+}
+
 function mapMember(row: Record<string, unknown>): Member {
   return {
     id: String(row.id || ""),
@@ -132,7 +219,7 @@ async function fetchMember(accessToken: string): Promise<Member> {
     headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` },
     cache: "no-store",
   });
-  if (!response.ok) throw new Error("Không thể xác minh hồ sơ thành viên.");
+  if (!response.ok) throw authFailure("Không thể xác minh hồ sơ thành viên.", response.status);
   const rows = (await response.json()) as Record<string, unknown>[];
   const row = rows[0];
   if (!row) throw new Error("Không tìm thấy hồ sơ thành viên.");
@@ -191,25 +278,97 @@ async function fetchLearningProgress(accessToken: string): Promise<LearningProgr
   }
 }
 
-async function refreshSession(current: StoredSession): Promise<StoredSession> {
-  let accessToken = current.accessToken;
-  let refreshToken = current.refreshToken;
-  if (current.expiresAt - Date.now() <= 90_000) {
-    const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
-      method: "POST",
-      headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
-      body: JSON.stringify({ refresh_token: current.refreshToken }),
+async function fetchPersonalLearningSnapshot(accessToken: string): Promise<{ snapshot: PersonalLearningSnapshot | null; status: "ready" | "empty" | "error" }> {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/learning-sync?snapshot=1`, {
+      method: "GET",
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
     });
-    const body = (await response.json().catch(() => ({}))) as Record<string, unknown>;
-    if (!response.ok) throw new Error("Phiên đăng nhập đã hết hạn.");
-    accessToken = String(body.access_token || "");
-    refreshToken = String(body.refresh_token || current.refreshToken);
+    if (!response.ok) return { snapshot: null, status: "error" };
+    const body = (await response.json().catch(() => null)) as Record<string, unknown> | null;
+    if (!body) return { snapshot: null, status: "error" };
+    if (body.hasSync !== true) return { snapshot: null, status: "empty" };
+    const snapshot = normalizePersonalLearningSnapshot(body.snapshot);
+    return snapshot ? { snapshot, status: "ready" } : { snapshot: null, status: "error" };
+  } catch {
+    return { snapshot: null, status: "error" };
   }
-  if (!accessToken) throw new Error("Phiên đăng nhập không hợp lệ.");
-  const member = await fetchMember(accessToken);
-  const next = { accessToken, refreshToken, expiresAt: tokenExpiry(accessToken), member };
-  saveStored(next);
-  return next;
+}
+
+async function fetchNotificationInbox(accessToken: string): Promise<{ notifications: MemberNotification[]; unreadCount: number }> {
+  const headers = { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}` };
+  const params = new URLSearchParams({
+    select: "id,title,body,kind,created_at,read_at",
+    order: "created_at.desc",
+    limit: "20",
+  });
+  const unreadParams = new URLSearchParams({ select: "id", read_at: "is.null" });
+  const [rowsResponse, countResponse] = await Promise.all([
+    fetch(`${SUPABASE_URL}/rest/v1/notifications?${params}`, { headers, cache: "no-store" }),
+    fetch(`${SUPABASE_URL}/rest/v1/notifications?${unreadParams}`, {
+      method: "HEAD",
+      headers: { ...headers, Prefer: "count=exact", "Range-Unit": "items", Range: "0-0" },
+      cache: "no-store",
+    }),
+  ]);
+  if (!rowsResponse.ok || !countResponse.ok) throw new Error("Không tải được hộp thông báo.");
+  const notifications = (await rowsResponse.json()) as MemberNotification[];
+  const contentRange = countResponse.headers.get("content-range") || "";
+  const unreadCount = Number(contentRange.match(/\/(\d+)$/)?.[1] ?? notifications.filter((item) => !item.read_at).length);
+  return { notifications, unreadCount: Number.isFinite(unreadCount) ? unreadCount : 0 };
+}
+
+async function markAllMemberNotificationsRead(accessToken: string) {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/notifications_mark_all_read_v1`, {
+    method: "POST",
+    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+    body: "{}",
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error("Chưa thể đánh dấu thông báo đã đọc.");
+}
+
+async function refreshSession(current: StoredSession): Promise<StoredSession> {
+  const refresh = async () => {
+    // Re-read after acquiring the shared origin lock; another tab may have
+    // already rotated the refresh token while this request was waiting.
+    const latest = readStored() ?? current;
+    let accessToken = latest.accessToken;
+    let refreshToken = latest.refreshToken;
+    if (latest.expiresAt - Date.now() <= 90_000) {
+      const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+        method: "POST",
+        headers: { apikey: SUPABASE_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: latest.refreshToken }),
+        cache: "no-store",
+      });
+      const body = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+      if (!response.ok) throw authFailure("Không thể làm mới phiên HIU TMC.", response.status);
+      accessToken = String(body.access_token || "");
+      refreshToken = String(body.refresh_token || latest.refreshToken);
+    }
+    if (!accessToken) throw new Error("Phiên đăng nhập không hợp lệ.");
+    const member = await fetchMember(accessToken);
+    const next = { accessToken, refreshToken, expiresAt: tokenExpiry(accessToken), member };
+    saveStored(next);
+    return next;
+  };
+  const hostname = window.location.hostname || "";
+  const sameOriginHub = hostname === "hiutmc.com" || hostname.endsWith(".hiutmc.com");
+  if (sameOriginHub && navigator.locks?.request) {
+    let refreshStarted = false;
+    try {
+      return await navigator.locks.request(SESSION_REFRESH_LOCK, () => {
+        refreshStarted = true;
+        return refresh();
+      });
+    } catch (error) {
+      // Fall back only when the lock callback never began. Never rotate twice.
+      if (refreshStarted) throw error;
+    }
+  }
+  return refresh();
 }
 
 async function loginMember(studentCode: string, password: string): Promise<StoredSession> {
@@ -253,8 +412,15 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<StoredSession | null>(null);
   const [staffAccess, setStaffAccess] = useState<StaffAccess | null>(null);
   const [learningProgress, setLearningProgress] = useState<LearningProgress | null>(null);
+  const [personalLearningSnapshot, setPersonalLearningSnapshot] = useState<PersonalLearningSnapshot | null>(null);
+  const [personalLearningSnapshotStatus, setPersonalLearningSnapshotStatus] = useState<"loading" | "ready" | "empty" | "error">("loading");
   const [learningProgressReady, setLearningProgressReady] = useState(false);
+  const [notifications, setNotifications] = useState<MemberNotification[]>([]);
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
+  const [notificationsStatus, setNotificationsStatus] = useState<"loading" | "ready" | "error">("loading");
   const [ready, setReady] = useState(false);
+  const [spiritPetSpecies, setSpiritPetSpecies] = useState<string | null>(null);
+  const [spiritPetReady, setSpiritPetReady] = useState(false);
 
   useEffect(() => {
     let live = true;
@@ -280,11 +446,15 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
           setSession(refreshed);
           setStaffAccess(access?.authorized ? access : null);
         }
-      } catch {
-        saveStored(null);
-        await clearStaffSession();
+      } catch (error) {
+        const unauthorized = (error as Error & { clearSession?: boolean })?.clearSession === true;
+        const cached = unauthorized ? null : readStored();
+        if (unauthorized) {
+          saveStored(null);
+          await clearStaffSession();
+        }
         if (live) {
-          setSession(null);
+          setSession(cached);
           setStaffAccess(null);
         }
       } finally {
@@ -296,10 +466,39 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let live = true;
+    if (!session) {
+      setSpiritPetSpecies(null);
+      setSpiritPetReady(true);
+      return () => { live = false; };
+    }
+    setSpiritPetSpecies(null);
+    setSpiritPetReady(false);
+    void loadSpiritPetProfile(session).then((species) => {
+      if (!live) return;
+      setSpiritPetSpecies(species);
+      setSpiritPetReady(true);
+    }).catch(() => {
+      if (!live) return;
+      // Do not present a stale device value as a server-synced profile.
+      setSpiritPetSpecies(null);
+      setSpiritPetReady(true);
+    });
+    return () => { live = false; };
+  }, [session?.member.id, session?.accessToken]);
+
+  useEffect(() => {
+    let live = true;
+    setPersonalLearningSnapshot(null);
+    setPersonalLearningSnapshotStatus("loading");
+    setLearningProgressReady(false);
+    setNotifications([]);
+    setUnreadNotificationCount(0);
+    setNotificationsStatus(session?.accessToken ? "loading" : "ready");
     const refresh = async () => {
       if (!session?.accessToken) {
         if (live) {
           setLearningProgress(null);
+          setPersonalLearningSnapshot(null);
           setLearningProgressReady(true);
         }
         return;
@@ -311,15 +510,101 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       }
     };
     setLearningProgressReady(false);
+    const refreshSnapshot = async () => {
+      if (!session?.accessToken) {
+        if (live) {
+          setPersonalLearningSnapshot(null);
+          setPersonalLearningSnapshotStatus("empty");
+        }
+        return;
+      }
+      const result = await fetchPersonalLearningSnapshot(session.accessToken);
+      if (live) {
+        setPersonalLearningSnapshot(result.snapshot);
+        setPersonalLearningSnapshotStatus(result.status);
+      }
+    };
+    const refreshNotificationInbox = async () => {
+      if (!session?.accessToken) {
+        if (live) {
+          setNotifications([]);
+          setUnreadNotificationCount(0);
+          setNotificationsStatus("ready");
+        }
+        return;
+      }
+      try {
+        const inbox = await fetchNotificationInbox(session.accessToken);
+        if (!live) return;
+        setNotifications(inbox.notifications);
+        setUnreadNotificationCount(inbox.unreadCount);
+        setNotificationsStatus("ready");
+      } catch {
+        if (live) setNotificationsStatus("error");
+      }
+    };
+    const refreshSyncedLearningData = async () => {
+      if (!session?.accessToken) {
+        await Promise.all([refresh(), refreshSnapshot(), refreshNotificationInbox()]);
+        return;
+      }
+      const [progress, snapshot, inbox] = await Promise.all([
+        fetchLearningProgress(session.accessToken),
+        fetchPersonalLearningSnapshot(session.accessToken),
+        fetchNotificationInbox(session.accessToken).catch(() => null),
+      ]);
+      if (!live) return;
+      setLearningProgress(progress);
+      setLearningProgressReady(true);
+      setPersonalLearningSnapshot(snapshot.snapshot);
+      setPersonalLearningSnapshotStatus(snapshot.status);
+      if (inbox) {
+        setNotifications(inbox.notifications);
+        setUnreadNotificationCount(inbox.unreadCount);
+        setNotificationsStatus("ready");
+      } else {
+        setNotificationsStatus("error");
+      }
+    };
     void refresh();
-    const onFocus = () => void refresh();
-    const onVisible = () => { if (document.visibilityState === "visible") void refresh(); };
+    void refreshSnapshot();
+    void refreshNotificationInbox();
+    const onFocus = () => { void refreshSyncedLearningData(); };
+    const onVisible = () => { if (document.visibilityState === "visible") void refreshSyncedLearningData(); };
+    const channels: ReturnType<typeof realtimeClient.channel>[] = [];
+    if (session?.accessToken && session.member.id) {
+      void realtimeClient.realtime.setAuth(session.accessToken).then(() => {
+        if (!live) return;
+        const learningChannel = realtimeClient
+          .channel(`learning-sync-stats:${session.member.id}`)
+          .on("postgres_changes", {
+            event: "*",
+            schema: "public",
+            table: "learning_sync_stats",
+            filter: `member_id=eq.${session.member.id}`,
+          }, () => { void refreshSyncedLearningData(); })
+          .subscribe();
+        const notificationChannel = realtimeClient
+          .channel(`notifications:${session.member.id}`)
+          .on("postgres_changes", {
+            event: "*",
+            schema: "public",
+            table: "notifications",
+            filter: `member_id=eq.${session.member.id}`,
+          }, () => { void refreshNotificationInbox(); })
+          .subscribe();
+        channels.push(learningChannel, notificationChannel);
+      }).catch(() => {
+        // The polling fallback below keeps the dashboard current if Realtime is unavailable.
+      });
+    }
     window.addEventListener("focus", onFocus);
     document.addEventListener("visibilitychange", onVisible);
-    const timer = window.setInterval(() => void refresh(), 60_000);
+    const timer = window.setInterval(() => void refreshSyncedLearningData(), 60_000);
     return () => {
       live = false;
       window.clearInterval(timer);
+      for (const channel of channels) void realtimeClient.removeChannel(channel);
       window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onVisible);
     };
@@ -328,25 +613,57 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
   const refreshLearningProgress = async () => {
     if (!session?.accessToken) {
       setLearningProgress(null);
+      setPersonalLearningSnapshot(null);
+      setPersonalLearningSnapshotStatus("empty");
       setLearningProgressReady(true);
+      setNotifications([]);
+      setUnreadNotificationCount(0);
+      setNotificationsStatus("ready");
       return;
     }
     setLearningProgressReady(false);
-    const progress = await fetchLearningProgress(session.accessToken);
+    const [progress, snapshot] = await Promise.all([
+      fetchLearningProgress(session.accessToken),
+      fetchPersonalLearningSnapshot(session.accessToken),
+    ]);
     setLearningProgress(progress);
+    setPersonalLearningSnapshot(snapshot.snapshot);
+    setPersonalLearningSnapshotStatus(snapshot.status);
     setLearningProgressReady(true);
+  };
+
+  const markAllNotificationsRead = async () => {
+    if (!session?.accessToken) return;
+    await markAllMemberNotificationsRead(session.accessToken);
+    const inbox = await fetchNotificationInbox(session.accessToken);
+    setNotifications(inbox.notifications);
+    setUnreadNotificationCount(inbox.unreadCount);
+    setNotificationsStatus("ready");
   };
 
   const value = useMemo<AuthContextValue>(() => ({
     member: session?.member ?? null,
+    spiritPetSpecies,
+    spiritPetReady,
     staffAccess,
     learningProgress,
+    personalLearningSnapshot,
+    personalLearningSnapshotStatus,
     learningProgressReady,
+    notifications,
+    unreadNotificationCount,
+    notificationsStatus,
     ready,
     login: async (studentCode, password) => {
       const next = await loginMember(studentCode, password);
-      const access = await syncStaffSession(next.accessToken);
+      const returningToGameHub = new URLSearchParams(window.location.search).get("open") === "game-hub";
       setSession(next);
+      if (returningToGameHub) {
+        // Complete member SSO before optional staff authorization work.
+        navigateToGameHub(next);
+        return null;
+      }
+      const access = await syncStaffSession(next.accessToken);
       setStaffAccess(access?.authorized ? access : null);
       return access;
     },
@@ -356,7 +673,12 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       setSession(null);
       setStaffAccess(null);
       setLearningProgress(null);
+      setPersonalLearningSnapshot(null);
+      setPersonalLearningSnapshotStatus("empty");
       setLearningProgressReady(true);
+      setNotifications([]);
+      setUnreadNotificationCount(0);
+      setNotificationsStatus("ready");
       await clearStaffSession();
       if (accessToken) {
         void fetch(`${SUPABASE_URL}/auth/v1/logout?scope=local`, {
@@ -366,39 +688,13 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
         }).catch(() => {});
       }
     },
-    openGameHub: async () => {
-      const hubUrl = "https://hiutmc-game-hub.pages.dev/";
-      if (!session) {
-        window.location.assign(hubUrl);
-        return;
-      }
-      try {
-        const fresh = await refreshSession(session);
-        const access = await syncStaffSession(fresh.accessToken);
-        setSession(fresh);
-        setStaffAccess(access?.authorized ? access : null);
-        const fragment = new URLSearchParams({
-          [BRIDGE_FLAG]: "1",
-          access_token: fresh.accessToken,
-          refresh_token: fresh.refreshToken,
-        });
-        const target = new URL(hubUrl);
-        target.hash = fragment.toString();
-        window.location.assign(target.toString());
-      } catch {
-        saveStored(null);
-        await clearStaffSession();
-        setSession(null);
-        setStaffAccess(null);
-        window.location.assign(hubUrl);
-      }
-    },
     openStudyOs: async (rawUrl) => {
       let target: URL;
       try { target = new URL(rawUrl, window.location.href); } catch { window.location.assign(rawUrl); return; }
       const allowed = new Set(["yhct-hiu-final4-stage-hiu-yhct.vercel.app", "study.hiutmc.com"]);
       const sameOriginGateway = target.hostname === "hiutmc.com" && (target.pathname === "/apps/study" || target.pathname.startsWith("/apps/study/"));
       if ((!allowed.has(target.hostname) && !sameOriginGateway) || !session) {
+        await transitionBeforeAppNavigation(target.toString());
         window.location.assign(target.toString());
         return;
       }
@@ -413,21 +709,36 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
           refresh_token: fresh.refreshToken,
         });
         target.hash = fragment.toString();
+        await transitionBeforeAppNavigation(target.toString());
         window.location.assign(target.toString());
-      } catch {
-        saveStored(null);
-        await clearStaffSession();
-        setSession(null);
-        setStaffAccess(null);
+      } catch (error) {
+        if ((error as Error & { clearSession?: boolean })?.clearSession) {
+          saveStored(null);
+          await clearStaffSession();
+          setSession(null);
+          setStaffAccess(null);
+        }
+        // A satellite app outage or 5xx does not invalidate HIU TMC auth.
+        await transitionBeforeAppNavigation(target.toString());
         window.location.assign(target.toString());
       }
     },
+    openGameHub: async (rawUrl) => {
+      if (!session || !canAccessGameHub(session.member.role)) return;
+      let target: URL;
+      try { target = new URL(rawUrl, window.location.href); } catch { return; }
+      if (target.origin !== window.location.origin || !/^\/apps\/game-hub(?:\/|$)/.test(target.pathname)) return;
+      // Same-origin proxy reads the existing session. Do not wait on refresh,
+      // staff authorization, or any other optional API before navigating.
+      window.location.assign(target.toString());
+    },
     refreshLearningProgress,
+    markAllNotificationsRead,
     openStaffConsole: () => {
       if (!staffAccess?.authorized) return;
       window.location.assign(staffAccess.canAdmin ? "/admin/" : "/mod/");
     },
-  }), [ready, session, staffAccess, learningProgress, learningProgressReady]);
+  }), [ready, session, spiritPetSpecies, spiritPetReady, staffAccess, learningProgress, personalLearningSnapshot, personalLearningSnapshotStatus, learningProgressReady, notifications, unreadNotificationCount, notificationsStatus]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
@@ -457,6 +768,46 @@ export function StudyOsLink({
   return <a href={href} className={className} onClick={onClick} {...rest}>{children}</a>;
 }
 
+export function GameHubLink({
+  href,
+  className,
+  children,
+  ...rest
+}: {
+  href: string;
+  className?: string;
+  children: ReactNode;
+  [key: string]: unknown;
+}) {
+  const { member, openGameHub } = useMemberAuth();
+  const canBridgeSession = Boolean(member && canAccessGameHub(member.role));
+  const onClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!canBridgeSession) return;
+    event.preventDefault();
+    void openGameHub(href);
+  };
+  return <a href={href} className={className} {...rest} onClick={canBridgeSession ? onClick : undefined}>{children}</a>;
+}
+
+function ProfileDisplayModeSetting({ onModeChange }: { onModeChange?: (mode: DisplayMode) => void }) {
+  const { mode, setMode } = useDisplayMode();
+  const pcEnabled = mode === "pc";
+  const nextMode = pcEnabled ? "auto" : "pc";
+
+  return (
+    <button
+      className={styles.displayModeSetting}
+      type="button"
+      onClick={() => { setMode(nextMode); onModeChange?.(nextMode); }}
+      aria-pressed={pcEnabled}
+      aria-label={pcEnabled ? "Đang bật chế độ PC. Nhấn để chuyển về Mobile." : "Đang dùng chế độ Mobile. Nhấn để chuyển sang PC."}
+    >
+      <span><strong>Chế độ hiển thị</strong><small>{pcEnabled ? "Đang dùng PC · Nhấn để chuyển về Mobile." : "Đang dùng Mobile · Nhấn để chuyển sang PC."}</small></span>
+      <span className={styles.profileModeButton}>{pcEnabled ? "PC đang bật" : "Bật chế độ PC →"}</span>
+    </button>
+  );
+}
+
 export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
   const { member, staffAccess, learningProgress, ready, login, logout, openStudyOs, openStaffConsole } = useMemberAuth();
   const [open, setOpen] = useState(false);
@@ -465,16 +816,22 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    if (!ready || member) return;
+    if (new URLSearchParams(window.location.search).get("open") === "game-hub") setOpen(true);
+  }, [ready, member]);
+
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (busy || !studentCode.trim() || !password) return;
+    const returningToGameHub = new URLSearchParams(window.location.search).get("open") === "game-hub";
     setBusy(true);
     setError("");
     try {
       const access = await login(studentCode, password);
       setPassword("");
       setOpen(false);
-      if (access?.authorized) {
+      if (access?.authorized && !returningToGameHub) {
         window.location.assign(access.canAdmin ? "/admin/" : "/mod/");
       }
     } catch (cause) {
@@ -490,7 +847,7 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
 
   return <>
     <button className={styles.accountButton} type="button" onClick={() => setOpen(true)} aria-label={member ? `Tài khoản ${member.fullName}` : "Đăng nhập thành viên"}>
-      <i className={styles.avatar}>{member?.avatarUrl ? <img src={member.avatarUrl} alt="" /> : (initials || "HIU")}</i>
+      <i className={styles.avatar}>{member?.avatarUrl ? <img src={member.avatarUrl} alt="" loading="lazy" /> : (initials || "HIU")}</i>
       <span>
         <strong>{member ? member.fullName : "Thành viên YHCT"}</strong>
         <small>{!ready ? "Đang kiểm tra phiên…" : member ? `${member.title} · Đã đồng bộ Study OS` : "Đăng nhập bằng tài khoản Study OS"}</small>
@@ -502,14 +859,11 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
         <button className={styles.close} type="button" onClick={() => setOpen(false)} aria-label="Đóng">×</button>
         {member ? <>
           <div className={styles.memberCard}>
-            <i className={styles.avatarLarge}>{member.avatarUrl ? <img src={member.avatarUrl} alt="" /> : initials}</i>
+            <i className={styles.avatarLarge}>{member.avatarUrl ? <img src={member.avatarUrl} alt="" loading="lazy" /> : initials}</i>
             <span><small>THÀNH VIÊN ĐÃ ĐỒNG BỘ</small><strong>{member.fullName}</strong><em>{member.studentCode || "HIU YHCT"} · {member.title}</em></span>
           </div>
           <p>Phiên đăng nhập trang chủ dùng cùng hệ tài khoản với Study OS. Quyền Admin/Mod được xác minh lại tại máy chủ trước khi mở khu vực quản trị.</p>
-          <div className={styles.displayModeSetting}>
-            <span><strong>Chế độ hiển thị</strong><small>Chuyển Mobile/PC ngay trong hồ sơ thành viên.</small></span>
-            <DisplayModeToggle className={styles.profileModeButton} onModeChange={(next) => { if (next === "pc") setOpen(false); }} />
-          </div>
+          <ProfileDisplayModeSetting onModeChange={(next) => { if (next === "pc") setOpen(false); }} />
           <div className={styles.syncState}>
             <strong>{learningProgress?.hasSync ? "Tiến độ Study OS đã đồng bộ" : "Tiến độ Study OS chưa có bản đồng bộ thành công"}</strong>
             <small>{learningProgress?.hasSync ? `Streak ${learningProgress.streak} ngày · ${learningProgress.todayQuestions} câu hôm nay · ${learningProgress.xp} XP` : "Mở Study OS sau bản sửa để hệ thống gửi lại dữ liệu học tập lên máy chủ."}</small>
@@ -525,10 +879,7 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
           <label>Mật khẩu<input value={password} onChange={(e) => { setPassword(e.target.value); if (error) setError(""); }} type="password" autoComplete="current-password" disabled={busy} /></label>
           {error && <div className={styles.error} role="alert">{error}</div>}
           <button className={styles.primary} type="submit" disabled={busy || !studentCode.trim() || !password}>{busy ? "Đang xác thực…" : "Đăng nhập"}</button>
-          <div className={styles.displayModeSetting}>
-            <span><strong>Chế độ hiển thị</strong><small>Đổi Mobile/PC trước hoặc sau khi đăng nhập.</small></span>
-            <DisplayModeToggle className={styles.profileModeButton} onModeChange={(next) => { if (next === "pc") setOpen(false); }} />
-          </div>
+          <ProfileDisplayModeSetting onModeChange={(next) => { if (next === "pc") setOpen(false); }} />
           <small className={styles.note}>Tài khoản và quyền thành viên được xác thực trực tiếp từ hệ thống Study OS và hồ sơ club_members.</small>
         </form>}
       </section>

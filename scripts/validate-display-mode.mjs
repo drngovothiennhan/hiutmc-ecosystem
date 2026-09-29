@@ -8,8 +8,7 @@ const memberComponent = fs.readFileSync("components/MemberAuthBridge.tsx", "utf8
 
 const errors = [];
 
-const displayToggle = fs.readFileSync("components/DisplayModeToggle.tsx", "utf8");
-if (!displayToggle.includes("onModeChange?.(nextMode)")) errors.push("display-mode toggle must notify consumers when mode changes");
+if (!memberComponent.includes("onModeChange?.(nextMode)")) errors.push("profile display mode must notify the account dialog when changed");
 if (!memberComponent.includes('if (next === "pc") setOpen(false);')) errors.push("member dialog must close automatically when switching to PC mode");
 
 for (const marker of [

@@ -13,6 +13,7 @@ import {
   type SpiritEvolutionStage,
 } from "@/data/spirit-pet-visuals";
 import styles from "./SpiritCompanion.module.css";
+import { useMemberAuth } from "./MemberAuthBridge";
 
 type PetKind = "dragon" | "phoenix" | "sphinx" | "qilin" | "peacock" | "fox";
 type PetSpecies = {
@@ -24,7 +25,14 @@ type PetSpecies = {
   motion: string;
 };
 
-const PET_STORAGE_KEY = "hiutmc-spirit-pet-v1";
+const DATABASE_SPECIES_TO_KIND: Record<string, PetKind> = {
+  thanh_long: "dragon",
+  chu_tuoc: "phoenix",
+  kim_su: "sphinx",
+  ky_lan: "qilin",
+  khong_tuoc: "peacock",
+  ho_ly: "fox",
+};
 const PROGRESS_STORAGE_KEY = "hiutmc-learning-progress-v1";
 const PROGRESS_EVENT = "hiutmc:learning-progress-changed";
 const BASELINE_VISUAL_STAGE: SpiritEvolutionStage = 1;
@@ -66,9 +74,9 @@ const species: PetSpecies[] = [
   { kind: "dragon", name: "Thanh Long", title: "Rồng · Nghị lực", primary: "#2f8e8a", secondary: "#d5b260", motion: "float" },
   { kind: "phoenix", name: "Chu Tước", title: "Phụng Hoàng · Tái sinh", primary: "#c64b3d", secondary: "#f0b44d", motion: "flare" },
   { kind: "sphinx", name: "Kim Sư", title: "Kim Sư · Kiên định", primary: "#b97b35", secondary: "#e3c57a", motion: "breathe" },
-  { kind: "qilin", name: "Kỳ Lân", title: "Kỳ Lân · Cát tường", primary: "#d06d5f", secondary: "#f1d9a7", motion: "hop" },
+  { kind: "qilin", name: "Kỳ Lân", title: "Kỳ Lân · Cát tường", primary: "#568c80", secondary: "#e9dfbd", motion: "hop" },
   { kind: "peacock", name: "Khổng Tước", title: "Khổng Tước · Thanh cao", primary: "#237a77", secondary: "#73bfc5", motion: "sway" },
-  { kind: "fox", name: "Hồ Ly", title: "Hồ Ly · Linh hoạt", primary: "#d97c64", secondary: "#f7ded0", motion: "bounce" },
+  { kind: "fox", name: "Hồ Ly", title: "Hồ Ly · Linh hoạt", primary: "#b85d34", secondary: "#f1d7ab", motion: "bounce" },
 ];
 
 function readLocalProgress(): LearningProgress {
@@ -81,46 +89,29 @@ function readLocalProgress(): LearningProgress {
   }
 }
 
-function GenericPetArt({ pet }: { pet: PetSpecies }) {
-  return (
-    <svg viewBox="0 0 96 96" role="img" aria-label={pet.name} className={styles.petSvg}>
-      <defs>
-        <linearGradient id={"pet-" + pet.kind} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor={pet.secondary} />
-          <stop offset="1" stopColor={pet.primary} />
-        </linearGradient>
-      </defs>
-      <ellipse cx="48" cy="63" rx="24" ry="19" fill={"url(#pet-" + pet.kind + ")"} />
-      <circle cx="48" cy="38" r="20" fill={"url(#pet-" + pet.kind + ")"} />
-      {pet.kind === "fox" && (
-        <>
-          <path d="M32 25 25 8 43 21Z" fill={pet.primary} />
-          <path d="m64 25 7-17-18 13Z" fill={pet.primary} />
-          <path d="M69 63c22-6 21 19 5 20-7 0-11-4-13-7 13 2 16-7 8-13Z" fill={pet.secondary} />
-        </>
-      )}
-      {pet.kind === "dragon" && (
-        <>
-          <path d="m34 23-5-14 12 10M62 23l5-14-12 10" fill="none" stroke={pet.secondary} strokeWidth="5" strokeLinecap="round" />
-          <path d="M70 60c18-6 22 10 12 18-5 4-12 3-16 0" fill="none" stroke={pet.primary} strokeWidth="7" strokeLinecap="round" />
-        </>
-      )}
-      {pet.kind === "sphinx" && <path d="M27 34c2-18 40-18 42 0l-5 11H32Z" fill={pet.secondary} opacity=".72" />}
-      {pet.kind === "qilin" && (
-        <>
-          <path d="M48 20 54 5l5 18" fill={pet.secondary} />
-          <path d="M33 26 28 15l12 7M63 26l5-11-12 7" fill={pet.primary} />
-        </>
-      )}
-      
-      <circle cx="41" cy="38" r="2.6" fill="#1b2735" />
-      <circle cx="55" cy="38" r="2.6" fill="#1b2735" />
-      <path d="M44 47c2.5 2.5 5.5 2.5 8 0" fill="none" stroke="#7d3443" strokeWidth="2.4" strokeLinecap="round" />
-    </svg>
-  );
-}
+const VISUAL_V2_ACTIVE_SPECIES = new Set<PetKind>(["dragon", "phoenix", "sphinx", "qilin", "peacock", "fox"]);
 
-const VISUAL_V2_ACTIVE_SPECIES = new Set<PetKind>(["dragon", "phoenix", "sphinx", "peacock"]);
+const qilinPreviewStages: Array<{
+  stage: SpiritEvolutionStage;
+  short: string;
+  description: string;
+}> = [
+  { stage: 1, short: "Mầm linh", description: "Kỳ Lân non nhỏ, sừng mới nhú, bờm ngắn trên dáng bốn chân thanh mảnh." },
+  { stage: 2, short: "Thành hình", description: "Sừng và bờm rõ hơn; thân Kỳ Lân bắt đầu hiện các vệt vảy ngọc." },
+  { stage: 3, short: "Linh thể", description: "Dáng chạy linh hoạt với bờm dài, đuôi bay và vảy xếp lớp." },
+  { stage: 4, short: "Viên mãn", description: "Kỳ Lân trưởng thành với sừng hoàn chỉnh, bờm lượn và hoa văn ngọc kim tinh xảo." },
+];
+
+const foxPreviewStages: Array<{
+  stage: SpiritEvolutionStage;
+  short: string;
+  description: string;
+}> = [
+  { stage: 1, short: "Mầm linh", description: "Hồ Ly con với tai vểnh, mõm cáo và một chiếc đuôi bông nhỏ." },
+  { stage: 2, short: "Thành hình", description: "Hồ Ly trẻ linh hoạt, hai chiếc đuôi riêng biệt bắt đầu xòe sau thân." },
+  { stage: 3, short: "Linh thể", description: "Cáo trưởng thành đang bật nhảy, nhiều đuôi dài mở thành quạt." },
+  { stage: 4, short: "Viên mãn", description: "Hồ Ly chín đuôi múa giữa không trung với bộ lông và đuôi hoàn chỉnh." },
+];
 
 function PetArtwork({
   pet,
@@ -131,7 +122,7 @@ function PetArtwork({
   stage?: SpiritEvolutionStage;
   compact?: boolean;
 }) {
-  if (!VISUAL_V2_ACTIVE_SPECIES.has(pet.kind)) return <GenericPetArt pet={pet} />;
+
 
   const visual = resolveSpiritPetVisual(pet.kind, stage);
   if (!visual) return null;
@@ -161,6 +152,7 @@ function PetArtwork({
 }
 
 export default function SpiritCompanion() {
+  const { member, ready: authReady, spiritPetSpecies, spiritPetReady } = useMemberAuth();
   const [pet, setPet] = useState<PetSpecies | null>(null);
   const [open, setOpen] = useState(false);
   const [isNew, setIsNew] = useState(false);
@@ -170,26 +162,23 @@ export default function SpiritCompanion() {
   const [previewStage, setPreviewStage] = useState<SpiritEvolutionStage | null>(null);
 
   useEffect(() => {
+    if (!authReady || (member && !spiritPetReady)) return;
     setDayKey(localDayKey(new Date()));
     setProgress(readLocalProgress());
 
-    try {
-      const saved = window.localStorage.getItem(PET_STORAGE_KEY);
-      if (saved) {
-        const found = species.find((item) => item.kind === saved);
-        if (found) {
-          setPet(found);
-          return;
-        }
-      }
-      const next = species[Math.floor(Math.random() * species.length)];
-      window.localStorage.setItem(PET_STORAGE_KEY, next.kind);
-      setPet(next);
-      setIsNew(true);
-    } catch {
-      setPet(species[3]);
+    if (member) {
+      const kind = spiritPetSpecies ? DATABASE_SPECIES_TO_KIND[spiritPetSpecies] : null;
+      const found = species.find((item) => item.kind === kind) || null;
+      setPet(found);
+      setIsNew(false);
+      return;
     }
-  }, []);
+
+    // Signed-out visitors get an in-memory preview only; it is not saved on this device.
+    const next = species[Math.floor(Math.random() * species.length)];
+    setPet(next);
+    setIsNew(true);
+  }, [authReady, member?.id, spiritPetReady, spiritPetSpecies]);
 
   useEffect(() => {
     const sync = () => setProgress(readLocalProgress());
@@ -210,14 +199,15 @@ export default function SpiritCompanion() {
   const nextMission = missions.find((mission) => !completedToday.has(mission.id));
 
   const message = useMemo(() => {
+    if (!member) return "Linh thú khách chỉ là bản xem thử tạm thời. Đăng nhập để đồng bộ hồ sơ Linh Thú giữa các thiết bị.";
     if (isNew) return "Bạn vừa gặp linh thú đồng hành đầu tiên. Mình sẽ nhắc các nhiệm vụ học tập đang lưu trên thiết bị này.";
     if (!dayKey) return "Mình đang đồng bộ nhiệm vụ học tập trên thiết bị.";
     if (remaining === 0) return "Ba nhiệm vụ hôm nay đã được đánh dấu hoàn thành. Tiến độ này hiện chỉ lưu trên thiết bị.";
     if (nextMission) return `Bạn còn ${remaining} nhiệm vụ hôm nay. Gợi ý tiếp theo: ${nextMission.title}.`;
     return "Mình ở đây để gom nhắc học và hoạt động quan trọng vào một góc nhỏ.";
-  }, [dayKey, isNew, nextMission, remaining]);
+  }, [dayKey, isNew, member, nextMission, remaining]);
 
-  if (!pet) return <button className={styles.placeholder} aria-label="Linh thú đồng hành" type="button">✦</button>;
+  if (!pet || (member && !spiritPetReady)) return <button className={styles.placeholder} aria-label={member ? "Linh thú đang chờ máy chủ đồng bộ" : "Linh thú đồng hành"} title={member ? "Không tải được hồ sơ Linh Thú từ máy chủ." : undefined} type="button">✦</button>;
 
   const theme = { "--pet-a": pet.primary, "--pet-b": pet.secondary } as CSSProperties;
   const badgeText = dayKey ? String(remaining) : "…";
@@ -226,7 +216,11 @@ export default function SpiritCompanion() {
     ? phoenixPreviewStages[renderedStage - 1]
     : pet.kind === "peacock"
       ? peacockPreviewStages[renderedStage - 1]
-      : genericPreviewStages[renderedStage - 1];
+      : pet.kind === "qilin"
+        ? qilinPreviewStages[renderedStage - 1]
+        : pet.kind === "fox"
+          ? foxPreviewStages[renderedStage - 1]
+          : genericPreviewStages[renderedStage - 1];
   const visualVersion = VISUAL_V2_ACTIVE_SPECIES.has(pet.kind) ? SPIRIT_VISUAL_VERSION : "legacy-frozen";
 
   return (
@@ -285,7 +279,11 @@ export default function SpiritCompanion() {
                     ? phoenixPreviewStages[item.stage - 1]
                     : pet.kind === "peacock"
                       ? peacockPreviewStages[item.stage - 1]
-                      : item;
+                      : pet.kind === "qilin"
+                        ? qilinPreviewStages[item.stage - 1]
+                        : pet.kind === "fox"
+                          ? foxPreviewStages[item.stage - 1]
+                          : item;
                   return (
                     <button
                       key={item.stage}
@@ -306,8 +304,9 @@ export default function SpiritCompanion() {
           )}
 
           <small className={styles.note}>
-            Visual {visualVersion}. Preview chỉ thay asset hiển thị; progression, cấp thật, XP, thân mật, vật phẩm và đồng bộ tài khoản vẫn FROZEN/REVIEW.
+            Hồ sơ loài của thành viên được lưu trên máy chủ để dùng khi đổi thiết bị. Preview là tạm thời; cấp thật, XP, thân mật, vật phẩm và phần thưởng vẫn FROZEN/REVIEW.
           </small>
+          {!member && <small className={styles.note}>Đăng nhập thành viên để lưu hồ sơ Linh Thú trên máy chủ và tiếp tục dùng khi đổi thiết bị.</small>}
         </section>
       )}
       <button type="button" className={styles.launcher} onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-label={"Mở linh thú " + pet.name}>

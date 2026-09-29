@@ -1,4 +1,5 @@
 import { discoverChannels } from "@/data/community-hub";
+import TcmNewsFeed from "@/components/TcmNewsFeed";
 import styles from "./discover.module.css";
 
 export default function DiscoverPage() {
@@ -28,6 +29,8 @@ export default function DiscoverPage() {
           </article>
         ))}
       </section>
+
+      <TcmNewsFeed />
 
       <section className={styles.sources}>
         <div>

@@ -22,6 +22,7 @@ on:
   pull_request:
     branches:
       - main
+      - production
   workflow_dispatch:
 
 permissions:
@@ -78,6 +79,9 @@ jobs:
       - name: Validate server staff authorization
         run: npm run validate:staff-auth
 
+      - name: Validate admin spirit-pet profile invariant
+        run: npm run validate:spirit-pet-admin
+
       - name: Validate Admin/Mod shadow backend
         run: npm run validate:admin-shadow
 
@@ -86,6 +90,9 @@ jobs:
 
       - name: Validate profile display control and learning progress
         run: npm run validate:profile-progress
+
+      - name: Test admin-only traffic counter
+        run: npm run test:traffic
 
       - name: Build static export
         run: npm run build

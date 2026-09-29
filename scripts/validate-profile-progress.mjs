@@ -18,6 +18,10 @@ for(const marker of [
 
 for(const marker of [
   "DisplayModeToggle",
+  "ProfileDisplayModeSetting",
+  "setMode(nextMode)",
+  "aria-pressed={pcEnabled}",
+  "Bật chế độ PC",
   "profileModeButton",
   "learningProgressReady",
   'method: "GET"',
@@ -30,8 +34,9 @@ for(const marker of [
 for(const marker of [
   ".displayModeSetting",
   ".profileModeButton",
-  "position:static!important",
-  "justify-content:center!important",
+  "cursor:pointer",
+  ".displayModeSetting:focus-visible",
+  "justify-content:center",
 ]){
   if(!authCss.includes(marker))errors.push(`profile display control style missing: ${marker}`);
 }

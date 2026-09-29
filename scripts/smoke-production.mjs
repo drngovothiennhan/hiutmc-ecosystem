@@ -14,19 +14,44 @@ const routes = [
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const sameOriginAppRoutes = [
+  ["/apps/study/", "YHCT HIU 4.0"],
+  ["/apps/thietchan/", "A.I THIỆT CHẨN"],
+  ["/apps/trungyvan/", "Trung Y Văn HIU"],
+  ["/apps/atlas/", "Huyệt vị · Kinh lạc · Giải phẫu 3D"],
+];
+
+
+async function fetchBody(url, options = {}, kind = "text") {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    const body = kind === "bytes" ? Buffer.from(await response.arrayBuffer()) : await response.text();
+    return { response, body };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function fetchHeaders(url, options = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function getWithRetry(url, attempts = 12) {
   let last;
   for (let i = 1; i <= attempts; i += 1) {
     try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 15000);
-      const response = await fetch(url, {
+      const { response, body: text } = await fetchBody(url, {
         redirect: "follow",
-        signal: controller.signal,
         headers: { "user-agent": "HIU-YHCT-release-smoke/1.0" },
       });
-      clearTimeout(timer);
-      const text = await response.text();
       if (response.ok) return { response, text, attempt: i };
       last = new Error(`${url} returned HTTP ${response.status}`);
     } catch (error) {
@@ -37,18 +62,102 @@ async function getWithRetry(url, attempts = 12) {
   throw last || new Error(`Unable to fetch ${url}`);
 }
 
+const petVisualAssets = ["dragon", "phoenix", "sphinx", "peacock", "qilin", "fox"]
+  .flatMap((species) => [1, 2, 3, 4].flatMap((stage) => ["full", "icon"]
+    .map((variant) => `/spirit-pets/visual-v2/${species}-stage-${stage}-${variant}.webp`)));
+const petVisualResults = await Promise.all(petVisualAssets.map(async (path) => {
+  const url = new URL(path, base).toString();
+  const response = await fetchHeaders(url);
+  const contentType = response.headers.get("content-type") || "";
+  if (!response.ok || !contentType.includes("image/webp")) {
+    throw new Error(`Spirit pet visual asset failed production smoke: ${path} (HTTP ${response.status}, ${contentType})`);
+  }
+  return path;
+}));
+console.log(`PASS ${petVisualResults.length} production spirit visual-v2 WebP assets (all six species / four stages)`);
+
+let liveHtmlFromRoute = "";
 for (const [route, marker] of routes) {
   const url = new URL(route, base).toString();
   const { response, text, attempt } = await getWithRetry(url);
   if (!text.includes(marker)) {
     throw new Error(`${url} is reachable but missing expected marker: ${marker}`);
   }
+  if (route === "/") liveHtmlFromRoute = text;
   console.log(`PASS ${response.status} ${url} (attempt ${attempt})`);
 }
 
+for (const [route, marker] of sameOriginAppRoutes) {
+  const url = new URL(route, base).toString();
+  const { response, text, attempt } = await getWithRetry(url);
+  if (!text.includes(marker)) throw new Error(`${url} gateway missing expected marker: ${marker}`);
+  if (!response.headers.get("x-hiutmc-app-gateway")) throw new Error(`${url} missing gateway header`);
+  if (!text.includes("<base href=")) throw new Error(`${url} missing same-origin base rewrite`);
+  const assetRefs = [...text.matchAll(/<(?:script|link)[^>]+(?:src|href)=["']([^"'#]+)["']/gi)]
+    .map(match => match[1])
+    .filter(ref => !ref.startsWith("data:"))
+    .slice(0, 8);
+  if (!assetRefs.length) throw new Error(`${url} gateway did not expose any shell asset references`);
+  for (const ref of assetRefs) {
+    const assetUrl = new URL(ref, url).toString();
+    const asset = await getWithRetry(assetUrl, 4);
+    if (!asset.response.ok) throw new Error(`${assetUrl} gateway shell asset failed`);
+  }
+  console.log(`PASS same-origin gateway ${response.status} ${url} + ${assetRefs.length} shell assets (attempt ${attempt})`);
+}
+
+const sameOriginDeepRoutes = [
+  ["/apps/study/ai", "YHCT HIU 4.0"],
+  ["/apps/study/api/manifest", null],
+  ["/apps/thietchan/open-source.html", "Thông tin ứng dụng & nguồn mở"],
+  ["/apps/trungyvan/manifest.webmanifest", null],
+  ["/apps/atlas/data/meridians.json", null],
+  ["/apps/atlas/models/atlas.json", null],
+];
+for (const [route, marker] of sameOriginDeepRoutes) {
+  const url = new URL(route, base).toString();
+  const { response, text, attempt } = await getWithRetry(url);
+  if (!response.headers.get("x-hiutmc-app-gateway")) throw new Error(`${url} deep route missing gateway header`);
+  if (marker && !text.includes(marker)) throw new Error(`${url} deep route missing marker: ${marker}`);
+  console.log(`PASS deep same-origin route ${response.status} ${url} (attempt ${attempt})`);
+}
+
+const thietChanHealthUrl = new URL('/apps/thietchan/api/health', base).toString();
+const { response: thietChanHealthResponse, text: thietChanHealthText } = await getWithRetry(thietChanHealthUrl, 6);
+const thietChanHealth = JSON.parse(thietChanHealthText || '{}');
+if (!thietChanHealthResponse.ok || thietChanHealth.ok !== true || thietChanHealth.vision?.provider !== 'local') {
+  throw new Error(`A.I Thiệt Chẩn health through HIU TMC gateway is not ready: ${thietChanHealthResponse.status}`);
+}
+console.log('PASS A.I Thiệt Chẩn health through HIU TMC gateway');
+
+const { text: thietChanAppJs } = await getWithRetry(new URL('/apps/thietchan/app.js?hiutmc_smoke=1', base).toString(), 6);
+if (!thietChanAppJs.includes('ensureInlineVisualVerification')) throw new Error('HIU TMC gateway is serving stale A.I Thiệt Chẩn app.js');
+console.log('PASS A.I Thiệt Chẩn current analysis runtime through HIU TMC gateway');
+
+const { text: thietChanAdminHtml } = await getWithRetry(new URL('/apps/thietchan/admin-center.html', base).toString(), 6);
+if (!thietChanAdminHtml.includes('Admin Center · A.I THIỆT CHẨN') || !thietChanAdminHtml.includes('không phải Admin Center HIU TMC')) {
+  throw new Error('A.I Thiệt Chẩn Admin Center identity is incorrect through HIU TMC gateway');
+}
+console.log('PASS A.I Thiệt Chẩn Admin Center identity through HIU TMC gateway');
+
+const rootAdminFromThietChan = await fetchHeaders(new URL('/admin-center.html', base).toString(), {
+  redirect: 'manual',
+  headers: {
+    referer: new URL('/apps/thietchan/', base).toString(),
+    accept: 'text/html',
+    'sec-fetch-dest': 'document',
+    'user-agent': 'HIU-YHCT-release-smoke/1.0',
+  },
+});
+const rootAdminLocation = rootAdminFromThietChan.headers.get('location') || '';
+if (![301,302,303,307,308].includes(rootAdminFromThietChan.status) || !rootAdminLocation.includes('/apps/thietchan/admin-center.html')) {
+  throw new Error(`A.I Thiệt Chẩn document navigation escaped its app prefix: ${rootAdminFromThietChan.status} ${rootAdminLocation}`);
+}
+console.log('PASS A.I Thiệt Chẩn document navigation stays inside its gateway prefix');
+
 async function expectStaffRedirect(route, required) {
   const url = new URL(route, base).toString();
-  const response = await fetch(url, {
+  const response = await fetchHeaders(url, {
     redirect: "manual",
     headers: { "user-agent": "HIU-YHCT-release-smoke/1.0" },
   });
@@ -65,22 +174,63 @@ async function expectStaffRedirect(route, required) {
 await expectStaffRedirect("/admin/", "admin");
 await expectStaffRedirect("/mod/", "mod");
 
-const anonymousStaff = await fetch(new URL("/api/staff/access", base), {
+const { response: anonymousStaff, body: anonymousStaffText } = await fetchBody(new URL("/api/staff/access", base), {
   redirect: "manual",
   headers: { "user-agent": "HIU-YHCT-release-smoke/1.0" },
 });
-const anonymousStaffBody = await anonymousStaff.json().catch(() => ({}));
+const anonymousStaffBody = JSON.parse(anonymousStaffText || "{}");
 if (anonymousStaff.status !== 401 || anonymousStaffBody.authorized !== false) {
   throw new Error(`Anonymous staff API must return 401/authorized=false; got ${anonymousStaff.status}`);
 }
 console.log("PASS anonymous staff API denied");
 
+const { response: anonymousTraffic, body: anonymousTrafficText } = await fetchBody(new URL("/api/admin/traffic", base), {
+  redirect: "manual",
+  headers: { "user-agent": "HIU-YHCT-release-smoke/1.0" },
+});
+const anonymousTrafficBody = JSON.parse(anonymousTrafficText || "{}");
+if (anonymousTraffic.status !== 401 || anonymousTrafficBody.authorized !== false) {
+  throw new Error(`Anonymous traffic API must return 401/authorized=false; got ${anonymousTraffic.status}`);
+}
+console.log("PASS anonymous Admin traffic API denied");
+
+const { response: publicHubsResponse, body: publicHubsText } = await fetchBody(new URL("/api/hub-registry", base), { redirect: "manual" });
+const publicHubs = JSON.parse(publicHubsText || "null");
+if (publicHubsResponse.status !== 200 || !Array.isArray(publicHubs?.hubs)) {
+  throw new Error(`Published Hub registry must be public JSON; got ${publicHubsResponse.status}`);
+}
+console.log("PASS public published Hub registry API");
+
+const newsFeedUrl = "https://gzmpnsrwqjpsbklyflqr.supabase.co/rest/v1/rpc/tcm_news_feed_v1";
+const { response: publicNewsResponse, body: publicNewsText } = await fetchBody(newsFeedUrl, {
+  method: "POST",
+  headers: {
+    apikey: "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG",
+    "content-type": "application/json",
+    accept: "application/json",
+  },
+  body: JSON.stringify({ p_limit: 3 }),
+});
+const publicNews = JSON.parse(publicNewsText || "null");
+if (publicNewsResponse.status !== 200 || !Array.isArray(publicNews)) {
+  throw new Error(`Published Google News feed RPC must return an array; got ${publicNewsResponse.status}`);
+}
+for (const item of publicNews) {
+  let sourceIsHttps = false;
+  try { sourceIsHttps = new URL(item.canonical_url).protocol === "https:"; } catch {}
+  if (typeof item.id !== "string" || typeof item.title !== "string" || !sourceIsHttps) {
+    throw new Error("Published Google News feed returned a row without a title, id, or HTTPS source link");
+  }
+}
+console.log(`PASS public published Google News feed RPC (${publicNews.length} live rows)`);
+
 for (const [path, method] of [
   ["/api/staff/shadow/snapshot", "GET"],
   ["/api/staff/shadow/hub-draft", "POST"],
+  ["/api/staff/shadow/publish", "POST"],
   ["/api/staff/shadow/moderation", "POST"],
 ]) {
-  const response = await fetch(new URL(path, base), {
+  const { response, body: responseText } = await fetchBody(new URL(path, base), {
     method,
     redirect: "manual",
     headers: {
@@ -89,14 +239,14 @@ for (const [path, method] of [
     },
     ...(method === "POST" ? { body: JSON.stringify({}) } : {}),
   });
-  const body = await response.json().catch(() => ({}));
+  const body = JSON.parse(responseText || "{}");
   if (response.status !== 401 || body.authorized !== false) {
-    throw new Error(`Anonymous CP23 shadow endpoint must return 401/authorized=false: ${path} got ${response.status}`);
+    throw new Error(`Anonymous staff endpoint must return 401/authorized=false: ${path} got ${response.status}`);
   }
-  console.log(`PASS CP23 shadow endpoint denied anonymous ${method} ${path}`);
+  console.log(`PASS staff endpoint denied anonymous ${method} ${path}`);
 }
 
-const home = await fetch(new URL("/", base), { redirect: "follow" });
+const home = await fetchHeaders(new URL("/", base), { redirect: "follow" });
 const requiredHeaders = [
   ["x-content-type-options", "nosniff"],
   ["referrer-policy", "strict-origin-when-cross-origin"],
@@ -111,7 +261,7 @@ for (const [name, expected] of requiredHeaders) {
 
 console.log("HIU YHCT production smoke passed.");
 
-const { text: liveHtml } = await getWithRetry(new URL('/', base));
+const liveHtml = liveHtmlFromRoute;
 const approvedMarkers = [
   "HIU YHCT DIGITAL CAMPUS",
   "Chào mừng trở lại",
@@ -139,13 +289,21 @@ for (const marker of hiddenAvatarMarkers) {
   if (liveHtml.includes(marker)) throw new Error(`Legacy avatar flow must remain hidden in CP15: ${marker}`);
 }
 const memberAppUrls = [
+  "https://hiutmc.com/apps/study/",
+  "https://hiutmc.com/apps/thietchan/",
+  "https://hiutmc.com/apps/trungyvan/",
+  "https://hiutmc.com/apps/atlas/",
+];
+for (const appUrl of memberAppUrls) {
+  if (!liveHtml.includes(appUrl)) throw new Error(`Homepage is missing an app destination: ${appUrl}`);
+}
+for (const rawUpstream of [
   "https://yhct-hiu-final4-stage-hiu-yhct.vercel.app/",
   "https://ai-thiet-chan-hiu-yhct.vercel.app/",
   "https://drngovothiennhan.github.io/trung-y-van-hiu/",
   "https://drngovothiennhan.github.io/human-atlas/",
-];
-for (const appUrl of memberAppUrls) {
-  if (!liveHtml.includes(appUrl)) throw new Error(`Homepage is missing an app destination: ${appUrl}`);
+]) {
+  if (liveHtml.includes(`href="${rawUpstream}`)) throw new Error(`Homepage still exposes raw upstream navigation: ${rawUpstream}`);
 }
 const { text: manifestText } = await getWithRetry(new URL('/manifest.webmanifest', base));
 const manifest = JSON.parse(manifestText);
@@ -153,8 +311,7 @@ if (manifest.id !== '/' || manifest.display !== 'standalone') throw new Error('I
 for (const size of [192, 512]) {
   const icon = manifest.icons.find(icon => icon.sizes === `${size}x${size}` && icon.type === 'image/png');
   if (!icon) throw new Error(`Missing live PWA icon ${size}`);
-  const response = await fetch(new URL(icon.src, base));
-  const data = Buffer.from(await response.arrayBuffer());
+  const { response, body: data } = await fetchBody(new URL(icon.src, base), {}, "bytes");
   if (!response.ok || data.length < 24 || data.toString('hex',0,8) !== '89504e470d0a1a0a' || data.readUInt32BE(16) !== size || data.readUInt32BE(20) !== size) throw new Error(`Invalid live PNG ${size}`);
 }
 for (const [path, marker] of [['/sw.js','hiutmc-offline-v1'],['/offline.html','Bạn đang ngoại tuyến']]) {
@@ -162,11 +319,10 @@ for (const [path, marker] of [['/sw.js','hiutmc-offline-v1'],['/offline.html','B
   if (!text.includes(marker) || !response.headers.get('cache-control')?.includes('no-cache')) throw new Error(`PWA asset/header check failed ${path}`);
 }
 
-const zaloPreview = await fetch(new URL("/", base), {
+const { body: zaloHtml } = await fetchBody(new URL("/", base), {
   redirect: "follow",
   headers: { "user-agent": "Zalo-LinkPreview/1.0" },
 });
-const zaloHtml = await zaloPreview.text();
 for (const marker of [
   'property="og:title"',
   'property="og:description"',
@@ -176,17 +332,15 @@ for (const marker of [
 ]) {
   if (!zaloHtml.includes(marker)) throw new Error(`Zalo/social preview HTML missing marker: ${marker}`);
 }
-const socialImage = await fetch("https://hiutmc.com/icons/icon-512.png?share=cp22");
-const socialImageData = Buffer.from(await socialImage.arrayBuffer());
+const { response: socialImage, body: socialImageData } = await fetchBody("https://hiutmc.com/icons/icon-512.png?share=cp22", {}, "bytes");
 if (!socialImage.ok || socialImageData.length < 24 || socialImageData.toString("hex",0,8) !== "89504e470d0a1a0a") {
   throw new Error("Social preview PNG is not reachable or invalid.");
 }
 if (socialImageData.readUInt32BE(16) < 300 || socialImageData.readUInt32BE(20) < 300) {
   throw new Error("Social preview image is too small.");
 }
-const robots = await fetch(new URL("/robots.txt", base));
-const robotsText = await robots.text();
+const { response: robots, body: robotsText } = await fetchBody(new URL("/robots.txt", base));
 if (!robots.ok || !robotsText.includes("Allow: /")) throw new Error("robots.txt does not allow social crawlers.");
 console.log("PASS Zalo/social Open Graph preview metadata, summary and image.");
 
-console.log('PASS CP23 Digital Campus, server-protected Admin/Mod routes, shadow backend denial, Zalo link preview, existing Hub destinations, PWA and offline worker.');
+console.log('PASS Digital Campus, shared Hub registry, server-protected Admin/Mod routes, staff API denial, Zalo link preview, existing Hub destinations, PWA and offline worker.');
