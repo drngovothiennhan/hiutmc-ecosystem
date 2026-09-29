@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260927-04",
+  "release": "HIU-YHCT-ECOSYSTEM-20260929-01",
   "product_name": "HIU YHCT Ecosystem",
-  "checkpoint": "CP37",
+  "checkpoint": "CP38",
   "base_checkpoint_sha": "504dcca453fd95238c16ef2330f042f47a2cbab1",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP37 hotfixes the A.I Thiệt Chẩn same-origin gateway: current runtime assets are cache-busted, nested A.I Thiệt Chẩn PWA workers are isolated from the HIU TMC shell, connected-app document navigation remains under /apps/thietchan/, and production smoke verifies gateway health, current analysis runtime, and the dedicated A.I Thiệt Chẩn Admin Center."
+  "verification": "CP38 unifies display mode and page transitions across the portal and connected apps: one shell script (lib/shell-mode.mjs) runs on every portal page and is injected into every /apps/* page, so the saved PC/Mobile choice sets the viewport everywhere and every navigation uses the same view transition; assistant links now open the same-origin gateway instead of the upstream host. Homepage structure is unchanged. CI, Cloudflare deployment and production smoke remain mandatory."
 }

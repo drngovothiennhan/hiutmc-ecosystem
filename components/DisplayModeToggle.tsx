@@ -11,8 +11,15 @@ function readMode(): DisplayMode {
   catch { return "auto"; }
 }
 
+declare global {
+  interface Window { __hiutmcApplyDisplayMode?: (mode: DisplayMode) => void }
+}
+
 function applyMode(mode: DisplayMode) {
-  document.documentElement.dataset.displayMode = mode;
+  // The shell script (lib/shell-mode.mjs) also switches the viewport meta, so
+  // pages other than the homepage follow the same PC/Mobile choice.
+  if (window.__hiutmcApplyDisplayMode) window.__hiutmcApplyDisplayMode(mode);
+  else document.documentElement.dataset.displayMode = mode;
 }
 
 export function useDisplayMode() {
