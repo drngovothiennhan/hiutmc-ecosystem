@@ -55,14 +55,15 @@ for (const [html, route] of [[admin, "Admin"], [mod, "Mod"]]) {
   }
 }
 
+// Admin Center tabs were regrouped on 2026-09-30 at the owner's request:
+// traffic is part of the overview, Hub content + links are one page, moderation + members are one
+// page, the audit log + settings are one page, and "Giao diện" (site theme) was added.
 for (const marker of [
   "Tổng quan",
-  "Nội dung Hub",
-  "Liên kết",
-  "Duyệt của Mod",
-  "Thành viên & vai trò",
-  "Nhật ký",
-  "Cấu hình",
+  "Nội dung & Liên kết",
+  "Duyệt & Thành viên",
+  "Nhật ký & Cấu hình",
+  "Giao diện",
   "Lượt truy cập",
   "/api/admin/traffic",
   "SERVER VERIFIED",
