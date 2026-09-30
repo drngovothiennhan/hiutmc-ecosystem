@@ -1,4 +1,4 @@
-# HIU YHCT Ecosystem — Production status
+# HIU TMC — Production status
 
 ## Source of truth
 - Public site: https://hiutmc.com
@@ -12,7 +12,7 @@
 - Exact release contract: `RELEASE.json`.
 
 ## Approved product
-- The homepage is the approved illustrated HIU YHCT ecosystem map, with direct links to Study OS, A.I Thiệt Chẩn, Trung Y Văn and 3D Atlas.
+- The homepage is the approved illustrated HIU TMC ecosystem map, with direct links to Study OS, A.I Thiệt Chẩn, Trung Y Văn and 3D Atlas.
 - The mobile taskbar links to Trang chủ, Ứng dụng, Nhiệm vụ, Atlas 3D and Cộng đồng.
 - A reversible Mobile/PC switch remains visible in both modes; returning from PC mode restores the device-sized layout and taskbar.
 - The floating Trợ lý học tập button opens the approved Study OS assistant and direct routes to all four registered Hubs; it does not simulate an AI chat inside the portal.
@@ -30,8 +30,8 @@
 
 ## Social link preview
 - The homepage exports crawler-visible Open Graph metadata for Zalo and other social link previews.
-- Share title: `HIU YHCT Ecosystem – Cổng học tập Y học cổ truyền HIU`.
-- Share summary mentions Study OS, Atlas 3D, A.I Thiệt Chẩn, Trung Y Văn and the HIU YHCT academic community.
+- Share title: `HIU TMC – Cổng học tập Y học cổ truyền HIU`.
+- Share summary mentions Study OS, Atlas 3D, A.I Thiệt Chẩn, Trung Y Văn and the HIU TMC academic community.
 - Preview image uses the public 512×512 PNG icon with a versioned query string to reduce stale image-cache reuse.
 - `robots.txt` allows link-preview crawlers.
 

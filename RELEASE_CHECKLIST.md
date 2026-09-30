@@ -1,4 +1,4 @@
-# HIU YHCT Ecosystem — Production release checklist
+# HIU TMC — Production release checklist
 
 ## Approved CP12 experience
 - [x] Illustrated ecosystem map remains the homepage and links directly to all four registered Hubs.
