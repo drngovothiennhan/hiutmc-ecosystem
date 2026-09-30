@@ -482,7 +482,7 @@ async function proxyEcosystemApp(request, url, config, suffixOverride = null) {
 }
 
 function reservedMainPath(pathname) {
-  return /^\/(api\/(staff|admin|hub-registry)|admin|mod)(\/|$)/.test(pathname);
+  return /^\/(api\/(staff|admin|hub-registry|site-theme)|admin|mod)(\/|$)/.test(pathname);
 }
 
 export default {
@@ -532,6 +532,50 @@ export default {
       return json({ hubs: Array.isArray(payload) ? payload : [] }, 200, { "cache-control": "public, max-age=60, s-maxage=60" });
     }
 
+
+    if (pathname === "/api/site-theme") {
+      if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+      const { response, payload } = await supabasePublicRpc("site_theme_get_public_v1");
+      const themeId = response.ok && payload && typeof payload.themeId === "string" && /^[a-z0-9-]{1,32}$/.test(payload.themeId) ? payload.themeId : "default";
+      // Any failure falls back to the default design so the public site never depends on this call.
+      return json({ themeId }, 200, { "cache-control": response.ok ? "public, max-age=60, s-maxage=60" : "public, max-age=15" });
+    }
+
+    if (pathname === "/api/staff/site-theme") {
+      if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+      if (!sameOriginMutation(request)) return json({ error: "Invalid origin" }, 403);
+      const gate = await shadowStaffAccess(request, "admin");
+      if (!gate.ok) return gate.response;
+      const body = await request.json().catch(() => null);
+      if (!body || typeof body !== "object") return json({ error: "Invalid JSON" }, 400);
+      const { response, payload } = await supabaseRpc(gate.token, "site_theme_set_v1", { p_theme_id: String(body.themeId || "") });
+      return json({ data: payload }, response.ok ? 200 : response.status);
+    }
+
+    if (pathname === "/api/staff/members") {
+      if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+      const gate = await shadowStaffAccess(request, "admin");
+      if (!gate.ok) return gate.response;
+      const { response, payload } = await supabaseRpc(gate.token, "ecosystem_admin_member_list_v1");
+      return json({ data: payload }, response.ok ? 200 : response.status, { "cache-control": "no-store" });
+    }
+
+    if (pathname === "/api/staff/members/role") {
+      if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+      if (!sameOriginMutation(request)) return json({ error: "Invalid origin" }, 403);
+      const gate = await shadowStaffAccess(request, "admin");
+      if (!gate.ok) return gate.response;
+      const body = await request.json().catch(() => null);
+      if (!body || typeof body !== "object") return json({ error: "Invalid JSON" }, 400);
+      // Only Member <-> Mod is reachable from here; the database enforces the same rule.
+      const role = body.role === "mod" ? "mod" : body.role === "member" ? "member" : "";
+      if (!role) return json({ error: "Invalid role" }, 400);
+      const { response, payload } = await supabaseRpc(gate.token, "ecosystem_admin_set_member_role_v1", {
+        p_member_id: String(body.memberId || ""),
+        p_role: role,
+      });
+      return json({ data: payload }, response.ok ? 200 : response.status);
+    }
 
     if (pathname === "/api/staff/shadow/snapshot") {
       if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
