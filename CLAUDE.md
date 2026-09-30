@@ -1,4 +1,4 @@
-# CLAUDE.md — HIU YHCT Ecosystem (hiutmc.com)
+# CLAUDE.md — HIU TMC (trước đây: HIU YHCT Ecosystem) (hiutmc.com)
 
 Instructions for any AI agent working in this repository. Read this first, then
 `docs/ARCHITECTURE.md`.
