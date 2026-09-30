@@ -44,8 +44,8 @@ for (const marker of [
 if (!dashboard.includes('academy-world.webp')) errors.push("approved hero background reference is missing");
 
 for (const marker of [
-  "Khám phá hệ sinh thái HIU YHCT",
-  "Cộng đồng HIU YHCT",
+  "Khám phá hệ sinh thái HIU TMC",
+  "Cộng đồng HIU TMC",
   "Sự kiện & hoạt động",
   "Thông báo gần đây",
 ]) {

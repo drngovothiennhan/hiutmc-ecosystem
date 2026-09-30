@@ -208,18 +208,18 @@ export default function StaffConsole({ mode }: { mode: "admin" | "mod" }) {
   const clearDrafts = () => { setDrafts({}); setNotice("Đã xóa phần chỉnh sửa chưa lưu trên biểu mẫu này."); };
 
   if (!authReady) {
-    return <main className={styles.authGate}><section><span>HIU YHCT STAFF AUTH</span><h1>Đang xác minh quyền máy chủ…</h1><p>Cloudflare đang kiểm tra phiên đăng nhập với hồ sơ thành viên trước khi mở khu vực quản trị.</p></section></main>;
+    return <main className={styles.authGate}><section><span>HIU TMC STAFF AUTH</span><h1>Đang xác minh quyền máy chủ…</h1><p>Cloudflare đang kiểm tra phiên đăng nhập với hồ sơ thành viên trước khi mở khu vực quản trị.</p></section></main>;
   }
 
   return <main className={styles.shell}>
     <aside className={styles.sidebar}>
-      <a className={styles.brand} href="/"><span className={styles.seal}>HIU</span><span><strong>{mode === "admin" ? "ADMIN CENTER" : "MOD CENTER"}</strong><small>HIU YHCT ECOSYSTEM</small></span></a>
+      <a className={styles.brand} href="/"><span className={styles.seal}>HIU</span><span><strong>{mode === "admin" ? "ADMIN CENTER" : "MOD CENTER"}</strong><small>HIU TMC ECOSYSTEM</small></span></a>
       <p className={styles.sideLabel}>KHÔNG GIAN QUẢN TRỊ</p>
       <nav className={styles.nav} aria-label="Mục quản trị">{visibleTabs.map((item) => <button key={item.id} className={tab === item.id ? styles.selected : ""} onClick={() => { setTab(item.id); setNotice(""); }}><span>{item.icon}</span>{item.title}</button>)}</nav>
       <a className={styles.back} href="/">← Xem trang chính</a>
     </aside>
     <section className={styles.main}>
-      <header className={styles.top}><div><span className={styles.eyebrow}>HIU YHCT · BẢNG ĐIỀU KHIỂN</span><h1>{visibleTabs.find((item) => item.id === tab)?.title}</h1><small className={styles.staffIdentity}>{staff?.member?.fullName || "HIU YHCT"} · {staff?.role || mode}</small></div><span className={styles.localTag}>SERVER VERIFIED</span></header>
+      <header className={styles.top}><div><span className={styles.eyebrow}>HIU TMC · BẢNG ĐIỀU KHIỂN</span><h1>{visibleTabs.find((item) => item.id === tab)?.title}</h1><small className={styles.staffIdentity}>{staff?.member?.fullName || "HIU TMC"} · {staff?.role || mode}</small></div><span className={styles.localTag}>SERVER VERIFIED</span></header>
       <div className={styles.warning}><strong>Quyền truy cập đã xác thực tại máy chủ</strong><p>Cloudflare xác minh phiên Supabase và vai trò club_members. Bản nháp Hub, xuất bản công khai, hàng chờ Moderator và nhật ký được lưu trên Supabase để đồng bộ giữa các thiết bị.</p></div>
       {notice && <p className={styles.statusMessage} role="status">{notice}</p>}
 

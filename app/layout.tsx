@@ -4,7 +4,7 @@ import NavigationTransitions from "@/components/NavigationTransitions";
 import PwaInstall from "@/components/PwaInstall";
 import { SHELL_MODE_SCRIPT } from "@/lib/shell-mode.mjs";
 
-const SOCIAL_TITLE = "HIU YHCT Ecosystem – Cổng học tập Y học cổ truyền HIU";
+const SOCIAL_TITLE = "HIU TMC – Cổng học tập Y học cổ truyền HIU";
 const SOCIAL_DESCRIPTION = "Study OS · Atlas 3D · A.I Thiệt Chẩn · Trung Y Văn · cộng đồng học thuật dành cho sinh viên Y học cổ truyền HIU.";
 const SOCIAL_IMAGE = "/icons/icon-512.png?share=cp22";
 
@@ -15,14 +15,14 @@ export const viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://hiutmc.com"),
-  applicationName: "HIU YHCT Ecosystem",
+  applicationName: "HIU TMC",
   title: {
     default: SOCIAL_TITLE,
-    template: "%s | HIU YHCT Ecosystem",
+    template: "%s | HIU TMC",
   },
   description: SOCIAL_DESCRIPTION,
   keywords: [
-    "HIU YHCT",
+    "HIU TMC",
     "Y học cổ truyền",
     "Study OS",
     "Atlas 3D",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "vi_VN",
     url: "https://hiutmc.com",
-    siteName: "HIU YHCT Ecosystem",
+    siteName: "HIU TMC",
     title: SOCIAL_TITLE,
     description: SOCIAL_DESCRIPTION,
     images: [
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
         width: 512,
         height: 512,
         type: "image/png",
-        alt: "HIU YHCT Ecosystem – Cổng học tập Y học cổ truyền HIU",
+        alt: "HIU TMC – Cổng học tập Y học cổ truyền HIU",
       },
     ],
   },

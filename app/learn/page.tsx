@@ -5,7 +5,7 @@ export default function LearnPage() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <a href="/" className={styles.back}>← HIU YHCT Ecosystem</a>
+        <a href="/" className={styles.back}>← HIU TMC</a>
         <div>
           <span>Learning Center</span>
           <strong>Học theo mục tiêu, không theo danh sách ứng dụng.</strong>
@@ -14,7 +14,7 @@ export default function LearnPage() {
 
       <section className={styles.hero}>
         <div>
-          <span className={styles.kicker}>HIU YHCT Learning Center</span>
+          <span className={styles.kicker}>HIU TMC Learning Center</span>
           <h1>Một điểm bắt đầu cho mọi hành trình học.</h1>
           <p>
             Learning Center giúp sinh viên chọn đúng việc cần làm trước, rồi điều hướng sang

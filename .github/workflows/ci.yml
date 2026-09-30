@@ -1,4 +1,4 @@
-name: HIU YHCT Ecosystem CI
+name: HIU TMC CI
 
 on:
   push:

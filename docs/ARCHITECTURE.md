@@ -1,4 +1,6 @@
-# Architecture — HIU YHCT Ecosystem
+# Architecture — HIU TMC
+
+> Ghi chú đổi tên (30/09/2026): "HIU YHCT Ecosystem" nay thống nhất là **HIU TMC**. Chỉ đổi tên nhận diện hiển thị; URL, tên package và mã release cũ giữ nguyên để tránh xung đột.
 
 State as of 2026-09-29, verified against the `production` branch (release
 `HIU-YHCT-ECOSYSTEM-20260927-04`, checkpoint CP37).

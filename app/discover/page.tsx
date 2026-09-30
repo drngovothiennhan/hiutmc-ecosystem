@@ -6,12 +6,12 @@ export default function DiscoverPage() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <a href="/" className={styles.back}>← HIU YHCT Ecosystem</a>
+        <a href="/" className={styles.back}>← HIU TMC</a>
         <a href="/community/" className={styles.community}>Community</a>
       </header>
 
       <section className={styles.hero}>
-        <span className={styles.kicker}>HIU YHCT Discover</span>
+        <span className={styles.kicker}>HIU TMC Discover</span>
         <h1>Cập nhật có nguồn.<br />Không chạy theo số lượng.</h1>
         <p>
           Discover là lớp tập trung thông tin của hệ sinh thái. Nội dung chỉ được xuất bản khi có
