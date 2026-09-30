@@ -72,7 +72,7 @@ function HomeContent() {
     : !learningProgressReady
       ? "Đang đọc dữ liệu học tập từ máy chủ."
       : synced && learningProgress
-        ? `Streak ${learningProgress.streak} ngày · ${learningProgress.todayQuestions} câu hôm nay · ${learningProgress.xp} XP${latestScore !== null ? ` · Điểm gần nhất ${latestScore}%` : ""}.`
+        ? `Streak ${learningProgress.streak} ngày · ${learningProgress.todayQuestions} câu hôm nay · ${learningProgress.xp} XP Study OS${latestScore !== null ? ` · Điểm gần nhất ${latestScore}%` : ""}.`
         : "Mở Study OS một lần để gửi lại dữ liệu học tập sau bản sửa đồng bộ.";
   const ringClass = [styles.ring, synced && latestScore === null ? styles.ringSyncedNoScore : "", !synced ? styles.ringSyncPending : ""].filter(Boolean).join(" ");
   const ringStyle = synced && latestScore !== null
