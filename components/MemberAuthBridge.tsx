@@ -1,11 +1,12 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useDisplayMode, type DisplayMode } from "./DisplayModeToggle";
 import { transitionBeforeAppNavigation } from "./NavigationTransitions";
 import styles from "./MemberAuthBridge.module.css";
 import { normalizePersonalLearningSnapshot, type PersonalLearningSnapshot } from "@/data/personalized-learning";
+import { diffCompletions, mergeProgress, normalizeProgress, type LearningProgress as MissionProgress, type MissionCompletion } from "@/data/learning-progress";
 
 const SUPABASE_URL = "https://gzmpnsrwqjpsbklyflqr.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG";
@@ -83,6 +84,7 @@ type AuthContextValue = {
   personalLearningSnapshot: PersonalLearningSnapshot | null;
   personalLearningSnapshotStatus: "loading" | "ready" | "empty" | "error";
   learningProgressReady: boolean;
+  missionSyncStatus: MissionSyncStatus;
   notifications: MemberNotification[];
   unreadNotificationCount: number;
   notificationsStatus: "loading" | "ready" | "error";
@@ -97,6 +99,55 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+// Daily missions: localStorage stays the fast cache read by DailyMissions and SpiritCompanion.
+// While signed in, the server (member_mission_completions) is the durable source of truth.
+export type MissionSyncStatus = "signed-out" | "syncing" | "synced" | "error";
+const MISSION_STORAGE_KEY = "hiutmc-learning-progress-v1";
+const MISSION_OWNER_KEY = "hiutmc-mission-sync-owner-v1";
+const MISSION_DIRTY_KEY = "hiutmc-mission-sync-dirty-v1";
+const MISSION_EVENT = "hiutmc:learning-progress-changed";
+
+function readMissionProgress(): MissionProgress {
+  try {
+    const raw = window.localStorage.getItem(MISSION_STORAGE_KEY);
+    return raw ? normalizeProgress(JSON.parse(raw)) : { completions: [] };
+  } catch {
+    return { completions: [] };
+  }
+}
+
+function writeMissionMirror(progress: MissionProgress, ownerId: string | null) {
+  try {
+    if (ownerId === null) {
+      window.localStorage.removeItem(MISSION_STORAGE_KEY);
+      window.localStorage.removeItem(MISSION_OWNER_KEY);
+      window.localStorage.removeItem(MISSION_DIRTY_KEY);
+    } else {
+      window.localStorage.setItem(MISSION_STORAGE_KEY, JSON.stringify(progress));
+      window.localStorage.setItem(MISSION_OWNER_KEY, ownerId);
+    }
+  } catch {}
+  window.dispatchEvent(new CustomEvent(MISSION_EVENT, { detail: { ...progress, source: "account" } }));
+}
+
+function setMissionDirty(dirty: boolean) {
+  try {
+    if (dirty) window.localStorage.setItem(MISSION_DIRTY_KEY, "1");
+    else window.localStorage.removeItem(MISSION_DIRTY_KEY);
+  } catch {}
+}
+
+async function callMissionRpc(accessToken: string, fn: "mission_completions_sync" | "mission_completion_set", body: Record<string, unknown>): Promise<unknown> {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+    method: "POST",
+    headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`${fn}_${response.status}`);
+  return response.json();
+}
 
 const SPIRIT_PET_STORAGE_KEY = "hiutmc-spirit-pet-v1";
 const SPIRIT_PET_CLIENT_TO_DB: Record<string, string> = {
@@ -421,6 +472,82 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [spiritPetSpecies, setSpiritPetSpecies] = useState<string | null>(null);
   const [spiritPetReady, setSpiritPetReady] = useState(false);
+  const [missionSyncStatus, setMissionSyncStatus] = useState<MissionSyncStatus>("signed-out");
+  const missionServerRef = useRef<MissionCompletion[] | null>(null);
+  const missionQueueRef = useRef<Promise<void>>(Promise.resolve());
+  const missionTokenRef = useRef<string>("");
+
+  useEffect(() => {
+    missionTokenRef.current = session?.accessToken ?? "";
+  }, [session?.accessToken]);
+
+  // Pull (and, on first sign-in, merge) the member's mission completions.
+  useEffect(() => {
+    const memberId = session?.member.id;
+    const accessToken = session?.accessToken;
+    if (!memberId || !accessToken) {
+      missionServerRef.current = null;
+      setMissionSyncStatus("signed-out");
+      return;
+    }
+    let live = true;
+    setMissionSyncStatus("syncing");
+    void (async () => {
+      try {
+        let owner = "";
+        let dirty = false;
+        try {
+          owner = window.localStorage.getItem(MISSION_OWNER_KEY) || "";
+          dirty = window.localStorage.getItem(MISSION_DIRTY_KEY) === "1";
+        } catch {}
+        const local = readMissionProgress();
+        // Rows made as a guest, or earlier on this device for this same member (unsent), are merged in.
+        // Rows mirrored from a different member's account are never uploaded to this one.
+        const rows = owner === "" || (owner === memberId && dirty) ? local.completions : [];
+        const result = await callMissionRpc(accessToken, "mission_completions_sync", { p_rows: rows }) as { completions?: unknown };
+        const server = mergeProgress(result);
+        if (!live) return;
+        missionServerRef.current = server.completions;
+        setMissionDirty(false);
+        writeMissionMirror(server, memberId);
+        setMissionSyncStatus("synced");
+      } catch {
+        if (live) setMissionSyncStatus("error");
+      }
+    })();
+    return () => { live = false; };
+  }, [session?.member.id, session?.accessToken]);
+
+  // Push each change made on the home page to the account.
+  useEffect(() => {
+    const memberId = session?.member.id;
+    if (!memberId) return;
+    const onChange = (event: Event) => {
+      const detail = (event as CustomEvent<Record<string, unknown> | undefined>).detail;
+      if (detail && detail.source === "account") return;
+      const next = normalizeProgress(detail);
+      const known = missionServerRef.current;
+      if (known === null) { setMissionDirty(true); return; }
+      const { added, removed } = diffCompletions(known, next.completions);
+      if (!added.length && !removed.length) return;
+      missionQueueRef.current = missionQueueRef.current.then(async () => {
+        const token = missionTokenRef.current;
+        try {
+          if (!token) throw new Error("no_token");
+          for (const item of removed) await callMissionRpc(token, "mission_completion_set", { p_day: item.day, p_mission_id: item.missionId, p_done: false });
+          for (const item of added) await callMissionRpc(token, "mission_completion_set", { p_day: item.day, p_mission_id: item.missionId, p_done: true });
+          missionServerRef.current = next.completions;
+          setMissionSyncStatus("synced");
+        } catch {
+          // Keep the local copy and merge it into the account on the next sync.
+          setMissionDirty(true);
+          setMissionSyncStatus("error");
+        }
+      });
+    };
+    window.addEventListener(MISSION_EVENT, onChange);
+    return () => window.removeEventListener(MISSION_EVENT, onChange);
+  }, [session?.member.id]);
 
   useEffect(() => {
     let live = true;
@@ -650,6 +777,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     personalLearningSnapshot,
     personalLearningSnapshotStatus,
     learningProgressReady,
+    missionSyncStatus,
     notifications,
     unreadNotificationCount,
     notificationsStatus,
@@ -670,6 +798,10 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
     logout: async () => {
       const accessToken = session?.accessToken;
       saveStored(null);
+      // Do not leave this member's missions on a shared device after sign-out.
+      missionServerRef.current = null;
+      writeMissionMirror({ completions: [] }, null);
+      setMissionSyncStatus("signed-out");
       setSession(null);
       setStaffAccess(null);
       setLearningProgress(null);
@@ -738,7 +870,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
       if (!staffAccess?.authorized) return;
       window.location.assign(staffAccess.canAdmin ? "/admin/" : "/mod/");
     },
-  }), [ready, session, spiritPetSpecies, spiritPetReady, staffAccess, learningProgress, personalLearningSnapshot, personalLearningSnapshotStatus, learningProgressReady, notifications, unreadNotificationCount, notificationsStatus]);
+  }), [ready, session, spiritPetSpecies, spiritPetReady, staffAccess, learningProgress, personalLearningSnapshot, personalLearningSnapshotStatus, learningProgressReady, missionSyncStatus, notifications, unreadNotificationCount, notificationsStatus]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
