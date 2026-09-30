@@ -998,7 +998,7 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
           <ProfileDisplayModeSetting onModeChange={(next) => { if (next === "pc") setOpen(false); }} />
           <div className={styles.syncState}>
             <strong>{learningProgress?.hasSync ? "Tiến độ Study OS đã đồng bộ" : "Tiến độ Study OS chưa có bản đồng bộ thành công"}</strong>
-            <small>{learningProgress?.hasSync ? `Streak ${learningProgress.streak} ngày · ${learningProgress.todayQuestions} câu hôm nay · ${learningProgress.xp} XP` : "Mở Study OS sau bản sửa để hệ thống gửi lại dữ liệu học tập lên máy chủ."}</small>
+            <small>{learningProgress?.hasSync ? `Streak ${learningProgress.streak} ngày · ${learningProgress.todayQuestions} câu hôm nay · ${learningProgress.xp} XP Study OS` : "Mở Study OS sau bản sửa để hệ thống gửi lại dữ liệu học tập lên máy chủ."}</small>
           </div>
           {staffAccess?.authorized && <button className={styles.staff} type="button" onClick={openStaffConsole}>Mở {staffLabel} →</button>}
           <button className={styles.primary} type="button" onClick={() => void openStudyOs(studyOsUrl)}>Mở Study OS →</button>
