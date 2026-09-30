@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import NavigationTransitions from "@/components/NavigationTransitions";
 import PwaInstall from "@/components/PwaInstall";
+import SiteTheme from "@/components/SiteTheme";
 import { SHELL_MODE_SCRIPT } from "@/lib/shell-mode.mjs";
+import { SITE_THEME_SCRIPT } from "@/lib/site-theme-script.mjs";
 
 const SOCIAL_TITLE = "HIU TMC – Cổng học tập Y học cổ truyền HIU";
 const SOCIAL_DESCRIPTION = "Study OS · Atlas 3D · A.I Thiệt Chẩn · Trung Y Văn · cộng đồng học thuật dành cho sinh viên Y học cổ truyền HIU.";
@@ -66,8 +68,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="vi" suppressHydrationWarning>
-      <head><script dangerouslySetInnerHTML={{ __html: SHELL_MODE_SCRIPT }} /></head>
-      <body>{children}<NavigationTransitions /><PwaInstall /></body>
+      <head><script dangerouslySetInnerHTML={{ __html: SHELL_MODE_SCRIPT }} /><script dangerouslySetInnerHTML={{ __html: SITE_THEME_SCRIPT }} /></head>
+      <body>{children}<NavigationTransitions /><PwaInstall /><SiteTheme /></body>
     </html>
   );
 }

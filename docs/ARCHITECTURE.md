@@ -17,6 +17,8 @@ and gateways into five separate learning apps, plus Admin/Mod consoles.
 Browser ──► Cloudflare Worker "hiutmc-ecosystem" (worker.mjs, custom domain hiutmc.com)
               ├─ static site: Next.js 16 static export in ./out  (binding ASSETS)
               ├─ /api/staff/*, /admin, /mod ── verifies Supabase session + club_members.role
+              │    (/api/staff/members[/role] and /api/staff/site-theme are Admin-only)
+              ├─ /api/site-theme ── public read of the saved site theme id (falls back to "default")
               ├─ /api/hub-registry, /api/admin/traffic
               ├─ Durable Object VisitCounter (binding VISITS) ── public page visit stats
               └─ /apps/<name>/* ── same-origin reverse proxy to each app (table below)
@@ -50,6 +52,23 @@ those rows in `data/learning-progress.ts`, so nothing else is stored.
 and `SpiritCompanion` read), merges guest or unsent rows on first sign-in, never
 uploads rows mirrored from a different member, and clears the mirror on sign-out.
 Guests keep device-only progress.
+
+### Admin Center (regrouped 2026-09-30)
+
+Tabs: **Tổng quan** (includes traffic), **Nội dung & Liên kết**, **Duyệt & Thành viên**,
+**Nhật ký & Cấu hình**, **Giao diện**. Moderators see only overview, review and system.
+Admin-only additions:
+
+- *Member roles*: `ecosystem_admin_member_list_v1` and `ecosystem_admin_set_member_role_v1`.
+  Only Member ↔ Mod can be changed; Admin, Leader and Super Mod rows are untouched, an Admin
+  cannot change their own role, a promotion needs an approved, login-enabled member, and each
+  change is written to `ecosystem_audit_log`.
+- *Site theme*: `site_theme_settings` (one row) with `site_theme_get_public_v1` (anon read) and
+  `site_theme_set_v1` (Admin write, audited). Themes live in `data/site-themes.ts`
+  (four seasons, six festivals, plus "auto" by date). All stylesheet colours that a theme can change read
+  `var(--st-*, <original colour>)`, so with no theme (or any failure) the approved design is
+  unchanged. `components/SiteTheme.tsx` applies the theme and light decoration; `?theme_preview=<id>`
+  previews a theme in one tab without saving. Themes are not injected into the connected apps.
 
 ## Source layout
 
