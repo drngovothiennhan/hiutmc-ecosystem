@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.hiutmc.app",
+      "sha256_cert_fingerprints": [
+        "AA:BB:CC:...:THAY_BANG_SHA256_CUA_APP_SIGNING_KEY_TREN_PLAY_CONSOLE",
+        "DD:EE:FF:...:THAY_BANG_SHA256_CUA_UPLOAD_KEY_TRONG_signing-key-info.txt"
+      ]
+    }
+  }
+]
