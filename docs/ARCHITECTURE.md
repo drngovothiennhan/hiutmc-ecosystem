@@ -1,4 +1,4 @@
-# Architecture — HIU YHCT Ecosystem
+# Architecture — HIU TMC
 
 State as of 2026-09-29, verified against the `production` branch (release
 `HIU-YHCT-ECOSYSTEM-20260927-04`, checkpoint CP37).

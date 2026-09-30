@@ -860,7 +860,7 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
         {member ? <>
           <div className={styles.memberCard}>
             <i className={styles.avatarLarge}>{member.avatarUrl ? <img src={member.avatarUrl} alt="" loading="lazy" /> : initials}</i>
-            <span><small>THÀNH VIÊN ĐÃ ĐỒNG BỘ</small><strong>{member.fullName}</strong><em>{member.studentCode || "HIU YHCT"} · {member.title}</em></span>
+            <span><small>THÀNH VIÊN ĐÃ ĐỒNG BỘ</small><strong>{member.fullName}</strong><em>{member.studentCode || "HIU TMC"} · {member.title}</em></span>
           </div>
           <p>Phiên đăng nhập trang chủ dùng cùng hệ tài khoản với Study OS. Quyền Admin/Mod được xác minh lại tại máy chủ trước khi mở khu vực quản trị.</p>
           <ProfileDisplayModeSetting onModeChange={(next) => { if (next === "pc") setOpen(false); }} />
@@ -872,7 +872,7 @@ export function MemberAccount({ studyOsUrl }: { studyOsUrl: string }) {
           <button className={styles.primary} type="button" onClick={() => void openStudyOs(studyOsUrl)}>Mở Study OS →</button>
           <button className={styles.secondary} type="button" onClick={() => void logout().then(() => setOpen(false))}>Đăng xuất</button>
         </> : <form onSubmit={submit}>
-          <small className={styles.kicker}>HIU YHCT MEMBER SSO</small>
+          <small className={styles.kicker}>HIU TMC MEMBER SSO</small>
           <h2>Đăng nhập thành viên</h2>
           <p>Dùng cùng MSSV và mật khẩu đang sử dụng tại Study OS. Tài khoản Admin/Mod sẽ được máy chủ nhận diện và chuyển đúng khu vực sau khi xác thực.</p>
           <label>MSSV<input value={studentCode} onChange={(e) => setStudentCode(e.target.value)} autoComplete="username" inputMode="numeric" disabled={busy} /></label>

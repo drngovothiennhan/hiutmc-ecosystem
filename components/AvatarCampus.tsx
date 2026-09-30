@@ -161,11 +161,11 @@ export default function AvatarCampus() {
   return (
     <section className={styles.avatarStudio} aria-labelledby="avatar-studio-title">
       <div className={styles.avatarStudioHead}>
-        <div><span className={styles.avatarKicker}>NHÂN VẬT HIU YHCT</span><h2 id="avatar-studio-title">Tạo nhân vật của bạn</h2></div>
+        <div><span className={styles.avatarKicker}>NHÂN VẬT HIU TMC</span><h2 id="avatar-studio-title">Tạo nhân vật của bạn</h2></div>
         <span className={styles.avatarPreviewBadge}>CP9</span>
       </div>
 
-      <div className={styles.avatarCampus} tabIndex={0} onKeyDown={handleMovement} aria-label="Không gian HIU YHCT. Dùng phím mũi tên hoặc cụm nút điều khiển để di chuyển.">
+      <div className={styles.avatarCampus} tabIndex={0} onKeyDown={handleMovement} aria-label="Không gian HIU TMC. Dùng phím mũi tên hoặc cụm nút điều khiển để di chuyển.">
         <div className={styles.campusSky}/>
         <div className={styles.sunHalo}/>
         <div className={`${styles.campusHill} ${styles.campusHillBack}`}/>
@@ -206,7 +206,7 @@ export default function AvatarCampus() {
         <label>Biểu cảm<select value={options.expression} onChange={(e) => update("expression", e.target.value as AvatarOptions["expression"])}><option>Tươi</option><option>Cười</option><option>Điềm tĩnh</option></select></label>
         <button className={styles.resetAvatar} type="button" onClick={reset}>Đặt lại</button>
       </div>
-      <p className={styles.avatarStorageNote}>Thiết kế bám theo bản thảo nhân vật HIU YHCT: blouse trắng, lớp áo xanh truyền thống, thẻ sinh viên và phụ kiện học tập. Tùy chọn đang lưu cục bộ; đồng bộ theo tài khoản sẽ được nối sau khi SSO hoàn tất.</p>
+      <p className={styles.avatarStorageNote}>Thiết kế bám theo bản thảo nhân vật HIU TMC: blouse trắng, lớp áo xanh truyền thống, thẻ sinh viên và phụ kiện học tập. Tùy chọn đang lưu cục bộ; đồng bộ theo tài khoản sẽ được nối sau khi SSO hoàn tất.</p>
     </section>
   );
 }

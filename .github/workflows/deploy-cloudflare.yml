@@ -1,4 +1,4 @@
-name: Deploy HIU YHCT Ecosystem to Cloudflare
+name: Deploy HIU TMC to Cloudflare
 
 on:
   workflow_dispatch:

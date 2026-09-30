@@ -7,7 +7,7 @@ export default function CommunityPage() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <a href="/" className={styles.back}>← HIU YHCT Ecosystem</a>
+        <a href="/" className={styles.back}>← HIU TMC</a>
         <div className={styles.nav}>
           <a href="/learn/">Learning Center</a>
           <a href="/discover/">Discover</a>
@@ -15,7 +15,7 @@ export default function CommunityPage() {
       </header>
 
       <section className={styles.hero}>
-        <span className={styles.kicker}>HIU YHCT Community</span>
+        <span className={styles.kicker}>HIU TMC Community</span>
         <h1>Học cùng nhau.<br />Chia sẻ có kiểm chứng.</h1>
         <p>
           Community kết nối trực tiếp với backend CLB hiện có để hiển thị nội dung học thuật

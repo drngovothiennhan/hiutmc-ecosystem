@@ -5,12 +5,12 @@ export default function AILabPage() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <a href="/" className={styles.back}>← HIU YHCT Ecosystem</a>
+        <a href="/" className={styles.back}>← HIU TMC</a>
         <a href="/learn/" className={styles.learn}>Learning Center</a>
       </header>
 
       <section className={styles.hero}>
-        <span className={styles.kicker}>HIU YHCT AI Lab</span>
+        <span className={styles.kicker}>HIU TMC AI Lab</span>
         <h1>Một cổng AI.<br />Đúng công cụ cho đúng việc.</h1>
         <p>
           AI Lab không gom mọi chức năng vào một chatbot. Hệ thống giúp sinh viên xác định nhu cầu,

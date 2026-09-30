@@ -2,7 +2,7 @@ import fs from "node:fs";
 
 const release = JSON.parse(fs.readFileSync("RELEASE.json", "utf8"));
 const expected = {
-  product_name: "HIU YHCT Ecosystem",
+  product_name: "HIU TMC",
   domain: "https://hiutmc.com",
   hosting: "Cloudflare Workers Static Assets",
   stage: "production",

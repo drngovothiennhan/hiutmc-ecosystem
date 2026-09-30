@@ -4,7 +4,7 @@ import styles from "./privacy.module.css";
 export const metadata: Metadata = {
   title: "Chính sách quyền riêng tư",
   description:
-    "Cách HIU TMC (HIU YHCT Ecosystem) thu thập, sử dụng, lưu trữ và xóa dữ liệu của người dùng.",
+    "Cách HIU TMC thu thập, sử dụng, lưu trữ và xóa dữ liệu của người dùng.",
   alternates: { canonical: "/privacy/" },
 };
 
@@ -14,7 +14,7 @@ export default function PrivacyPage() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <a href="/" className={styles.back}>← HIU YHCT Ecosystem</a>
+        <a href="/" className={styles.back}>← HIU TMC</a>
       </header>
 
       <section className={styles.hero}>
@@ -29,7 +29,7 @@ export default function PrivacyPage() {
         <section>
           <h2>1. Ai vận hành</h2>
           <p>
-            HIU TMC (HIU YHCT Ecosystem) do HIU CLB Y Học cổ truyền vận hành, phục vụ học tập của sinh viên
+            HIU TMC do HIU CLB Y Học cổ truyền vận hành, phục vụ học tập của sinh viên
             Y học cổ truyền. Mọi câu hỏi về dữ liệu xin gửi tới{" "}
             <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
           </p>

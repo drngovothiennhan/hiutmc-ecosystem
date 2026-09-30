@@ -1,4 +1,4 @@
-# FROZEN / REVIEW — HIU YHCT Digital Campus
+# FROZEN / REVIEW — HIU TMC Digital Campus
 
 Checkpoint scope: UI dashboard + compact spirit companion preview.
 

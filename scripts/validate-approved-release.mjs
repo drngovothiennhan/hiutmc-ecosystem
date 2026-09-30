@@ -32,15 +32,15 @@ if (homeSource.includes("mailto:clb.yhoccotruyen.hiu@gmail.com?subject=")) {
 }
 
 for (const marker of [
-  "HIU YHCT DIGITAL CAMPUS",
+  "HIU TMC DIGITAL CAMPUS",
   "Chào mừng trở lại",
   "TIẾP TỤC HỌC TẬP",
-  "Khám phá hệ sinh thái HIU YHCT",
+  "Khám phá hệ sinh thái HIU TMC",
   "Study OS",
   "3D Atlas",
   "A.I Thiệt Chẩn",
   "Trung Y Văn",
-  "Cộng đồng HIU YHCT",
+  "Cộng đồng HIU TMC",
   "Sự kiện &amp; hoạt động",
   "Tiến độ học tập",
   "Nhiệm vụ hôm nay",
@@ -50,7 +50,7 @@ for (const marker of [
 }
 
 for (const [html, route] of [[admin, "Admin"], [mod, "Mod"]]) {
-  for (const marker of ["HIU YHCT STAFF AUTH", "Đang xác minh quyền máy chủ"]) {
+  for (const marker of ["HIU TMC STAFF AUTH", "Đang xác minh quyền máy chủ"]) {
     if (!html.includes(marker)) errors.push(`${route} route missing authorization gate marker: ${marker}`);
   }
 }
@@ -77,7 +77,7 @@ const socialMarkers = [
   'property="og:description"',
   'property="og:image"',
   'name="twitter:card"',
-  'HIU YHCT Ecosystem – Cổng học tập Y học cổ truyền HIU',
+  'HIU TMC – Cổng học tập Y học cổ truyền HIU',
   'Study OS · Atlas 3D · A.I Thiệt Chẩn · Trung Y Văn',
   'https://hiutmc.com/icons/icon-512.png?share=cp22',
 ];
@@ -116,4 +116,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Approved HIU YHCT Digital Campus, protected Admin/Mod routes and staff console are present.");
+console.log("Approved HIU TMC Digital Campus, protected Admin/Mod routes and staff console are present.");
