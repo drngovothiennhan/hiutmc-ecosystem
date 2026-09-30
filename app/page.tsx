@@ -3,6 +3,7 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import HomeIcon, { type HomeIconName } from "@/components/HomeIcon";
 import DailyMissions from "@/components/DailyMissions";
+import LaunchShowcase from "@/components/LaunchShowcase";
 import DisplayModeToggle from "@/components/DisplayModeToggle";
 import SpiritCompanion from "@/components/SpiritCompanion";
 import { canAccessGameHub, GameHubLink, MemberAccount, MemberAuthProvider, StudyOsLink, useMemberAuth } from "@/components/MemberAuthBridge";
@@ -262,6 +263,8 @@ function HomeContent() {
             <section id="missions" className={styles.missionWrap}>
               <DailyMissions apps={apps} />
             </section>
+
+            <LaunchShowcase />
 
             {showNotificationInbox && <section id="notifications" className={styles.noticeCard} aria-labelledby="notifications-title">
               <header className={styles.noticeHeader}>
