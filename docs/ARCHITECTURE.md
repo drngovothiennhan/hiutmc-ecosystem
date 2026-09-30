@@ -40,7 +40,7 @@ The Worker injects a small script so proxied apps keep their own path prefix
 
 | Path | Contents |
 |---|---|
-| `app/` | Next.js routes: home, admin, mod, ai, community, discover, ecosystem/[slug], learn, search |
+| `app/` | Next.js routes: home, admin, mod, ai, community, discover, ecosystem/[slug], learn, privacy, search |
 | `components/` | UI: EcosystemMap, SpiritCompanion, DailyMissions, MemberAuthBridge, StaffConsole, PwaInstall … |
 | `data/` | App registry (`apps.ts`), learning, community, personalization, spirit-pet visuals |
 | `asset-sources/` | Spirit-pet artwork sources; `npm run materialize:spirit-assets` renders them to `public/spirit-pets/` |
@@ -72,3 +72,12 @@ production; clean-up needs the owner's approval.
 - PR #47 Game Hub SSO G2 — partly superseded by the live G3 launcher; decide keep/close.
 - PR #42 CP31 motion effects — partly live; needs rebuilding on current `main`.
 - Y Quán personalization is deferred until Game Hub exposes per-topic learner data.
+
+## Google Play (TWA)
+
+The PWA is packaged for Google Play as a Trusted Web Activity (package `com.hiutmc.app`,
+built with PWABuilder). Steps and store copy: `docs/play-store/PLAY-STORE-KIT.md`.
+Digital Asset Links must be served at `/.well-known/assetlinks.json` (template in
+`docs/play-store/assetlinks.template.json`; add `public/.well-known/assetlinks.json`
+with the real SHA-256 fingerprints once the app is created in Play Console).
+Privacy policy: `/privacy/`.
