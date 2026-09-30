@@ -1,0 +1,15 @@
+.root{display:grid;gap:16px;padding:22px;border:1px solid rgba(116,21,29,.16);border-radius:20px;background:#fffdf9;color:#2c2322;box-shadow:0 8px 24px rgba(80,25,28,.05)}
+.kicker{font-size:10px;font-weight:900;letter-spacing:.13em;color:#74151d}
+.root h2{margin:6px 0 0;font:700 clamp(22px,3vw,30px)/1.15 "HIU Serif",Georgia,serif;color:#4f0f16}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.stats div{display:grid;gap:4px;padding:14px;border-radius:14px;background:#f4e9dd}
+.stats strong{font:700 30px/1 "HIU Serif",Georgia,serif;color:#74151d}
+.stats span{font-size:12px;line-height:1.45;color:#705f5c}
+.stats .gift{background:#74151d}
+.stats .gift strong,.stats .gift span{color:#fff}
+.board{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.board li{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:#fff;border:1px solid rgba(116,21,29,.1)}
+.board b{color:#74151d}.board span{font-weight:700;letter-spacing:.04em}.board em{font-style:normal;color:#346345;font-weight:800;font-size:12px}
+.note{margin:0;font-size:11px;color:#705f5c;line-height:1.5}
+.cta{justify-self:start;padding:10px 14px;border-radius:12px;background:#74151d;color:#fff;font-weight:800;text-decoration:none}
+@media(max-width:620px){.root{padding:16px}}
