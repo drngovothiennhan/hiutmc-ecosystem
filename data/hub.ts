@@ -5,10 +5,10 @@ export const hubPillars = [
 ];
 
 export const learningShortcuts = [
-  { label: "Học 15 phút", detail: "Mở Study OS", href: "https://yhct-hiu-final4-stage-hiu-yhct.vercel.app/" },
-  { label: "Kinh lạc 3D", detail: "Mở Atlas", href: "https://drngovothiennhan.github.io/human-atlas/" },
-  { label: "Quan sát thiệt chẩn", detail: "Mở A.I Thiệt Chẩn", href: "https://ai-thiet-chan-hiu-yhct.vercel.app/" },
-  { label: "Đọc Trung Y Văn", detail: "Mở thư viện", href: "https://drngovothiennhan.github.io/trung-y-van-hiu/" },
+  { label: "Học 15 phút", detail: "Mở Study OS", href: "https://hiutmc.com/apps/study/" },
+  { label: "Kinh lạc 3D", detail: "Mở Atlas", href: "https://hiutmc.com/apps/atlas/" },
+  { label: "Quan sát thiệt chẩn", detail: "Mở A.I Thiệt Chẩn", href: "https://hiutmc.com/apps/thietchan/" },
+  { label: "Đọc Trung Y Văn", detail: "Mở thư viện", href: "https://hiutmc.com/apps/trungyvan/" },
 ];
 
 export const plannedSpaces = [
