@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { StudyOsLink } from "@/components/MemberAuthBridge";
 import { publicSupabase } from "@/data/public-supabase";
 import styles from "./LaunchShowcase.module.css";
 
@@ -89,7 +90,7 @@ export default function LaunchShowcase() {
         </ol>
       )}
       <p className={styles.note}>Chỉ tính dữ liệu luyện tập đã được máy chủ xác minh. Tên người học được rút gọn thành chữ cái đầu.</p>
-      <a className={styles.cta} href="https://yhct-hiu-final4-stage-hiu-yhct.vercel.app/">Mở Study OS →</a>
+      <StudyOsLink className={styles.cta} href="https://hiutmc.com/apps/study/">Mở Study OS →</StudyOsLink>
     </section>
   );
 }
