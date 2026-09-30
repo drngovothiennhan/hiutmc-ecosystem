@@ -69,6 +69,15 @@ function clearStaffCookie() {
 
 async function validateStaff(token) {
   if (!token || token.length < 40) return { authorized: false, reason: "missing_token" };
+  try {
+    return await validateStaffUnsafe(token);
+  } catch {
+    // Supabase unreachable: deny access instead of surfacing a Worker exception.
+    return { authorized: false, reason: "auth_service_unavailable" };
+  }
+}
+
+async function validateStaffUnsafe(token) {
 
   const userResponse = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
     headers: {
@@ -136,31 +145,46 @@ async function validateStaff(token) {
 }
 
 
+const UPSTREAM_UNAVAILABLE = () => ({
+  response: new Response(null, { status: 503 }),
+  payload: { error: "upstream_unavailable" },
+});
+
 async function supabaseRpc(token, name, body = {}) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
-    method: "POST",
-    headers: {
-      apikey: SUPABASE_KEY,
-      authorization: `Bearer ${token}`,
-      "content-type": "application/json",
-      accept: "application/json",
-    },
-    body: JSON.stringify(body),
-  });
+  let response;
+  try {
+    response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_KEY,
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+        accept: "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    return UPSTREAM_UNAVAILABLE();
+  }
   const payload = await response.json().catch(async () => ({ error: await response.text().catch(() => "") }));
   return { response, payload };
 }
 
 async function supabasePublicRpc(name) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
-    method: "POST",
-    headers: {
-      apikey: SUPABASE_KEY,
-      "content-type": "application/json",
-      accept: "application/json",
-    },
-    body: "{}",
-  });
+  let response;
+  try {
+    response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_KEY,
+        "content-type": "application/json",
+        accept: "application/json",
+      },
+      body: "{}",
+    });
+  } catch {
+    return UPSTREAM_UNAVAILABLE();
+  }
   const payload = await response.json().catch(async () => ({ error: await response.text().catch(() => "") }));
   return { response, payload };
 }
