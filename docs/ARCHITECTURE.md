@@ -22,7 +22,8 @@ Browser ──► Cloudflare Worker "hiutmc-ecosystem" (worker.mjs, custom domai
               └─ /apps/<name>/* ── same-origin reverse proxy to each app (table below)
 
 Supabase project gzmpnsrwqjpsbklyflqr ── auth, club_members, shadow Admin/Mod tables,
-                                          learning-sync, spirit-pet profiles
+                                          learning-sync, spirit-pet profiles,
+                                          member_mission_completions (daily missions)
 ```
 
 ### Proxied apps (`APP_PROXY_CONFIG` in `worker.mjs`)
@@ -37,6 +38,18 @@ Supabase project gzmpnsrwqjpsbklyflqr ── auth, club_members, shadow Admin/Mo
 
 The Worker injects a small script so proxied apps keep their own path prefix
 (fetch, XHR, history, links and service-worker scope are rewritten).
+
+### Daily missions and badges
+
+Signed-in members keep completed daily missions in `member_mission_completions`
+(RLS: a member reads only their own rows; writes only through the
+`mission_completions_sync` and `mission_completion_set` RPCs, which take identity
+from the session). Badges, streaks, the weekly challenge and XP are derived from
+those rows in `data/learning-progress.ts`, so nothing else is stored.
+`MemberAuthBridge` mirrors the list into localStorage (the cache that `DailyMissions`
+and `SpiritCompanion` read), merges guest or unsent rows on first sign-in, never
+uploads rows mirrored from a different member, and clears the mirror on sign-out.
+Guests keep device-only progress.
 
 ## Source layout
 

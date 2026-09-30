@@ -100,3 +100,26 @@ export function earnedPoints(completions: MissionCompletion[]): number {
   const points = new Map(missionCatalog.map((mission) => [mission.id, mission.points]));
   return completions.reduce((sum, item) => sum + (points.get(item.missionId) ?? 0), 0);
 }
+
+export function completionKey(item: MissionCompletion): string {
+  return `${item.day}|${item.missionId}`;
+}
+
+/** Rows to add and remove on the server so it matches `next`, given what it last confirmed. */
+export function diffCompletions(previous: MissionCompletion[], next: MissionCompletion[]): { added: MissionCompletion[]; removed: MissionCompletion[] } {
+  const before = new Set(previous.map(completionKey));
+  const after = new Set(next.map(completionKey));
+  return {
+    added: next.filter((item) => !before.has(completionKey(item))),
+    removed: previous.filter((item) => !after.has(completionKey(item))),
+  };
+}
+
+/** Union of several untrusted lists, normalized like local progress. Used for the first sign-in merge. */
+export function mergeProgress(...lists: unknown[]): LearningProgress {
+  const all: unknown[] = [];
+  for (const list of lists) {
+    if (list && typeof list === "object" && Array.isArray((list as { completions?: unknown }).completions)) all.push(...(list as { completions: unknown[] }).completions);
+  }
+  return normalizeProgress({ completions: all });
+}

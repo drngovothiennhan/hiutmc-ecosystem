@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { EcosystemApp } from "@/data/apps";
+import { useMemberAuth } from "./MemberAuthBridge";
 import {
   currentStreak,
   earnedPoints,
@@ -20,6 +21,9 @@ export default function DailyMissions({ apps }: { apps: EcosystemApp[] }) {
   const [progress, setProgress] = useState<LearningProgress>({ completions: [] });
   const [dayKey, setDayKey] = useState("");
   const [savedLocally, setSavedLocally] = useState(true);
+  const { member, missionSyncStatus } = useMemberAuth();
+  const signedIn = Boolean(member);
+  const syncing = signedIn && missionSyncStatus === "syncing";
 
   useEffect(() => {
     setDayKey(localDayKey(new Date()));
@@ -29,6 +33,13 @@ export default function DailyMissions({ apps }: { apps: EcosystemApp[] }) {
     } catch {
       setSavedLocally(false);
     }
+    // Progress mirrored from the member's account arrives through this event.
+    const onAccountProgress = (event: Event) => {
+      const detail = (event as CustomEvent<{ source?: string } | undefined>).detail;
+      if (detail?.source === "account") setProgress(normalizeProgress(detail));
+    };
+    window.addEventListener("hiutmc:learning-progress-changed", onAccountProgress);
+    return () => window.removeEventListener("hiutmc:learning-progress-changed", onAccountProgress);
   }, []);
 
   const missions = useMemo(() => selectMissionsForDay(dayKey), [dayKey]);
@@ -64,10 +75,18 @@ export default function DailyMissions({ apps }: { apps: EcosystemApp[] }) {
     }
   };
 
+  const disclosure = !signedIn
+    ? (savedLocally ? "Nhiệm vụ, điểm và huy hiệu đang lưu trên trình duyệt này. Đăng nhập thành viên để lưu theo tài khoản và dùng trên mọi thiết bị." : "Trình duyệt không cho phép lưu dữ liệu; tiến độ chỉ còn trong phiên này.")
+    : missionSyncStatus === "synced"
+      ? "Nhiệm vụ, điểm và huy hiệu được lưu theo tài khoản thành viên và đồng bộ giữa các thiết bị."
+      : missionSyncStatus === "error"
+        ? "Chưa đồng bộ được với tài khoản. Tiến độ vẫn được giữ trên thiết bị này và sẽ tự gửi lên ở lần đồng bộ tiếp theo."
+        : "Đang đồng bộ tiến độ với tài khoản thành viên…";
+
   return <section className="dailyMissions" aria-labelledby="daily-missions-title">
     <header className="missionHeader">
       <div><p className="sectionKicker">HỌC MỘT CHÚT MỖI NGÀY</p><h2 id="daily-missions-title">Nhiệm vụ hôm nay</h2><p>Chọn việc nhỏ, hoàn thành đều đặn, khám phá thêm một Hub.</p></div>
-      <span className="localProgressLabel">Tiến độ cá nhân · lưu trên thiết bị</span>
+      <span className="localProgressLabel">{signedIn ? "Tiến độ cá nhân · lưu theo tài khoản" : "Tiến độ cá nhân · lưu trên thiết bị"}</span>
     </header>
 
     <div className="missionStats" aria-label="Tiến độ học tập cá nhân">
@@ -84,7 +103,7 @@ export default function DailyMissions({ apps }: { apps: EcosystemApp[] }) {
           <div className="missionNumber">0{index + 1}</div>
           <div className="missionCopy"><div className="missionNameRow"><h3>{mission.title}</h3><span>+{mission.points} XP</span></div><p>{mission.detail}</p><div className="missionActions">
             <a href={app?.launchUrl ?? "/ecosystem/"} target="_blank" rel="noreferrer">Mở {app?.shortName ?? "Hub"} ↗</a>
-            <button type="button" onClick={() => toggleMission(mission.id)} disabled={!dayKey} aria-pressed={done}>{done ? "✓ Đã hoàn thành" : "Đánh dấu hoàn tất"}</button>
+            <button type="button" onClick={() => toggleMission(mission.id)} disabled={!dayKey || syncing} aria-pressed={done}>{done ? "✓ Đã hoàn thành" : "Đánh dấu hoàn tất"}</button>
           </div></div>
         </article>;
       })}
@@ -102,6 +121,6 @@ export default function DailyMissions({ apps }: { apps: EcosystemApp[] }) {
       </section>
     </div>
 
-    <p className="missionDisclosure" role="status">{savedLocally ? "Nhiệm vụ, điểm và huy hiệu chỉ lưu trên trình duyệt đang dùng; chưa đồng bộ với tài khoản thành viên." : "Trình duyệt không cho phép lưu dữ liệu; tiến độ chỉ còn trong phiên này."} Điểm trải nghiệm không phải điểm môn học. Bảng thi đua nhóm sẽ chỉ mở khi có dữ liệu thành viên đã xác thực; hiện không hiển thị tên hoặc điểm giả.</p>
+    <p className="missionDisclosure" role="status">{disclosure} Điểm trải nghiệm không phải điểm môn học. Bảng thi đua nhóm sẽ chỉ mở khi có dữ liệu thành viên đã xác thực; hiện không hiển thị tên hoặc điểm giả.</p>
   </section>;
 }

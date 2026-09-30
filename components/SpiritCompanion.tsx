@@ -200,9 +200,9 @@ export default function SpiritCompanion() {
 
   const message = useMemo(() => {
     if (!member) return "Linh thú khách chỉ là bản xem thử tạm thời. Đăng nhập để đồng bộ hồ sơ Linh Thú giữa các thiết bị.";
-    if (isNew) return "Bạn vừa gặp linh thú đồng hành đầu tiên. Mình sẽ nhắc các nhiệm vụ học tập đang lưu trên thiết bị này.";
-    if (!dayKey) return "Mình đang đồng bộ nhiệm vụ học tập trên thiết bị.";
-    if (remaining === 0) return "Ba nhiệm vụ hôm nay đã được đánh dấu hoàn thành. Tiến độ này hiện chỉ lưu trên thiết bị.";
+    if (isNew) return "Bạn vừa gặp linh thú đồng hành đầu tiên. Mình sẽ nhắc các nhiệm vụ học tập được lưu theo tài khoản của bạn.";
+    if (!dayKey) return "Mình đang đồng bộ nhiệm vụ học tập.";
+    if (remaining === 0) return "Ba nhiệm vụ hôm nay đã hoàn thành và được lưu theo tài khoản của bạn.";
     if (nextMission) return `Bạn còn ${remaining} nhiệm vụ hôm nay. Gợi ý tiếp theo: ${nextMission.title}.`;
     return "Mình ở đây để gom nhắc học và hoạt động quan trọng vào một góc nhỏ.";
   }, [dayKey, isNew, member, nextMission, remaining]);
