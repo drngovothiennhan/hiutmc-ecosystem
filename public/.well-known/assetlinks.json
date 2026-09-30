@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.hiutmc.app",
+        "sha256_cert_fingerprints": ["33:CC:3E:D7:8D:DB:47:1B:F9:0B:58:0B:9C:81:D5:B5:07:73:F4:27:46:C8:20:1D:6D:47:F1:52:A5:DD:66:E1"]
+      }
+    }]
