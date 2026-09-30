@@ -12,7 +12,7 @@ export default function SharedHubDetails({ slug }: { slug: string }) {
       <a className="backLink" href="/">← Về bản đồ</a>
       <div className="detailPanel">
         <span className="detailStatus">{app.status}</span>
-        <p className="sectionKicker">HIU YHCT ECOSYSTEM</p>
+        <p className="sectionKicker">HIU TMC ECOSYSTEM</p>
         <h1>{app.name}</h1>
         <h2>{app.tagline}</h2>
         <p>{app.description}</p>

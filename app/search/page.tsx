@@ -5,7 +5,7 @@ export default function SearchPage() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <a href="/" className={styles.back}>← HIU YHCT Ecosystem</a>
+        <a href="/" className={styles.back}>← HIU TMC</a>
         <a href="/learn/" className={styles.learn}>Learning Center</a>
       </header>
 

@@ -84,8 +84,8 @@ function HomeContent() {
     <main className={styles.shell}>
       <aside className={styles.sidebar} aria-label="Điều hướng hệ sinh thái">
         <a className={styles.brand} href="#top">
-          <img src="/hiu-club-logo.webp" alt="HIU YHCT" width="44" height="44" />
-          <span><strong>HIU YHCT</strong><small>TMC ECOSYSTEM</small></span>
+          <img src="/hiu-club-logo.webp" alt="HIU TMC" width="44" height="44" />
+          <span><strong>HIU TMC</strong><small>ECOSYSTEM</small></span>
         </a>
         <nav className={styles.nav}>
           <a href="#top"><i>⌂</i>Trang chủ</a>
@@ -116,8 +116,8 @@ function HomeContent() {
         </header>
 
         <section id="top" className={styles.hero}>
-          <small>HIU YHCT DIGITAL CAMPUS</small>
-          <h1>Chào mừng trở lại, <span>{member?.fullName || "HIU YHCT"}!</span></h1>
+          <small>HIU TMC DIGITAL CAMPUS</small>
+          <h1>Chào mừng trở lại, <span>{member?.fullName || "HIU TMC"}!</span></h1>
           <p>Một điểm vào thống nhất cho học tập, Atlas 3D, AI, Trung Y Văn và hoạt động học thuật của cộng đồng HIU.</p>
           <div className={styles.heroCtas}>
             {ready && !member && <StudyOsLink className={styles.heroJoin} href={registerUrl.toString()}>Đăng ký thành viên <span aria-hidden="true">↗</span></StudyOsLink>}
@@ -196,7 +196,7 @@ function HomeContent() {
 
             <section id="ecosystem" className={styles.panel}>
               <header className={styles.panelHead}>
-                <span><small>Core Hubs</small><h2>Khám phá hệ sinh thái HIU YHCT</h2></span>
+                <span><small>Core Hubs</small><h2>Khám phá hệ sinh thái HIU TMC</h2></span>
                 <a href="/discover/">Xem tất cả →</a>
               </header>
               <div className={styles.hubGrid}>
@@ -223,7 +223,7 @@ function HomeContent() {
             <div className={styles.lowerGrid}>
               <section className={styles.panel}>
                 <header className={styles.panelHead}>
-                  <span><small>Học cùng cộng đồng</small><h2>Cộng đồng HIU YHCT</h2></span>
+                  <span><small>Học cùng cộng đồng</small><h2>Cộng đồng HIU TMC</h2></span>
                   <a href="/community/">Xem thêm →</a>
                 </header>
                 <div className={styles.communityGrid}>
@@ -288,7 +288,7 @@ function HomeContent() {
         </div>
 
         <footer className={styles.footer}>
-          <strong>HIU YHCT Ecosystem</strong>
+          <strong>HIU TMC</strong>
           <span>Tri thức cổ truyền · Công nghệ hiện đại · Vì cộng đồng khỏe mạnh hơn</span>
         </footer>
       </div>

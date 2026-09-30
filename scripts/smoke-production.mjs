@@ -1,10 +1,10 @@
 const base = process.env.BASE_URL || "https://hiutmc.com";
 const routes = [
-  ["/", "HIU YHCT"],
+  ["/", "HIU TMC"],
   ["/learn/", "Learning Center"],
-  ["/ai/", "HIU YHCT AI Lab"],
-  ["/community/", "HIU YHCT Community"],
-  ["/discover/", "HIU YHCT Discover"],
+  ["/ai/", "HIU TMC AI Lab"],
+  ["/community/", "HIU TMC Community"],
+  ["/discover/", "HIU TMC Discover"],
   ["/search/", "Search Hub"],
   ["/ecosystem/study-os/", "Study OS"],
   ["/ecosystem/ai-thiet-chan/", "A.I Thiệt Chẩn"],
@@ -259,14 +259,14 @@ for (const [name, expected] of requiredHeaders) {
   console.log(`PASS header ${name}: ${value}`);
 }
 
-console.log("HIU YHCT production smoke passed.");
+console.log("HIU TMC production smoke passed.");
 
 const liveHtml = liveHtmlFromRoute;
 const approvedMarkers = [
-  "HIU YHCT DIGITAL CAMPUS",
+  "HIU TMC DIGITAL CAMPUS",
   "Chào mừng trở lại",
   "TIẾP TỤC HỌC TẬP",
-  "Khám phá hệ sinh thái HIU YHCT",
+  "Khám phá hệ sinh thái HIU TMC",
   "Study OS",
   "3D Atlas",
   "A.I Thiệt Chẩn",
@@ -327,7 +327,7 @@ for (const marker of [
   'property="og:title"',
   'property="og:description"',
   'property="og:image"',
-  'HIU YHCT Ecosystem – Cổng học tập Y học cổ truyền HIU',
+  'HIU TMC – Cổng học tập Y học cổ truyền HIU',
   'https://hiutmc.com/icons/icon-512.png?share=cp22',
 ]) {
   if (!zaloHtml.includes(marker)) throw new Error(`Zalo/social preview HTML missing marker: ${marker}`);
