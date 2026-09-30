@@ -33,6 +33,12 @@ export default function PrivacyPage() {
             Y học cổ truyền. Mọi câu hỏi về dữ liệu xin gửi tới{" "}
             <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
           </p>
+          <p>
+            <b>Ghi chú đổi tên:</b> từ 30/09/2026, hệ sinh thái trước đây gọi là “HIU YHCT Ecosystem”
+            thống nhất mang tên <b>HIU TMC</b>. Đây chỉ là thay đổi tên gọi; đơn vị vận hành, tài khoản thành viên,
+            dữ liệu và cách chúng tôi xử lý dữ liệu không thay đổi. Một số địa chỉ kỹ thuật cũ có thể còn chứa
+            “yhct” và vẫn hoạt động bình thường.
+          </p>
         </section>
 
         <section>
