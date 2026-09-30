@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/ai/",
     "/community/",
     "/search/",
+    "/privacy/",
     "/apps/study/",
     "/apps/atlas/",
     "/apps/thietchan/",
