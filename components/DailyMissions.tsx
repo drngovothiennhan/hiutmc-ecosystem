@@ -90,7 +90,7 @@ export default function DailyMissions({ apps }: { apps: EcosystemApp[] }) {
     </header>
 
     <div className="missionStats" aria-label="Tiến độ học tập cá nhân">
-      <article><span aria-hidden="true">✦</span><small>ĐIỂM TRẢI NGHIỆM</small><strong>{points}</strong><em>chỉ số tự theo dõi</em></article>
+      <article><span aria-hidden="true">✦</span><small>ĐIỂM NHIỆM VỤ</small><strong>{points}</strong><em>cộng khi bạn tự đánh dấu · tách riêng với XP Study OS và hạng thi đua</em></article>
       <article><span aria-hidden="true">♨</span><small>CHUỖI NGÀY HỌC</small><strong>{streak}<i> ngày</i></strong><em>hoàn thành ít nhất một nhiệm vụ</em></article>
       <article><span aria-hidden="true">✓</span><small>HÔM NAY</small><strong>{doneToday}<i> / 3</i></strong><em>{missions.length ? "nhiệm vụ đã đánh dấu" : "đang tải nhiệm vụ"}</em></article>
     </div>
@@ -101,7 +101,7 @@ export default function DailyMissions({ apps }: { apps: EcosystemApp[] }) {
         const done = completedIds.has(mission.id);
         return <article className={`missionCard${done ? " isDone" : ""}`} key={mission.id}>
           <div className="missionNumber">0{index + 1}</div>
-          <div className="missionCopy"><div className="missionNameRow"><h3>{mission.title}</h3><span>+{mission.points} XP</span></div><p>{mission.detail}</p><div className="missionActions">
+          <div className="missionCopy"><div className="missionNameRow"><h3>{mission.title}</h3><span>+{mission.points} điểm nhiệm vụ</span></div><p>{mission.detail}</p><div className="missionActions">
             <a href={app?.launchUrl ?? "/ecosystem/"} target="_blank" rel="noreferrer">Mở {app?.shortName ?? "Hub"} ↗</a>
             <button type="button" onClick={() => toggleMission(mission.id)} disabled={!dayKey || syncing} aria-pressed={done}>{done ? "✓ Đã hoàn thành" : "Đánh dấu hoàn tất"}</button>
           </div></div>
