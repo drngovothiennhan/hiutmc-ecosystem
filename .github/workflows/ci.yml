@@ -110,6 +110,9 @@ jobs:
       - name: Validate search extras (shared library + Google link, flag-gated)
         run: npm run validate:search-shared
 
+      - name: Validate herb names (Wikidata CC0, names only, flag-gated)
+        run: npm run validate:herb-names
+
       - name: Build static export
         run: npm run build
 

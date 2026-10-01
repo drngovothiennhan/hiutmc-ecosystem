@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20261001-03",
+  "release": "HIU-YHCT-ECOSYSTEM-20261001-04",
   "product_name": "HIU TMC",
-  "checkpoint": "CP41",
-  "base_checkpoint_sha": "7b38f68d406da815fe3f93852a75b5a71deeeed2",
+  "checkpoint": "CP42",
+  "base_checkpoint_sha": "2f7d9333bf6a32cb7db59d08f543ecd0b5ba42bc",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP41 adds two optional Search page extras behind feature flags that ship OFF (search-shared-library, search-google-link): published member resources from the Study OS library (same Supabase data, member session, no drafts) and an external Google link labelled as not verified by HIU. Quick-ask routing also recognises more herb/medicine words. Homepage structure is unchanged. CI, Cloudflare deployment and production smoke remain mandatory."
+  "verification": "CP42 adds a herb-name lookup for the Search page behind the OFF-by-default flag search-herb-names. Names (Vietnamese, Latin, Chinese) come from Wikidata (CC0) via a manual-only GitHub workflow that pushes to the review branch bot/herb-names; names only, no medical claims. The shipped dataset starts empty, so nothing shows until it is refreshed and the flag is raised. Homepage structure is unchanged. CI, Cloudflare deployment and production smoke remain mandatory."
 }

@@ -3,18 +3,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { googleSearchHref, parseLibraryRows, rankLibrary, type LibraryHit } from "@/data/shared-search";
 import { ecosystemApps } from "@/data/apps";
+import herbData from "@/data/herb-names.generated.json";
+import { herbTitle, lookupHerbs, type HerbEntry } from "@/data/herb-lookup";
 import { StudyOsLink, SUPABASE_KEY, SUPABASE_URL, useMemberAuth } from "./MemberAuthBridge";
 import { useFeatureFlag } from "./useFeatureFlag";
 
 /**
  * Optional extras under the Search page results. Both are behind feature flags that ship OFF:
  *   search-shared-library -> published member resources from the Study OS library (same Supabase data, member session)
+ *   search-herb-names     -> herb names (Vietnamese/Latin/Chinese) from Wikidata, CC0, names only
  *   search-google-link    -> external Google link, labelled as not verified by HIU
  * With both flags OFF this renders nothing, so the approved Search page is unchanged.
  */
 export default function SearchExtras({ query }: { query: string }) {
   const { accessToken } = useMemberAuth();
   const library = useFeatureFlag("search-shared-library", { accessToken });
+  const herbNames = useFeatureFlag("search-herb-names", { accessToken });
   const google = useFeatureFlag("search-google-link", { accessToken });
   const [rows, setRows] = useState<LibraryHit[] | null>(null);
   const studyHref = ecosystemApps.find((app) => app.slug === "study-os")?.launchUrl ?? "/apps/study/";
@@ -35,8 +39,9 @@ export default function SearchExtras({ query }: { query: string }) {
   }, [library, accessToken]);
 
   const hits = useMemo(() => (library && rows ? rankLibrary(rows, query) : []), [library, rows, query]);
+  const herbs = useMemo(() => (herbNames ? lookupHerbs(herbData.entries as HerbEntry[], query) : []), [herbNames, query]);
   const googleHref = google ? googleSearchHref(query) : null;
-  if (!hits.length && !googleHref) return null;
+  if (!hits.length && !herbs.length && !googleHref) return null;
 
   return (
     <div style={{ display: "grid", gap: 12, marginTop: 24, maxWidth: 900 }}>
@@ -48,6 +53,21 @@ export default function SearchExtras({ query }: { query: string }) {
               <li key={hit.resourceKey} style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "12px 14px", border: "1px solid rgba(116,21,29,.14)", borderRadius: 14, background: "#fff" }}>
                 <span>{hit.title}</span>
                 <StudyOsLink href={studyHref} className="">Mở Study OS →</StudyOsLink>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {herbs.length > 0 && (
+        <section aria-label="Tên dược liệu">
+          <h2 style={{ margin: "0 0 8px", fontSize: 16 }}>Tên dược liệu</h2>
+          <ul style={{ display: "grid", gap: 8, margin: 0, padding: 0, listStyle: "none" }}>
+            {herbs.map((herb) => (
+              <li key={herb.qid} style={{ padding: "12px 14px", border: "1px solid rgba(116,21,29,.14)", borderRadius: 14, background: "#fff" }}>
+                <b>{herbTitle(herb)}</b> · <i>{herb.latin}</i>
+                {herb.zh[0] ? <> · {herb.zh[0]}</> : null}
+                {herb.viAliases.length > 0 ? <><br /><small>Tên khác: {herb.viAliases.slice(0, 3).join(", ")}</small></> : null}
+                <br /><small>Nguồn tên gọi: <a href={herb.url} target="_blank" rel="noopener noreferrer">Wikidata</a> (CC0). Chỉ là tên, không phải thông tin y khoa; tra cứu công dụng ở Trung Y Văn.</small>
               </li>
             ))}
           </ul>
