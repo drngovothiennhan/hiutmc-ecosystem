@@ -51,7 +51,7 @@ for (const flag of ["search-shared-library", "search-google-link"]) if (!extras.
 if (!/learning_resource_list_v1/.test(extras)) errors.push("SearchExtras must read the shared Study OS library RPC");
 if (/p_include_drafts:\s*true/.test(extras)) errors.push("SearchExtras must never request drafts");
 if (!/rel="noopener noreferrer"/.test(extras)) errors.push("external Google link needs rel=noopener noreferrer");
-if (!/if \(!hits\.length && (!herbs\.length && )?!googleHref\) return null/.test(extras)) errors.push("with all flags OFF SearchExtras must render nothing");
+if (!/if \(!hits\.length && (!herbs\.length && )?(!drugs\.length && )?!googleHref\) return null/.test(extras)) errors.push("with all flags OFF SearchExtras must render nothing");
 if (!read("app/search/SearchClient.tsx").includes("<SearchExtras")) errors.push("SearchClient must mount SearchExtras");
 
 if (errors.length) {
