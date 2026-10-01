@@ -9,7 +9,7 @@
     "validate:registry": "node --experimental-strip-types scripts/validate-registry.mjs",
     "validate:release": "node scripts/validate-release.mjs",
     "validate:community": "node --experimental-strip-types scripts/validate-community-backend.mjs",
-    "check": "npm run materialize:spirit-assets && npm run validate:repo && npm run validate:release && npm run validate:registry && npm run validate:assets && npm run validate:pwa && npm run validate:community && npm run validate:learning && npm run validate:personalization && npm run validate:staff-auth && npm run validate:game-hub-gateway && npm run validate:admin-shadow && npm run validate:display-mode && npm run validate:profile-progress && npm run test:traffic && npm run build && npm run validate:approved && npm run validate:spirit-pet-admin && npm run validate:mission-sync && npm run validate:site-theme && npm run validate:feature-flags && npm run validate:assistant-guidance",
+    "check": "npm run materialize:spirit-assets && npm run validate:repo && npm run validate:release && npm run validate:registry && npm run validate:assets && npm run validate:pwa && npm run validate:community && npm run validate:learning && npm run validate:personalization && npm run validate:staff-auth && npm run validate:game-hub-gateway && npm run validate:admin-shadow && npm run validate:display-mode && npm run validate:profile-progress && npm run test:traffic && npm run build && npm run validate:approved && npm run validate:spirit-pet-admin && npm run validate:mission-sync && npm run validate:site-theme && npm run validate:feature-flags && npm run validate:assistant-guidance && npm run validate:search-shared",
     "validate:assets": "node scripts/validate-assets.mjs",
     "smoke:production": "node scripts/smoke-production.mjs",
     "validate:repo": "node scripts/validate-repo-boundary.mjs",
@@ -28,7 +28,8 @@
     "validate:mission-sync": "node --experimental-strip-types scripts/validate-mission-sync.mjs",
     "validate:site-theme": "node --experimental-strip-types scripts/validate-site-theme.mjs",
     "validate:feature-flags": "node scripts/validate-feature-flags.mjs",
-    "validate:assistant-guidance": "node --experimental-strip-types scripts/validate-assistant-guidance.mjs"
+    "validate:assistant-guidance": "node --experimental-strip-types scripts/validate-assistant-guidance.mjs",
+    "validate:search-shared": "node --experimental-strip-types scripts/validate-search-shared.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.102.0",

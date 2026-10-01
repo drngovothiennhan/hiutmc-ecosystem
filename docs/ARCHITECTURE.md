@@ -101,6 +101,17 @@ Logic is pure and offline in `data/assistant-guidance.ts` (validated by `validat
 `components/AssistantGuidance.tsx` mounted by `SpiritCompanion`, which renders nothing while every flag is OFF.
 `MemberAuthBridge` now also exposes the member's `accessToken` in context so flag rollouts can target members.
 
+### Search extras (added 2026-10-01, both flags OFF)
+
+`/search/` filters a static curated index (`data/search-index.ts`). Two optional extras, each behind its own flag and
+rendered by `components/SearchExtras.tsx` (nothing renders while both are OFF):
+
+- `search-shared-library` — published, member-audience resources from the Study OS library, read with the member's session via
+  the existing `learning_resource_list_v1` RPC on the shared Supabase project (never drafts). Titles only; "Mở Study OS" opens Study OS.
+- `search-google-link` — a `https://www.google.com/search?q=` link, labelled as an external result not verified by HIU.
+
+Pure logic: `data/shared-search.ts` (validated by `validate:search-shared`).
+
 ## Source layout
 
 | Path | Contents |
