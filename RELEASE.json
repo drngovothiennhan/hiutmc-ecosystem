@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20261001-01",
+  "release": "HIU-YHCT-ECOSYSTEM-20261001-02",
   "product_name": "HIU TMC",
-  "checkpoint": "CP39",
-  "base_checkpoint_sha": "c1e4288a5acc8ab8d24354fc245ec58a3576394f",
+  "checkpoint": "CP40",
+  "base_checkpoint_sha": "83e6645ee468980bdcfd40ff462fe916fc27e848",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP39 adds invisible release tooling and no visible change: a feature-flag service (GET /api/flags, lib/feature-flags.mjs; every flag defaults OFF, optional FEATURE_FLAGS and FEATURE_FLAGS_DISABLED Worker secrets), a service-worker safety guard in validate:pwa, CI now also runs the mission-sync, site-theme and feature-flag validators, and docs/RELEASE_PLAYBOOK.md. Homepage structure is unchanged. CI, Cloudflare deployment and production smoke remain mandatory."
+  "verification": "CP40 adds three smarter-companion upgrades behind feature flags that all ship OFF (assistant-context, assistant-quick-ask, assistant-nudges): next-step cards from real progress, an offline quick-ask router to the right app, and calm once-a-day reminders. No server, no AI credits, no visible change until a flag is raised. MemberAuthBridge also exposes the access token in context for flag rollouts. Homepage structure is unchanged. CI, Cloudflare deployment and production smoke remain mandatory."
 }

@@ -83,6 +83,24 @@ flag in their own session with `?flag_preview=<id>`. Client code uses `useFeatur
 (`components/useFeatureFlag.ts`), which starts `false`. The approved homepage does not use flags. Flags are a
 rollout control, not an authorization mechanism. Operating guide: `docs/RELEASE_PLAYBOOK.md`.
 
+### Smarter companion guidance (added 2026-10-01, all flags OFF)
+
+The portal's assistant surface is the spirit companion (`SpiritCompanion`); the generative "ask a question" assistant
+and the AI credits live in Study OS (separate repo). Three independent upgrades extend the companion, each behind its
+own flag (`assistant-context`, `assistant-quick-ask`, `assistant-nudges`) so they roll out separately:
+
+- *Context cards* — "what to do next" from data the member already has (verified Study OS snapshot: due/weak review
+  topics; today's missions; streak). Nothing is shown when there is no real data.
+- *Quick ask* — a typed question is routed to the right registered app (Atlas, Trung Y Văn, A.I Thiệt Chẩn, Study OS)
+  plus a `/search/?q=` link. Offline keyword routing: no AI call, no credits, never a clinical answer. Game Hub is never
+  suggested (role-gated).
+- *Calm nudges* — one reminder chip, each kind at most once per day (due review > streak at risk after 18:00 > unfinished
+  missions), quiet hours 22:30–06:00, dismissible, opening the panel counts as seen.
+
+Logic is pure and offline in `data/assistant-guidance.ts` (validated by `validate:assistant-guidance`); UI is
+`components/AssistantGuidance.tsx` mounted by `SpiritCompanion`, which renders nothing while every flag is OFF.
+`MemberAuthBridge` now also exposes the member's `accessToken` in context so flag rollouts can target members.
+
 ## Source layout
 
 | Path | Contents |
