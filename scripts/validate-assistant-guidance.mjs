@@ -6,6 +6,7 @@ import {
   buildContextCards, chooseNudge, dueTopics, greetingFor, inQuietHours, normalizeQuestion, routeQuestion, weakTopics,
 } from "../data/assistant-guidance.ts";
 import { FEATURE_FLAG_IDS } from "../lib/feature-flags.mjs";
+import { buildTyvReminder, daysUntilExam, parseTyvSummary, TYV_URL } from "../data/trung-y-van-reminder.ts";
 
 const errors = [];
 const read = (path) => fs.readFileSync(path, "utf8");
@@ -114,6 +115,39 @@ if (!component.includes("prefers-reduced-motion") && !read("components/Assistant
 const companion = read("components/SpiritCompanion.tsx");
 if (!companion.includes("<AssistantGuidance")) errors.push("SpiritCompanion must mount AssistantGuidance");
 if (/useFeatureFlag|feature-flags/.test(companion)) errors.push("SpiritCompanion (approved) must not import flags itself; AssistantGuidance owns them");
+
+// --- Trung Y Văn reminder shown by the Linh thú -----------------------------------------------------------
+{
+  const summary = (overrides = {}) => JSON.stringify({ v: 1, examDate: "2026-11-12", remindTime: "19:00", day: "2026-10-01", newPerDay: 15, newLeft: 9, due: 4, goalDone: false, ...overrides });
+  const evening = new Date(2026, 9, 1, 19, 30);
+  assert.equal(parseTyvSummary(null), null);
+  assert.equal(parseTyvSummary("not json"), null);
+  assert.equal(parseTyvSummary(summary({ v: 2 })), null, "unknown version is ignored");
+  assert.equal(parseTyvSummary(summary({ examDate: "12/11/2026" })), null);
+  assert.equal(parseTyvSummary(summary({ remindTime: "25:00" })), null);
+  assert.equal(parseTyvSummary(summary({ newLeft: -5, due: "x" })).newLeft, 0, "counts are clamped");
+  assert.equal(daysUntilExam("2026-11-12", evening), 42);
+  assert.equal(daysUntilExam("2026-10-01", evening), 0, "exam day itself is 0 days left");
+  assert.equal(daysUntilExam("2026-09-30", evening), null, "past exam date");
+  const today = buildTyvReminder(parseTyvSummary(summary()), evening);
+  assert.equal(today?.message, "Hôm nay còn 9 từ mới và 4 từ cần ôn. Còn 42 ngày đến kỳ thi.");
+  assert.equal(buildTyvReminder(parseTyvSummary(summary()), new Date(2026, 9, 1, 18, 59)), null, "not before the reminder time");
+  assert.equal(buildTyvReminder(parseTyvSummary(summary({ goalDone: true })), evening), null, "goal finished today");
+  assert.equal(buildTyvReminder(parseTyvSummary(summary({ newLeft: 0, due: 0 })), evening), null, "nothing left");
+  const stale = buildTyvReminder(parseTyvSummary(summary({ day: "2026-09-30", newLeft: 0, due: 0, goalDone: true })), evening);
+  assert.equal(stale?.message, "Hôm nay còn khoảng 15 từ mới và các từ đến hạn cần ôn. Còn 42 ngày đến kỳ thi.", "stale summary stays general, exact counts are unknown");
+  assert.match(buildTyvReminder(parseTyvSummary(summary({ examDate: "2026-10-01" })), evening).message, /ngày thi/);
+  assert.equal(TYV_URL, "/apps/trungyvan/");
+  const tyvLogic = read("data/trung-y-van-reminder.ts");
+  for (const banned of [/\bfetch\s*\(/, /localStorage/, /Math\.random/]) {
+    if (banned.test(tyvLogic)) errors.push(`trung-y-van-reminder.ts must stay pure: ${banned}`);
+  }
+  const tyvUi = read("components/TrungYVanReminder.tsx");
+  if (/fetch\(/.test(tyvUi)) errors.push("TrungYVanReminder must not make network calls");
+  if (/href=\{(?!TYV_URL)/.test(tyvUi)) errors.push("TrungYVanReminder link must be the fixed TYV_URL");
+  const spirit = read("components/SpiritCompanion.tsx");
+  if (!spirit.includes('<TrungYVanReminder mode="popup"') || !spirit.includes('<TrungYVanReminder mode="panel"')) errors.push("SpiritCompanion must mount the Trung Y Văn reminder in popup and panel");
+}
 
 if (errors.length) {
   console.error("Assistant guidance validation failed:");
