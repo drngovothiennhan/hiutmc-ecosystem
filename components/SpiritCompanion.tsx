@@ -17,6 +17,7 @@ import {
 import styles from "./SpiritCompanion.module.css";
 import { useMemberAuth } from "./MemberAuthBridge";
 import AssistantGuidance from "./AssistantGuidance";
+import TrungYVanReminder from "./TrungYVanReminder";
 
 type PetKind = "dragon" | "phoenix" | "sphinx" | "qilin" | "peacock" | "fox";
 type PetSpecies = {
@@ -246,6 +247,8 @@ export default function SpiritCompanion() {
           </div>
           <p>{message}</p>
 
+          <TrungYVanReminder mode="panel" />
+
           <div className={styles.localState}>
             <span>Nhiệm vụ hôm nay</span>
             <b>{dayKey ? `${completedToday.size} / ${missions.length}` : "Đang tải"}</b>
@@ -317,6 +320,7 @@ export default function SpiritCompanion() {
           {!member && <small className={styles.note}>Đăng nhập thành viên để lưu hồ sơ Linh Thú trên máy chủ và tiếp tục dùng khi đổi thiết bị.</small>}
         </section>
       )}
+      {!open && <TrungYVanReminder mode="popup" />}
       {!open && dayKey && <AssistantGuidance mode="chip" total={missions.length} remaining={remaining} nextMission={guidanceMission} streak={streak} weeklyCount={weeklyCount} onOpenPanel={() => setOpen(true)} />}
       <button type="button" className={styles.launcher} onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-label={"Mở linh thú " + pet.name}>
         <span className={styles.bubble}>{remaining === 0 ? "Hoàn thành hôm nay!" : remaining + " việc đang chờ"}</span>

@@ -32,6 +32,7 @@ Các mục sau mới chỉ được phép hiển thị ở trạng thái khóa h
 - Đọc tiến độ nhiệm vụ cục bộ đã tồn tại.
 - Hiển thị số nhiệm vụ còn lại và gợi ý nhiệm vụ kế tiếp.
 - Điều hướng sang Nhiệm vụ/Cộng đồng.
+- Nhắc học Trung Y Văn qua Linh thú: popup/dòng nhắc trong panel, chỉ đọc bản tóm tắt cục bộ do Trung Y Văn ghi vào localStorage khi người học bật nhắc (không máy chủ, không push; liên kết cố định `/apps/trungyvan/`). Xem `data/trung-y-van-reminder.ts`.
 - Responsive launcher nhỏ, không chiếm layout chính.
 
 ## Điều kiện để gỡ FROZEN
