@@ -113,6 +113,9 @@ jobs:
       - name: Validate herb names (Wikidata CC0, names only, flag-gated)
         run: npm run validate:herb-names
 
+      - name: Validate drug names (Wikidata CC0, names and ATC only, flag-gated)
+        run: npm run validate:drug-names
+
       - name: Build static export
         run: npm run build
 

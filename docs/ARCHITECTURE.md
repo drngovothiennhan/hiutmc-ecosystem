@@ -115,7 +115,11 @@ rendered by `components/SearchExtras.tsx` (nothing renders while both are OFF):
   `bot/herb-names` (never main/production). Names only, no medical claims. Seed keys: `data/herb-seed.json`. Pharmacopoeia text is NOT used
   (it is copyrighted; permission is pending with the owner).
 
-Pure logic: `data/shared-search.ts`, `data/herb-lookup.ts` (validated by `validate:search-shared`, `validate:herb-names`).
+- `search-drug-names` — drug names (Vietnamese, international, ATC code) from `public/data/drug-names.generated.json`, built from Wikidata (CC0)
+  by `scripts/build-drug-names.mjs` in the same manual workflow; fetched lazily by the browser only when the flag is on and a query is typed.
+  Names and ATC codes only: no indications, doses or clinical claims, and every result says so.
+
+Pure logic: `data/shared-search.ts`, `data/herb-lookup.ts`, `data/drug-lookup.ts` (validated by `validate:search-shared`, `validate:herb-names`, `validate:drug-names`).
 
 ## Source layout
 

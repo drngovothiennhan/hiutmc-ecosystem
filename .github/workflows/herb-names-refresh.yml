@@ -18,11 +18,13 @@ jobs:
           node-version: 22
       - name: Build herb names from Wikidata
         run: node scripts/build-herb-names.mjs
+      - name: Build drug names from Wikidata
+        run: node scripts/build-drug-names.mjs
       - name: Push the dataset to bot/herb-names for review
         run: |
           git config user.name "hiutmc-bot"
           git config user.email "noreply@hiutmc.com"
           git checkout -B bot/herb-names
-          git add data/herb-names.generated.json
+          git add data/herb-names.generated.json public/data/drug-names.generated.json
           git commit -m "Refresh herb names from Wikidata (CC0)" || echo "No change"
           git push -f origin bot/herb-names
