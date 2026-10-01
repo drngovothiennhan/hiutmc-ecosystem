@@ -45,6 +45,17 @@ Stages only ever widen (each includes the previous ones; CI proves this):
 | `percent` | staff + testers + a stable `percent`% of signed-in members (same people each time; raising the % only adds people; anonymous visitors are never in a cohort) |
 | `all` | everyone |
 
+### Registered flags
+
+| Flag | What it turns on |
+|---|---|
+| `assistant-context` | companion panel: "what to do next" cards from real progress |
+| `assistant-quick-ask` | companion panel: quick-ask box routing to the right app (no AI, no credits) |
+| `assistant-nudges` | calm reminder chip above the companion (once per kind per day) |
+
+Suggested first step: `{"assistant-context":{"stage":"staff"},"assistant-quick-ask":{"stage":"staff"},"assistant-nudges":{"stage":"staff"}}`,
+then try each with `?flag_preview=<flag-id>` while signed in as Admin/Mod before widening.
+
 ### Changing a stage (no deploy)
 
 Cloudflare dashboard → Workers & Pages → `hiutmc-ecosystem` → Settings → Variables and Secrets →
@@ -53,8 +64,8 @@ replaces plain variables). Value is JSON:
 
 ```json
 {
-  "deeptutor-agent": { "stage": "testers", "testers": ["<club_members.id>"] },
-  "clinical-learning-hub": { "stage": "percent", "percent": 10 }
+  "assistant-context": { "stage": "testers", "testers": ["<club_members.id>"] },
+  "assistant-quick-ask": { "stage": "percent", "percent": 10 }
 }
 ```
 

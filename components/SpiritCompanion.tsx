@@ -2,9 +2,11 @@
 
 import { type CSSProperties, useEffect, useMemo, useState } from "react";
 import {
+  currentStreak,
   localDayKey,
   normalizeProgress,
   selectMissionsForDay,
+  weeklyMissionCount,
   type LearningProgress,
 } from "@/data/learning-progress";
 import {
@@ -14,6 +16,7 @@ import {
 } from "@/data/spirit-pet-visuals";
 import styles from "./SpiritCompanion.module.css";
 import { useMemberAuth } from "./MemberAuthBridge";
+import AssistantGuidance from "./AssistantGuidance";
 
 type PetKind = "dragon" | "phoenix" | "sphinx" | "qilin" | "peacock" | "fox";
 type PetSpecies = {
@@ -197,6 +200,9 @@ export default function SpiritCompanion() {
   );
   const remaining = Math.max(0, missions.length - completedToday.size);
   const nextMission = missions.find((mission) => !completedToday.has(mission.id));
+  const guidanceMission = useMemo(() => (nextMission ? { title: nextMission.title, hubSlug: nextMission.hubSlug } : null), [nextMission?.id]);
+  const streak = useMemo(() => currentStreak(progress.completions, dayKey), [progress, dayKey]);
+  const weeklyCount = useMemo(() => weeklyMissionCount(progress.completions, dayKey), [progress, dayKey]);
 
   const message = useMemo(() => {
     if (!member) return "Linh thú khách chỉ là bản xem thử tạm thời. Đăng nhập để đồng bộ hồ sơ Linh Thú giữa các thiết bị.";
@@ -244,6 +250,8 @@ export default function SpiritCompanion() {
             <span>Nhiệm vụ hôm nay</span>
             <b>{dayKey ? `${completedToday.size} / ${missions.length}` : "Đang tải"}</b>
           </div>
+
+          <AssistantGuidance mode="panel" total={missions.length} remaining={remaining} nextMission={guidanceMission} streak={streak} weeklyCount={weeklyCount} />
 
           <div className={styles.actions}>
             <a href="#missions" onClick={() => setOpen(false)}><span>✓</span>Nhiệm vụ</a>
@@ -309,6 +317,7 @@ export default function SpiritCompanion() {
           {!member && <small className={styles.note}>Đăng nhập thành viên để lưu hồ sơ Linh Thú trên máy chủ và tiếp tục dùng khi đổi thiết bị.</small>}
         </section>
       )}
+      {!open && dayKey && <AssistantGuidance mode="chip" total={missions.length} remaining={remaining} nextMission={guidanceMission} streak={streak} weeklyCount={weeklyCount} onOpenPanel={() => setOpen(true)} />}
       <button type="button" className={styles.launcher} onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-label={"Mở linh thú " + pet.name}>
         <span className={styles.bubble}>{remaining === 0 ? "Hoàn thành hôm nay!" : remaining + " việc đang chờ"}</span>
         <span className={styles.petStage + " " + styles[pet.motion]}>

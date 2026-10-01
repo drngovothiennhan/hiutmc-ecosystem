@@ -1,0 +1,21 @@
+/* Guidance inside the companion panel and the small reminder chip. Only rendered when a flag is ON. */
+.block{display:grid;gap:12px;margin-top:12px}
+.title{margin:0 0 6px;color:#8f1935;font-family:"HIU Serif",Georgia,serif;font-size:12.5px}
+.cards{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.cards li{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 9px;border:1px solid #e4dac8;border-radius:10px;background:#fffaf2}
+.cards li>div{display:grid;gap:2px;min-width:0}
+.cards strong{color:#4e5b55;font-size:11px;line-height:1.35}
+.cards small{color:#7a7167;font-size:9.5px;line-height:1.45}
+.go{flex:0 0 auto;padding:5px 9px;border:1px solid color-mix(in srgb,var(--pet-a,#8f1935) 45%,#d8ccb4);border-radius:999px;background:#fff;color:#8f1935;font-size:10px;font-weight:800;text-decoration:none;cursor:pointer}
+.go:hover{background:#fff7e7}
+.ask{display:flex;gap:6px}
+.ask input{flex:1;min-width:0;padding:8px 10px;border:1px solid #d9ccb7;border-radius:10px;background:#fff;color:#203347;font-size:12px}
+.ask button{padding:8px 12px;border:0;border-radius:10px;background:#8f1935;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
+.ask button:disabled{opacity:.5;cursor:not-allowed}
+.note{display:block;margin-top:6px;color:#8a8176;font-size:9px;line-height:1.45}
+.chip{position:absolute;right:0;bottom:72px;display:flex;align-items:center;gap:6px;max-width:min(300px,calc(100vw - 24px));padding:7px 8px 7px 11px;border:1px solid #e0d4bf;border-radius:14px 14px 3px 14px;background:#fffdf8;color:#5f5549;box-shadow:0 10px 24px rgba(50,42,30,.12);font-size:11px;font-weight:700}
+.chipText{flex:1;min-width:0;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;line-height:1.4}
+.chipGo{flex:0 0 auto;padding:4px 9px;border-radius:999px;background:#8f1935;color:#fff;font-size:10px;font-weight:800;text-decoration:none}
+.chipClose{flex:0 0 auto;width:22px;height:22px;border:0;border-radius:50%;background:#f3eadb;color:#6b5660;font-size:15px;line-height:1;cursor:pointer}
+@media(max-width:700px){.chip{bottom:56px}}
+@media(prefers-reduced-motion:reduce){.chip,.go,.ask button{transition:none}}
