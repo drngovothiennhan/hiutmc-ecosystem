@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { googleSearchHref, parseLibraryRows, rankLibrary, type LibraryHit } from "@/data/shared-search";
 import { ecosystemApps } from "@/data/apps";
 import herbData from "@/data/herb-names.generated.json";
+import { lookupDrugs, parseDrugFile, type DrugEntry } from "@/data/drug-lookup";
 import { herbTitle, lookupHerbs, type HerbEntry } from "@/data/herb-lookup";
 import { StudyOsLink, SUPABASE_KEY, SUPABASE_URL, useMemberAuth } from "./MemberAuthBridge";
 import { useFeatureFlag } from "./useFeatureFlag";
@@ -19,7 +20,9 @@ export default function SearchExtras({ query }: { query: string }) {
   const { accessToken } = useMemberAuth();
   const library = useFeatureFlag("search-shared-library", { accessToken });
   const herbNames = useFeatureFlag("search-herb-names", { accessToken });
+  const drugNames = useFeatureFlag("search-drug-names", { accessToken });
   const google = useFeatureFlag("search-google-link", { accessToken });
+  const [drugFile, setDrugFile] = useState<DrugEntry[] | null>(null);
   const [rows, setRows] = useState<LibraryHit[] | null>(null);
   const studyHref = ecosystemApps.find((app) => app.slug === "study-os")?.launchUrl ?? "/apps/study/";
 
@@ -38,10 +41,21 @@ export default function SearchExtras({ query }: { query: string }) {
     return () => controller.abort();
   }, [library, accessToken]);
 
+  useEffect(() => {
+    if (!drugNames || drugFile || query.trim().length < 2) return;
+    const controller = new AbortController();
+    fetch("/data/drug-names.generated.json", { signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => setDrugFile(parseDrugFile(data)))
+      .catch(() => { if (!controller.signal.aborted) setDrugFile([]); });
+    return () => controller.abort();
+  }, [drugNames, drugFile, query]);
+
+  const drugs = useMemo(() => (drugNames && drugFile ? lookupDrugs(drugFile, query) : []), [drugNames, drugFile, query]);
   const hits = useMemo(() => (library && rows ? rankLibrary(rows, query) : []), [library, rows, query]);
   const herbs = useMemo(() => (herbNames ? lookupHerbs(herbData.entries as HerbEntry[], query) : []), [herbNames, query]);
   const googleHref = google ? googleSearchHref(query) : null;
-  if (!hits.length && !herbs.length && !googleHref) return null;
+  if (!hits.length && !herbs.length && !drugs.length && !googleHref) return null;
 
   return (
     <div style={{ display: "grid", gap: 12, marginTop: 24, maxWidth: 900 }}>
@@ -68,6 +82,20 @@ export default function SearchExtras({ query }: { query: string }) {
                 {herb.zh[0] ? <> · {herb.zh[0]}</> : null}
                 {herb.viAliases.length > 0 ? <><br /><small>Tên khác: {herb.viAliases.slice(0, 3).join(", ")}</small></> : null}
                 <br /><small>Nguồn tên gọi: <a href={herb.url} target="_blank" rel="noopener noreferrer">Wikidata</a> (CC0). Chỉ là tên, không phải thông tin y khoa; tra cứu công dụng ở Trung Y Văn.</small>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {drugs.length > 0 && (
+        <section aria-label="Tên thuốc">
+          <h2 style={{ margin: "0 0 8px", fontSize: 16 }}>Tên thuốc</h2>
+          <ul style={{ display: "grid", gap: 8, margin: 0, padding: 0, listStyle: "none" }}>
+            {drugs.map((drug) => (
+              <li key={drug.qid} style={{ padding: "12px 14px", border: "1px solid rgba(116,21,29,.14)", borderRadius: 14, background: "#fff" }}>
+                <b>{drug.vi}</b>{drug.en && drug.en.toLowerCase() !== drug.vi.toLowerCase() ? <> · <i>{drug.en}</i></> : null}
+                {drug.atc.length > 0 ? <> · ATC {drug.atc.join(", ")}</> : null}
+                <br /><small>Nguồn tên gọi: <a href={drug.url} target="_blank" rel="noopener noreferrer">Wikidata</a> (CC0). Chỉ là tên và mã phân loại, không phải hướng dẫn dùng thuốc.</small>
               </li>
             ))}
           </ul>

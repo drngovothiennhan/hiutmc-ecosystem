@@ -1,7 +1,7 @@
 export type FlagStage = "off" | "admin" | "staff" | "testers" | "percent" | "all";
 export type FlagConfig = { stage: FlagStage; percent?: number; testers?: string[] };
 export type FlagViewer = { role?: string; memberId?: string };
-export type FlagId = "assistant-context" | "assistant-quick-ask" | "assistant-nudges" | "search-shared-library" | "search-herb-names" | "search-google-link";
+export type FlagId = "assistant-context" | "assistant-quick-ask" | "assistant-nudges" | "search-shared-library" | "search-herb-names" | "search-drug-names" | "search-google-link";
 
 export const FLAG_STAGES: readonly FlagStage[];
 export const STAFF_ROLE_SET: readonly string[];

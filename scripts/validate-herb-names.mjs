@@ -47,7 +47,7 @@ if (new Set(seed).size !== seed.length) errors.push("seed list has duplicates");
 if (FEATURE_FLAG_REGISTRY["search-herb-names"]?.default.stage !== "off") errors.push("search-herb-names must be registered and default off");
 const extras = read("components/SearchExtras.tsx");
 if (!extras.includes('"search-herb-names"')) errors.push("SearchExtras must use the search-herb-names flag");
-if (!/if \(!hits\.length && !herbs\.length && !googleHref\) return null/.test(extras)) errors.push("with every flag OFF SearchExtras must render nothing");
+if (!/if \(!hits\.length && !herbs\.length && !drugs\.length && !googleHref\) return null/.test(extras)) errors.push("with every flag OFF SearchExtras must render nothing");
 const workflow = read(".github/workflows/herb-names-refresh.yml");
 if (/schedule:|push:|pull_request:/.test(workflow.replace(/#.*$/gm, ""))) errors.push("herb-names workflow must be manual only");
 if (/origin (main|production)/.test(workflow)) errors.push("herb-names workflow must never push to main or production");
