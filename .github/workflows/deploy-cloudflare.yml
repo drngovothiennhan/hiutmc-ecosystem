@@ -60,7 +60,7 @@ jobs:
         run: npm run materialize:spirit-assets
 
       - name: Validate release contracts
-        run: npm run validate:repo && npm run validate:release && npm run validate:registry && npm run validate:assets && npm run validate:pwa && npm run validate:community && npm run validate:learning && npm run validate:personalization && npm run validate:staff-auth && npm run validate:game-hub-gateway && npm run validate:admin-shadow && npm run validate:display-mode && npm run validate:profile-progress && npm run validate:spirit-pet-admin && npm run validate:mission-sync && npm run validate:site-theme && npm run validate:feature-flags && npm run validate:assistant-guidance && npm run test:traffic
+        run: npm run validate:repo && npm run validate:release && npm run validate:registry && npm run validate:assets && npm run validate:pwa && npm run validate:community && npm run validate:learning && npm run validate:personalization && npm run validate:staff-auth && npm run validate:game-hub-gateway && npm run validate:admin-shadow && npm run validate:display-mode && npm run validate:profile-progress && npm run validate:spirit-pet-admin && npm run validate:mission-sync && npm run validate:site-theme && npm run validate:feature-flags && npm run validate:assistant-guidance && npm run validate:search-shared && npm run test:traffic
 
       - name: Build static export
         run: npm run build

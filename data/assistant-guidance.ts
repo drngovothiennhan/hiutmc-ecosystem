@@ -177,7 +177,7 @@ export function normalizeQuestion(text: string): string {
 
 const RULES: Array<{ slug: string; why: string; keywords: string[] }> = [
   { slug: "atlas", why: "xem vị trí huyệt, đường kinh trên mô hình 3D", keywords: ["huyet", "kinh lac", "duong kinh", "cham cuu", "giai phau", "vi tri", "3d", "atlas", "mach", "nhan huyet", "tay huyet"] },
-  { slug: "trung-y-van", why: "tra cứu vị thuốc, bài thuốc, học liệu Trung y văn", keywords: ["vi thuoc", "duoc lieu", "bai thuoc", "phuong te", "han van", "han nom", "trung y van", "tra cuu", "thang thuoc", "cong dung", "thao duoc"] },
+  { slug: "trung-y-van", why: "tra cứu vị thuốc, bài thuốc, học liệu Trung y văn", keywords: ["vi thuoc", "duoc lieu", "bai thuoc", "phuong te", "han van", "han nom", "trung y van", "tra cuu", "thang thuoc", "cong dung", "thao duoc", "thuoc", "duoc", "tinh vi", "quy kinh", "nhan sam"] },
   { slug: "ai-thiet-chan", why: "luyện quan sát lưỡi và thiệt chẩn", keywords: ["luoi", "reu", "thiet chan", "sac luoi", "chan doan luoi", "reu luoi", "chat luoi"] },
   { slug: "study-os", why: "hỏi bài, ôn tập, luyện câu hỏi", keywords: ["on tap", "quiz", "flashcard", "de thi", "thi", "hoi bai", "cau hoi", "bai hoc", "hoc", "kiem tra", "trac nghiem", "bai tap"] },
 ];

@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { searchResources } from "@/data/search-index";
+import { MemberAuthProvider } from "@/components/MemberAuthBridge";
+import SearchExtras from "@/components/SearchExtras";
 import styles from "./search.module.css";
 
 const normalize = (value: string) =>
@@ -71,6 +73,7 @@ export default function SearchClient() {
           </div>
         )}
       </div>
+      <MemberAuthProvider><SearchExtras query={query} /></MemberAuthProvider>
     </>
   );
 }
