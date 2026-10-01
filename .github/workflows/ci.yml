@@ -107,6 +107,9 @@ jobs:
       - name: Validate smarter-companion guidance (truthful, offline, flag-gated)
         run: npm run validate:assistant-guidance
 
+      - name: Validate search extras (shared library + Google link, flag-gated)
+        run: npm run validate:search-shared
+
       - name: Build static export
         run: npm run build
 

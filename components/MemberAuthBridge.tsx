@@ -8,8 +8,8 @@ import styles from "./MemberAuthBridge.module.css";
 import { normalizePersonalLearningSnapshot, type PersonalLearningSnapshot } from "@/data/personalized-learning";
 import { diffCompletions, mergeProgress, normalizeProgress, type LearningProgress as MissionProgress, type MissionCompletion } from "@/data/learning-progress";
 
-const SUPABASE_URL = "https://gzmpnsrwqjpsbklyflqr.supabase.co";
-const SUPABASE_KEY = "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG";
+export const SUPABASE_URL = "https://gzmpnsrwqjpsbklyflqr.supabase.co";
+export const SUPABASE_KEY = "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG";
 const realtimeClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
 });

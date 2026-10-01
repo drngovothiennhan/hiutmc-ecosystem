@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20261001-02",
+  "release": "HIU-YHCT-ECOSYSTEM-20261001-03",
   "product_name": "HIU TMC",
-  "checkpoint": "CP40",
-  "base_checkpoint_sha": "83e6645ee468980bdcfd40ff462fe916fc27e848",
+  "checkpoint": "CP41",
+  "base_checkpoint_sha": "7b38f68d406da815fe3f93852a75b5a71deeeed2",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP40 adds three smarter-companion upgrades behind feature flags that all ship OFF (assistant-context, assistant-quick-ask, assistant-nudges): next-step cards from real progress, an offline quick-ask router to the right app, and calm once-a-day reminders. No server, no AI credits, no visible change until a flag is raised. MemberAuthBridge also exposes the access token in context for flag rollouts. Homepage structure is unchanged. CI, Cloudflare deployment and production smoke remain mandatory."
+  "verification": "CP41 adds two optional Search page extras behind feature flags that ship OFF (search-shared-library, search-google-link): published member resources from the Study OS library (same Supabase data, member session, no drafts) and an external Google link labelled as not verified by HIU. Quick-ask routing also recognises more herb/medicine words. Homepage structure is unchanged. CI, Cloudflare deployment and production smoke remain mandatory."
 }
