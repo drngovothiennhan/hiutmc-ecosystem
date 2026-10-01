@@ -10,7 +10,7 @@ const MAX_ENTRIES = 3000;
 
 export const QUERY = `SELECT ?item (SAMPLE(?vi) AS ?viL) (SAMPLE(?en) AS ?enL) (GROUP_CONCAT(DISTINCT ?atc; separator="|") AS ?atcs)
 WHERE {
-  ?item wdt:P31 wd:Q12140 .
+  { ?item wdt:P31 wd:Q12140 } UNION { ?item wdt:P267 ?anyAtc }
   ?item rdfs:label ?vi FILTER(LANG(?vi) = "vi")
   OPTIONAL { ?item rdfs:label ?en FILTER(LANG(?en) = "en") }
   OPTIONAL { ?item wdt:P267 ?atc }
