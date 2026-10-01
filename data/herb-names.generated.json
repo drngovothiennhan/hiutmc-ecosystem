@@ -1,0 +1,1419 @@
+{
+ "generatedAt": "2026-10-01T06:55:03.882Z",
+ "source": "Wikidata",
+ "license": "CC0 1.0",
+ "entries": [
+  {
+   "qid": "Q2561734",
+   "latin": "Aconitum carmichaelii",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "附子"
+   ],
+   "en": [
+    "Aconitum carmichaelii"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q2561734"
+  },
+  {
+   "qid": "Q21063",
+   "latin": "Alisma plantago-aquatica",
+   "vi": [
+    "Trạch tả"
+   ],
+   "viAliases": [
+    "Mã đề nước"
+   ],
+   "zh": [
+    "泽泻"
+   ],
+   "en": [
+    "Alisma plantago-aquatica"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q21063"
+  },
+  {
+   "qid": "Q2843829",
+   "latin": "Amomum villosum",
+   "vi": [
+    "Sa nhân đỏ"
+   ],
+   "viAliases": [],
+   "zh": [
+    "砂仁"
+   ],
+   "en": [
+    "Amomum villosum"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q2843829"
+  },
+  {
+   "qid": "Q1551608",
+   "latin": "Andrographis paniculata",
+   "vi": [
+    "Xuyên tâm liên"
+   ],
+   "viAliases": [
+    "Cây lá đắng",
+    "Công cộng",
+    "Khô đảm thảo",
+    "Lam khái liên"
+   ],
+   "zh": [
+    "穿心莲"
+   ],
+   "en": [
+    "Andrographis paniculata"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1551608"
+  },
+  {
+   "qid": "Q4379",
+   "latin": "Anemarrhena asphodeloides",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "知母"
+   ],
+   "en": [
+    "Anemarrhena asphodeloides"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q4379"
+  },
+  {
+   "qid": "Q847098",
+   "latin": "Angelica dahurica",
+   "vi": [
+    "Bạch chỉ"
+   ],
+   "viAliases": [],
+   "zh": [
+    "白芷"
+   ],
+   "en": [
+    "Angelica dahurica"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q847098"
+  },
+  {
+   "qid": "Q2051387",
+   "latin": "Angelica sinensis",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "当归"
+   ],
+   "en": [
+    "Angelica sinensis"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q2051387"
+  },
+  {
+   "qid": "Q156969",
+   "latin": "Areca catechu",
+   "vi": [
+    "Cau"
+   ],
+   "viAliases": [],
+   "zh": [
+    "檳榔"
+   ],
+   "en": [
+    "Areca catechu"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q156969"
+  },
+  {
+   "qid": "Q1308044",
+   "latin": "Artemisia annua",
+   "vi": [],
+   "viAliases": [
+    "Thanh hao hoa vàng"
+   ],
+   "zh": [
+    "黄花蒿"
+   ],
+   "en": [
+    "Artemisia annua"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1308044"
+  },
+  {
+   "qid": "Q4797490",
+   "latin": "Artemisia argyi",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "艾草"
+   ],
+   "en": [
+    "Artemisia argyi"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q4797490"
+  },
+  {
+   "qid": "Q5367391",
+   "latin": "Asarum sieboldii",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "汉城细辛"
+   ],
+   "en": [
+    "Asarum sieboldii"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q5367391"
+  },
+  {
+   "qid": "Q8207156",
+   "latin": "Asparagus cochinchinensis",
+   "vi": [
+    "Thiên môn đông"
+   ],
+   "viAliases": [],
+   "zh": [
+    "天门冬"
+   ],
+   "en": [
+    "Asparagus cochinchinensis"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q8207156"
+  },
+  {
+   "qid": "Q15520533",
+   "latin": "Astragalus mongholicus",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "蒙古黄耆"
+   ],
+   "en": [
+    "Astragalus mongholicus"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q15520533"
+  },
+  {
+   "qid": "Q5202812",
+   "latin": "Atractylodes lancea",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "苍术"
+   ],
+   "en": [
+    "Atractylodes lancea"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q5202812"
+  },
+  {
+   "qid": "Q8208640",
+   "latin": "Atractylodes macrocephala",
+   "vi": [
+    "Bạch truật"
+   ],
+   "viAliases": [],
+   "zh": [
+    "白术"
+   ],
+   "en": [
+    "Atractylodes macrocephala"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q8208640"
+  },
+  {
+   "qid": "Q4819590",
+   "latin": "Aucklandia lappa",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "木香"
+   ],
+   "en": [
+    "Aucklandia lappa"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q4819590"
+  },
+  {
+   "qid": "Q159003",
+   "latin": "Bletilla striata",
+   "vi": [
+    "Bạch cập"
+   ],
+   "viAliases": [],
+   "zh": [
+    "白芨"
+   ],
+   "en": [
+    "Bletilla striata"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q159003"
+  },
+  {
+   "qid": "Q1031631",
+   "latin": "Bupleurum chinense",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "北柴胡"
+   ],
+   "en": [
+    "Bupleurum chinense"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1031631"
+  },
+  {
+   "qid": "Q324714",
+   "latin": "Centella asiatica",
+   "vi": [
+    "Rau má"
+   ],
+   "viAliases": [],
+   "zh": [
+    "积雪草"
+   ],
+   "en": [
+    "Centella asiatica"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q324714"
+  },
+  {
+   "qid": "Q15530181",
+   "latin": "Chrysanthemum morifolium",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "菊花"
+   ],
+   "en": [
+    "Chrysanthemum morifolium"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q15530181"
+  },
+  {
+   "qid": "Q204148",
+   "latin": "Cinnamomum cassia",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "肉桂"
+   ],
+   "en": [
+    "Cinnamomum cassia"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q204148"
+  },
+  {
+   "qid": "Q5122273",
+   "latin": "Cistanche deserticola",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "肉蓯蓉"
+   ],
+   "en": [
+    "Cistanche deserticola"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q5122273"
+  },
+  {
+   "qid": "Q125337",
+   "latin": "Citrus reticulata",
+   "vi": [
+    "quýt"
+   ],
+   "viAliases": [],
+   "zh": [
+    "橘"
+   ],
+   "en": [
+    "Citrus reticulata"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q125337"
+  },
+  {
+   "qid": "Q1076269",
+   "latin": "Codonopsis pilosula",
+   "vi": [
+    "Đảng sâm"
+   ],
+   "viAliases": [],
+   "zh": [
+    "党参"
+   ],
+   "en": [
+    "Codonopsis pilosula"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1076269"
+  },
+  {
+   "qid": "Q827098",
+   "latin": "Coix lacryma-jobi",
+   "vi": [
+    "Ý dĩ"
+   ],
+   "viAliases": [
+    "Cườm thảo"
+   ],
+   "zh": [
+    "薏苡"
+   ],
+   "en": [
+    "Coix lacryma-jobi"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q827098"
+  },
+  {
+   "qid": "Q842233",
+   "latin": "Coptis chinensis",
+   "vi": [
+    "Hoàng liên Trung Quốc"
+   ],
+   "viAliases": [],
+   "zh": [
+    "黄连"
+   ],
+   "en": [
+    "Coptis chinensis"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q842233"
+  },
+  {
+   "qid": "Q728125",
+   "latin": "Cornus officinalis",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "山茱萸"
+   ],
+   "en": [
+    "Cornus officinalis"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q728125"
+  },
+  {
+   "qid": "Q42562",
+   "latin": "Curcuma longa",
+   "vi": [
+    "Nghệ"
+   ],
+   "viAliases": [],
+   "zh": [
+    "薑黃"
+   ],
+   "en": [
+    "Curcuma longa"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q42562"
+  },
+  {
+   "qid": "Q135003623",
+   "latin": "Curcuma longa",
+   "vi": [],
+   "viAliases": [],
+   "zh": [],
+   "en": [
+    "Turmeric"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q135003623"
+  },
+  {
+   "qid": "Q5366185",
+   "latin": "Cuscuta chinensis",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "菟丝子"
+   ],
+   "en": [
+    "Cuscuta chinensis"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q5366185"
+  },
+  {
+   "qid": "Q1391422",
+   "latin": "Cyperus rotundus",
+   "vi": [
+    "Củ gấu"
+   ],
+   "viAliases": [
+    "Cỏ cú"
+   ],
+   "zh": [
+    "香附子"
+   ],
+   "en": [
+    "Cyperus rotundus"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1391422"
+  },
+  {
+   "qid": "Q636713",
+   "latin": "Dendrobium nobile",
+   "vi": [
+    "Phi điệp kép"
+   ],
+   "viAliases": [],
+   "zh": [
+    "石斛"
+   ],
+   "en": [
+    "Dendrobium nobile"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q636713"
+  },
+  {
+   "qid": "Q5279593",
+   "latin": "Dioscorea polystachya",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "長山藥"
+   ],
+   "en": [
+    "Dioscorea polystachya"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q5279593"
+  },
+  {
+   "qid": "Q857092",
+   "latin": "Eclipta prostrata",
+   "vi": [
+    "Cỏ mực"
+   ],
+   "viAliases": [
+    "Cây nhọ nồi",
+    "Cỏ nhọ nồi",
+    "Hàn liên thảo",
+    "Nhọ nồi"
+   ],
+   "zh": [
+    "鳢肠"
+   ],
+   "en": [
+    "Eclipta prostrata"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q857092"
+  },
+  {
+   "qid": "Q2602813",
+   "latin": "Ephedra sinica",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "草麻黄"
+   ],
+   "en": [
+    "Ephedra sinica"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q2602813"
+  },
+  {
+   "qid": "Q10273306",
+   "latin": "Epimedium brevicornu",
+   "vi": [],
+   "viAliases": [
+    "Dâm dương hoắc lá hình tim"
+   ],
+   "zh": [
+    "淫羊藿"
+   ],
+   "en": [
+    "Epimedium brevicornu"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q10273306"
+  },
+  {
+   "qid": "Q131528",
+   "latin": "Eucommia ulmoides",
+   "vi": [
+    "Đỗ trọng"
+   ],
+   "viAliases": [
+    "Eucommiaceae"
+   ],
+   "zh": [
+    "杜仲"
+   ],
+   "en": [
+    "Eucommia ulmoides"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q131528"
+  },
+  {
+   "qid": "Q43511",
+   "latin": "Foeniculum vulgare",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "茴香"
+   ],
+   "en": [
+    "Foeniculum vulgare"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q43511"
+  },
+  {
+   "qid": "Q1275024",
+   "latin": "Forsythia suspensa",
+   "vi": [
+    "Liên kiều"
+   ],
+   "viAliases": [],
+   "zh": [
+    "连翘"
+   ],
+   "en": [
+    "Forsythia suspensa"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1275024"
+  },
+  {
+   "qid": "Q11148917",
+   "latin": "Fritillaria thunbergii",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "浙贝母"
+   ],
+   "en": [
+    "Fritillaria thunbergii"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q11148917"
+  },
+  {
+   "qid": "Q271098",
+   "latin": "Ganoderma lucidum",
+   "vi": [
+    "Nấm linh chi"
+   ],
+   "viAliases": [],
+   "zh": [
+    "亮蓋靈芝"
+   ],
+   "en": [
+    "Ganoderma lucidum"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q271098"
+  },
+  {
+   "qid": "Q1072101",
+   "latin": "Gardenia jasminoides",
+   "vi": [
+    "Dành dành"
+   ],
+   "viAliases": [
+    "Chi tử",
+    "Mác làng cương",
+    "Thuỷ hoàng chi"
+   ],
+   "zh": [
+    "栀子花"
+   ],
+   "en": [
+    "Gardenia jasminoides"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1072101"
+  },
+  {
+   "qid": "Q650760",
+   "latin": "Gastrodia elata",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "天麻"
+   ],
+   "en": [
+    "Gastrodia elata"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q650760"
+  },
+  {
+   "qid": "Q926053",
+   "latin": "Gentiana scabra",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "龙胆"
+   ],
+   "en": [
+    "Gentiana scabra"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q926053"
+  },
+  {
+   "qid": "Q1196166",
+   "latin": "Glycyrrhiza uralensis",
+   "vi": [
+    "Cam thảo"
+   ],
+   "viAliases": [],
+   "zh": [
+    "甘草"
+   ],
+   "en": [
+    "Glycyrrhiza uralensis"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1196166"
+  },
+  {
+   "qid": "Q134253",
+   "latin": "Gynostemma pentaphyllum",
+   "vi": [
+    "Giảo cổ lam"
+   ],
+   "viAliases": [
+    "Dây lõa hùng",
+    "Ngũ diệp sâm",
+    "Thất diệp đảm",
+    "Trường sinh thảo"
+   ],
+   "zh": [
+    "絞股藍"
+   ],
+   "en": [
+    "Gynostemma pentaphyllum"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q134253"
+  },
+  {
+   "qid": "Q164091",
+   "latin": "Houttuynia cordata",
+   "vi": [
+    "Giấp cá"
+   ],
+   "viAliases": [
+    "Cây giấp cá",
+    "Dấp cá",
+    "Diếp cá",
+    "Lá giấp",
+    "Rau dấp cá"
+   ],
+   "zh": [
+    "鱼腥草"
+   ],
+   "en": [
+    "Houttuynia cordata"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q164091"
+  },
+  {
+   "qid": "Q2878644",
+   "latin": "Illicium verum",
+   "vi": [
+    "Đại hồi"
+   ],
+   "viAliases": [],
+   "zh": [
+    "八角"
+   ],
+   "en": [
+    "Illicium verum"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q2878644"
+  },
+  {
+   "qid": "Q1071905",
+   "latin": "Leonurus japonicus",
+   "vi": [
+    "Ích mẫu"
+   ],
+   "viAliases": [],
+   "zh": [
+    "益母草"
+   ],
+   "en": [
+    "Leonurus japonicus"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1071905"
+  },
+  {
+   "qid": "Q15583445",
+   "latin": "Ligusticum striatum",
+   "vi": [
+    "Xuyên khung"
+   ],
+   "viAliases": [],
+   "zh": [
+    "条纹藁本"
+   ],
+   "en": [
+    "Ligusticum striatum"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q15583445"
+  },
+  {
+   "qid": "Q147386",
+   "latin": "Lilium brownii",
+   "vi": [],
+   "viAliases": [
+    "bách hợp"
+   ],
+   "zh": [
+    "野百合"
+   ],
+   "en": [
+    "Lilium brownii"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q147386"
+  },
+  {
+   "qid": "Q161083",
+   "latin": "Lonicera japonica",
+   "vi": [
+    "Kim ngân Nhật"
+   ],
+   "viAliases": [
+    "Kim ngân",
+    "Nhẫn đông"
+   ],
+   "zh": [
+    "金银花"
+   ],
+   "en": [
+    "Lonicera japonica"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q161083"
+  },
+  {
+   "qid": "Q196332",
+   "latin": "Lycium barbarum",
+   "vi": [],
+   "viAliases": [
+    "Kỷ tử"
+   ],
+   "zh": [
+    "宁夏枸杞"
+   ],
+   "en": [
+    "Lycium barbarum"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q196332"
+  },
+  {
+   "qid": "Q1042288",
+   "latin": "Magnolia officinalis",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "凹叶厚朴"
+   ],
+   "en": [
+    "Magnolia officinalis"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1042288"
+  },
+  {
+   "qid": "Q2977225",
+   "latin": "Mentha canadensis",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "薄荷"
+   ],
+   "en": [
+    "Mentha canadensis"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q2977225"
+  },
+  {
+   "qid": "Q157307",
+   "latin": "Morus alba",
+   "vi": [
+    "Dâu trắng"
+   ],
+   "viAliases": [
+    "Cây dâu tằm",
+    "Dâu tằm"
+   ],
+   "zh": [
+    "白桑"
+   ],
+   "en": [
+    "Morus alba"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q157307"
+  },
+  {
+   "qid": "Q16528",
+   "latin": "Nelumbo nucifera",
+   "vi": [
+    "Sen hồng"
+   ],
+   "viAliases": [],
+   "zh": [
+    "莲"
+   ],
+   "en": [
+    "Nelumbo nucifera"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q16528"
+  },
+  {
+   "qid": "Q7213081",
+   "latin": "Notopterygium incisum",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "羌活"
+   ],
+   "en": [
+    "Notopterygium incisum"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q7213081"
+  },
+  {
+   "qid": "Q398300",
+   "latin": "Ophiocordyceps sinensis",
+   "vi": [
+    "Đông trùng hạ thảo Tây Tạng"
+   ],
+   "viAliases": [],
+   "zh": [
+    "冬虫夏草"
+   ],
+   "en": [
+    "Ophiocordyceps sinensis"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q398300"
+  },
+  {
+   "qid": "Q537448",
+   "latin": "Ophiopogon japonicus",
+   "vi": [
+    "mạch môn"
+   ],
+   "viAliases": [],
+   "zh": [
+    "麦冬"
+   ],
+   "en": [
+    "Ophiopogon japonicus"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q537448"
+  },
+  {
+   "qid": "Q163076",
+   "latin": "Paeonia lactiflora",
+   "vi": [
+    "Thược dược Trung Quốc"
+   ],
+   "viAliases": [],
+   "zh": [
+    "芍药"
+   ],
+   "en": [
+    "Paeonia lactiflora"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q163076"
+  },
+  {
+   "qid": "Q163018",
+   "latin": "Paeonia suffruticosa",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "牡丹"
+   ],
+   "en": [
+    "Paeonia × suffruticosa"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q163018"
+  },
+  {
+   "qid": "Q182881",
+   "latin": "Panax ginseng",
+   "vi": [
+    "Chi Sâm"
+   ],
+   "viAliases": [],
+   "zh": [
+    "高丽参"
+   ],
+   "en": [
+    "Panax ginseng"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q182881"
+  },
+  {
+   "qid": "Q15551438",
+   "latin": "Panax notoginseng",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "三七"
+   ],
+   "en": [
+    "Panax notoginseng"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q15551438"
+  },
+  {
+   "qid": "Q2737217",
+   "latin": "Panax quinquefolius",
+   "vi": [
+    "Sâm Mỹ"
+   ],
+   "viAliases": [],
+   "zh": [
+    "花旗参"
+   ],
+   "en": [
+    "American ginseng"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q2737217"
+  },
+  {
+   "qid": "Q1076038",
+   "latin": "Perilla frutescens",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "紫蘇"
+   ],
+   "en": [
+    "Perilla frutescens"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1076038"
+  },
+  {
+   "qid": "Q481711",
+   "latin": "Phellodendron amurense",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "黄檗"
+   ],
+   "en": [],
+   "url": "https://www.wikidata.org/wiki/Q481711"
+  },
+  {
+   "qid": "Q1258277",
+   "latin": "Pinellia ternata",
+   "vi": [
+    "Bán hạ bắc"
+   ],
+   "viAliases": [],
+   "zh": [
+    "半夏"
+   ],
+   "en": [
+    "Pinellia ternata"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1258277"
+  },
+  {
+   "qid": "Q43084",
+   "latin": "Piper nigrum",
+   "vi": [
+    "hồ tiêu"
+   ],
+   "viAliases": [
+    "bạch cổ nguyệt",
+    "cây hồ tiêu",
+    "cổ nguyệt",
+    "hắc cổ nguyệt",
+    "hạt tiêu"
+   ],
+   "zh": [
+    "胡椒"
+   ],
+   "en": [
+    "black pepper"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q43084"
+  },
+  {
+   "qid": "Q1193995",
+   "latin": "Plantago asiatica",
+   "vi": [
+    "Xa tiền"
+   ],
+   "viAliases": [
+    "Mã đề á"
+   ],
+   "zh": [
+    "车前"
+   ],
+   "en": [
+    "Plantago asiatica"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1193995"
+  },
+  {
+   "qid": "Q805322",
+   "latin": "Platycodon grandiflorus",
+   "vi": [
+    "cát cánh"
+   ],
+   "viAliases": [],
+   "zh": [
+    "桔梗"
+   ],
+   "en": [
+    "Platycodon grandiflorus"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q805322"
+  },
+  {
+   "qid": "Q257757",
+   "latin": "Pogostemon cablin",
+   "vi": [
+    "Hoắc hương"
+   ],
+   "viAliases": [],
+   "zh": [
+    "广藿香"
+   ],
+   "en": [
+    "Pogostemon cablin"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q257757"
+  },
+  {
+   "qid": "Q12227443",
+   "latin": "Polygonatum sibiricum",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "黄精"
+   ],
+   "en": [
+    "Polygonatum sibiricum"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q12227443"
+  },
+  {
+   "qid": "Q37453",
+   "latin": "Prunus armeniaca",
+   "vi": [
+    "Mơ châu Âu"
+   ],
+   "viAliases": [
+    "Mơ Kavkaz",
+    "Mơ tây"
+   ],
+   "zh": [
+    "杏"
+   ],
+   "en": [
+    "Prunus armeniaca"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q37453"
+  },
+  {
+   "qid": "Q13189",
+   "latin": "Prunus persica",
+   "vi": [
+    "Đào"
+   ],
+   "viAliases": [],
+   "zh": [
+    "桃"
+   ],
+   "en": [
+    "Prunus persica"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q13189"
+  },
+  {
+   "qid": "Q1054489",
+   "latin": "Pueraria montana",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "葛"
+   ],
+   "en": [
+    "Pueraria montana"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1054489"
+  },
+  {
+   "qid": "Q1071605",
+   "latin": "Rehmannia glutinosa",
+   "vi": [
+    "Địa hoàng"
+   ],
+   "viAliases": [
+    "Sinh địa"
+   ],
+   "zh": [
+    "地黃"
+   ],
+   "en": [
+    "Rehmannia glutinosa"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1071605"
+  },
+  {
+   "qid": "Q29032482",
+   "latin": "Reynoutria multiflora",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "何首烏"
+   ],
+   "en": [
+    "Reynoutria multiflora"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q29032482"
+  },
+  {
+   "qid": "Q1109580",
+   "latin": "Rheum palmatum",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "掌叶大黄"
+   ],
+   "en": [
+    "Rheum palmatum"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1109580"
+  },
+  {
+   "qid": "Q3237818",
+   "latin": "Rubia cordifolia",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "披针叶茜草"
+   ],
+   "en": [
+    "Rubia cordifolia"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q3237818"
+  },
+  {
+   "qid": "Q1000854",
+   "latin": "Salvia miltiorrhiza",
+   "vi": [
+    "Đan sâm"
+   ],
+   "viAliases": [],
+   "zh": [
+    "丹参"
+   ],
+   "en": [
+    "Salvia miltiorrhiza"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1000854"
+  },
+  {
+   "qid": "Q5100860",
+   "latin": "Saposhnikovia divaricata",
+   "vi": [
+    "Phòng phong"
+   ],
+   "viAliases": [],
+   "zh": [
+    "防風"
+   ],
+   "en": [
+    "Saposhnikovia divaricata"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q5100860"
+  },
+  {
+   "qid": "Q900986",
+   "latin": "Schisandra chinensis",
+   "vi": [
+    "Ngũ vị tử bắc"
+   ],
+   "viAliases": [],
+   "zh": [
+    "五味子"
+   ],
+   "en": [
+    "Schisandra chinensis"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q900986"
+  },
+  {
+   "qid": "Q803769",
+   "latin": "Scutellaria baicalensis",
+   "vi": [
+    "hoàng cầm"
+   ],
+   "viAliases": [
+    "hoàng cầm (cây)"
+   ],
+   "zh": [
+    "黄芩"
+   ],
+   "en": [
+    "Scutellaria baicalensis"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q803769"
+  },
+  {
+   "qid": "Q3658986",
+   "latin": "Smilax glabra",
+   "vi": [
+    "Thổ phục linh"
+   ],
+   "viAliases": [],
+   "zh": [
+    "光滑菝葜"
+   ],
+   "en": [
+    "Smilax glabra"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q3658986"
+  },
+  {
+   "qid": "Q31795573",
+   "latin": "Sophora flavescens",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "苦参"
+   ],
+   "en": [
+    "Sophora flavescens"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q31795573"
+  },
+  {
+   "qid": "Q1023664",
+   "latin": "Stephania tetrandra",
+   "vi": [
+    "Hán phòng kỷ"
+   ],
+   "viAliases": [
+    "Hán phòng kỉ"
+   ],
+   "zh": [
+    "粉防己"
+   ],
+   "en": [
+    "Stephania tetrandra"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1023664"
+  },
+  {
+   "qid": "Q15582204",
+   "latin": "Taraxacum mongolicum",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "蒲公英"
+   ],
+   "en": [
+    "Taraxacum mongolicum"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q15582204"
+  },
+  {
+   "qid": "Q3595915",
+   "latin": "Terminalia chebula",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "诃子"
+   ],
+   "en": [
+    "Terminalia chebula"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q3595915"
+  },
+  {
+   "qid": "Q10919698",
+   "latin": "Tetradium ruticarpum",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "吴茱萸"
+   ],
+   "en": [
+    "Tetradium ruticarpum"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q10919698"
+  },
+  {
+   "qid": "Q847006",
+   "latin": "Trichosanthes kirilowii",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "栝楼"
+   ],
+   "en": [
+    "Trichosanthes kirilowii"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q847006"
+  },
+  {
+   "qid": "Q1134307",
+   "latin": "Uncaria rhynchophylla",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "嘴叶钩藤"
+   ],
+   "en": [
+    "Uncaria rhynchophylla"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q1134307"
+  },
+  {
+   "qid": "Q81191426",
+   "latin": "Wolfiporia cocos",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "茯苓"
+   ],
+   "en": [
+    "Wolfiporia cocos"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q81191426"
+  },
+  {
+   "qid": "Q15397152",
+   "latin": "Zanthoxylum bungeanum",
+   "vi": [],
+   "viAliases": [],
+   "zh": [
+    "花椒"
+   ],
+   "en": [
+    "Zanthoxylum bungeanum"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q15397152"
+  },
+  {
+   "qid": "Q35625",
+   "latin": "Zingiber officinale",
+   "vi": [
+    "Gừng"
+   ],
+   "viAliases": [
+    "Sinh khương"
+   ],
+   "zh": [
+    "薑"
+   ],
+   "en": [
+    "ginger"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q35625"
+  },
+  {
+   "qid": "Q11181633",
+   "latin": "Ziziphus jujuba",
+   "vi": [
+    "Táo tàu"
+   ],
+   "viAliases": [],
+   "zh": [
+    "枣树"
+   ],
+   "en": [
+    "Ziziphus jujuba"
+   ],
+   "url": "https://www.wikidata.org/wiki/Q11181633"
+  }
+ ]
+}
