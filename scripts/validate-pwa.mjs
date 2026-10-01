@@ -12,6 +12,13 @@ if (!fs.existsSync('public/hiu-club-logo.webp')) throw Error('Missing HIU CLB lo
 const headers = fs.readFileSync('public/_headers','utf8');
 if (!headers.includes('/sw.js\n  Cache-Control: no-cache') || !headers.includes('/manifest.webmanifest\n  Cache-Control: no-cache')) throw Error('Missing PWA update headers');
 const gatewayWorker = fs.readFileSync('worker.mjs','utf8');
+// The service worker must stay network-first with only the offline page cached, so a release can never
+// leave users on a stale bundle (docs/RELEASE_PLAYBOOK.md, section 4). Widening this needs owner approval.
+const serviceWorker = fs.readFileSync('public/sw.js', 'utf8');
+if ((serviceWorker.match(/addAll\(/g) || []).length !== 1 || !serviceWorker.includes("addAll(['/offline.html'])")) throw Error('sw.js may precache only /offline.html');
+if (/\bcache\.put\(|\.put\(event\.request|cache\.add\(/.test(serviceWorker)) throw Error('sw.js must not runtime-cache responses');
+if (!serviceWorker.includes("event.request.mode !== 'navigate'")) throw Error('sw.js must only handle page navigations');
+if (!serviceWorker.includes('url.origin !== self.location.origin')) throw Error('sw.js must never intercept other origins');
 if (!gatewayWorker.includes('window.__HIUTMC_DISABLE_NESTED_PWA=true')) throw Error('A.I Thiệt Chẩn gateway must disable nested PWA registration');
 if (!gatewayWorker.includes('hiutmc_gateway=20260927r1')) throw Error('A.I Thiệt Chẩn gateway must cache-bust proxied runtime assets');
 if (!gatewayWorker.includes('redirected.pathname = config.prefix +')) throw Error('Proxied document navigation must stay inside the connected app prefix');
