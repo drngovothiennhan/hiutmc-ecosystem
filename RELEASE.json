@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20261001-05",
+  "release": "HIU-YHCT-ECOSYSTEM-20261001-06",
   "product_name": "HIU TMC",
-  "checkpoint": "CP43",
-  "base_checkpoint_sha": "51b5a3502bdd03048f96ead1baf95c9a343018de",
+  "checkpoint": "CP44",
+  "base_checkpoint_sha": "f79a04d8e007f3eb12c8fc534545fb9e0ed6e3ac",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP43 adds a drug-name lookup (Vietnamese name, international name, ATC code) for the Search page behind the OFF-by-default flag search-drug-names. Data comes from Wikidata (CC0) through the manual-only workflow that pushes to the review branch bot/herb-names; names and ATC codes only, no indications or doses. The shipped dataset starts empty, so nothing shows until it is refreshed and the flag is raised. Homepage structure is unchanged. CI, Cloudflare deployment and production smoke remain mandatory."
+  "verification": "CP44 changes the 3D Atlas status from Preview to Production on the owner's instruction (2026-10-01); it is shown on the homepage app card and the registry. No layout change. CI, Cloudflare deployment and production smoke remain mandatory."
 }

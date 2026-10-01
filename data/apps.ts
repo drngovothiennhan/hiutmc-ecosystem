@@ -75,7 +75,7 @@ export const ecosystemApps: EcosystemApp[] = [
     launchUrl: "https://hiutmc.com/apps/atlas/",
     plannedCanonicalDomain: "https://atlas.hiutmc.com/",
     verifiedAt: "2026-09-23",
-    status: "Preview",
+    status: "Production",
     x: 76,
     y: 67,
     accent: "#5ee1d2"
