@@ -24,14 +24,18 @@ WHERE {
 GROUP BY ?item ?name`;
 }
 
+// Wikidata often falls back to the Latin name (or a Latin synonym) as the "Vietnamese" label. Those are not Vietnamese names.
+export const isLatinBinomial = (text) => /^[A-Z][a-z-]+ (?:×\s?)?[a-z-]+(?: (?:subsp|var|f)\. [a-z-]+)?$/.test(text);
+
 const split = (value) => [...new Set(String(value ?? "").split("|").map((part) => part.trim()).filter(Boolean))].slice(0, 6);
+const splitVi = (value) => split(value).filter((part) => !isLatinBinomial(part));
 
 export function rowsToEntries(bindings) {
   const entries = [];
   for (const row of bindings) {
     const qid = String(row.item?.value ?? "").split("/").pop();
     if (!/^Q\d+$/.test(qid) || !row.name?.value) continue;
-    const vi = split(row.vis?.value), aliases = split(row.viAs?.value);
+    const vi = splitVi(row.vis?.value), aliases = splitVi(row.viAs?.value);
     entries.push({
       qid, latin: row.name.value, vi, viAliases: aliases,
       zh: split(row.zhs?.value), en: split(row.ens?.value),

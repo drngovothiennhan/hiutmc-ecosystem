@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { buildQuery, rowsToEntries } from "./build-herb-names.mjs";
+import { buildQuery, isLatinBinomial, rowsToEntries } from "./build-herb-names.mjs";
 import { herbTitle, lookupHerbs, normalizeHerb } from "../data/herb-lookup.ts";
 import { FEATURE_FLAG_REGISTRY } from "../lib/feature-flags.mjs";
 
@@ -20,6 +20,12 @@ const ginseng = entries.find((entry) => entry.qid === "Q1");
 assert.deepEqual(ginseng.viAliases, ["Sâm Triều Tiên", "Nhân sâm"]);
 assert.equal(ginseng.url, "https://www.wikidata.org/wiki/Q1");
 assert.ok(buildQuery(['a"b']).includes('"ab"'), "quotes are stripped from VALUES");
+
+// Latin fallbacks are never presented as Vietnamese names
+assert.ok(isLatinBinomial("Panax ginseng") && isLatinBinomial("Aconitum chinense") && !isLatinBinomial("Nhân sâm") && !isLatinBinomial("Cau"));
+const fallback = rowsToEntries([b("Q9", "Angelica sinensis", { vi: "Angelica sinensis", viA: "Aconitum chinense|Đương quy" })])[0];
+assert.deepEqual(fallback.vi, []);
+assert.deepEqual(fallback.viAliases, ["Đương quy"]);
 
 // lookup: diacritic-insensitive, truthful
 assert.equal(normalizeHerb("Nhân Sâm"), "nhan sam");
