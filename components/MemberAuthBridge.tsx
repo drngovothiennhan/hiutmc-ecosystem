@@ -77,6 +77,8 @@ type StoredSession = {
 
 type AuthContextValue = {
   member: Member | null;
+  /** Current Supabase access token ("" when signed out). Lets rollout flags identify the member server-side. */
+  accessToken: string;
   spiritPetSpecies: string | null;
   spiritPetReady: boolean;
   staffAccess: StaffAccess | null;
@@ -770,6 +772,7 @@ export function MemberAuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AuthContextValue>(() => ({
     member: session?.member ?? null,
+    accessToken: session?.accessToken ?? "",
     spiritPetSpecies,
     spiritPetReady,
     staffAccess,

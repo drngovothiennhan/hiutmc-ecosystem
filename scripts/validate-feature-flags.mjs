@@ -24,12 +24,12 @@ const none = (flags) => Object.values(flags).every((value) => value === false);
 
 // --- fail closed ----------------------------------------------------------------------------------
 for (const viewer of [anon, everyone, mod, admin]) assert.ok(none(resolveFlags({ viewer })), "all flags are OFF by default for everyone");
-for (const bad of [undefined, null, "", "not json", "[]", "42", '"x"', "{", '{"deeptutor-agent":"all"}', '{"deeptutor-agent":{"stage":"bogus"}}']) {
+for (const bad of [undefined, null, "", "not json", "[]", "42", '"x"', "{", '{"assistant-context":"all"}', '{"assistant-context":{"stage":"bogus"}}']) {
   assert.ok(none(resolveFlags({ viewer: admin, overrides: parseFlagOverrides(bad) })), `bad config fails closed: ${String(bad)}`);
 }
 assert.deepEqual(parseFlagOverrides('{"unknown-flag":{"stage":"all"}}'), {}, "unknown flag ids are ignored");
-assert.equal(evaluateFlag("deeptutor-agent", { stage: "all" }, anon), true);
-assert.equal(evaluateFlag("deeptutor-agent", undefined, admin), false);
+assert.equal(evaluateFlag("assistant-context", { stage: "all" }, anon), true);
+assert.equal(evaluateFlag("assistant-context", undefined, admin), false);
 assert.equal(normalizeFlagConfig({ stage: "percent", percent: 500 }).percent, 100, "percent is clamped");
 assert.equal(normalizeFlagConfig({ stage: "percent", percent: -3 }).percent, 0);
 assert.equal(normalizeFlagConfig({ stage: "testers", testers: [1, "", "a".repeat(80), "ok"] }).testers.length, 1, "bad tester ids dropped");
@@ -40,39 +40,39 @@ const people = [anon, everyone, { memberId: "tester-1", role: "member" }, mod, a
 const config = (stage) => ({ stage, percent: 25, testers: ["tester-1"] });
 let previous = new Set();
 for (const stage of FLAG_STAGES) {
-  const on = new Set(people.filter((person) => evaluateFlag("deeptutor-agent", config(stage), person)).map((person) => JSON.stringify(person)));
+  const on = new Set(people.filter((person) => evaluateFlag("assistant-context", config(stage), person)).map((person) => JSON.stringify(person)));
   for (const entry of previous) if (!on.has(entry)) errors.push(`stage "${stage}" removed someone who had access at a narrower stage`);
   previous = on;
 }
-assert.equal(evaluateFlag("deeptutor-agent", config("admin"), mod), false, "admin stage excludes Mods");
-assert.equal(evaluateFlag("deeptutor-agent", config("admin"), admin), true);
-assert.equal(evaluateFlag("deeptutor-agent", config("staff"), mod), true);
-assert.equal(evaluateFlag("deeptutor-agent", config("staff"), everyone), false);
-assert.equal(evaluateFlag("deeptutor-agent", config("testers"), { memberId: "tester-1", role: "member" }), true);
-assert.equal(evaluateFlag("deeptutor-agent", config("testers"), everyone), false);
-assert.equal(evaluateFlag("deeptutor-agent", config("percent"), anon), false, "anonymous visitors are never in a percentage cohort");
-assert.equal(evaluateFlag("deeptutor-agent", { stage: "percent", percent: 100 }, everyone), true);
-assert.equal(evaluateFlag("deeptutor-agent", { stage: "percent", percent: 0 }, everyone), false);
+assert.equal(evaluateFlag("assistant-context", config("admin"), mod), false, "admin stage excludes Mods");
+assert.equal(evaluateFlag("assistant-context", config("admin"), admin), true);
+assert.equal(evaluateFlag("assistant-context", config("staff"), mod), true);
+assert.equal(evaluateFlag("assistant-context", config("staff"), everyone), false);
+assert.equal(evaluateFlag("assistant-context", config("testers"), { memberId: "tester-1", role: "member" }), true);
+assert.equal(evaluateFlag("assistant-context", config("testers"), everyone), false);
+assert.equal(evaluateFlag("assistant-context", config("percent"), anon), false, "anonymous visitors are never in a percentage cohort");
+assert.equal(evaluateFlag("assistant-context", { stage: "percent", percent: 100 }, everyone), true);
+assert.equal(evaluateFlag("assistant-context", { stage: "percent", percent: 0 }, everyone), false);
 // A role string alone is never enough to be staff unless it is one of the real staff roles.
-assert.equal(evaluateFlag("deeptutor-agent", config("staff"), { role: "leader", memberId: "l-1" }), false);
+assert.equal(evaluateFlag("assistant-context", config("staff"), { role: "leader", memberId: "l-1" }), false);
 
 // --- percentage cohorts are stable, per flag, and roughly the requested size --------------------
 const sample = Array.from({ length: 4000 }, (_, i) => `member-${i}`);
 const inCohort = (id, pct) => sample.filter((member) => rolloutBucket(id, member) < pct);
-const ten = inCohort("deeptutor-agent", 10);
+const ten = inCohort("assistant-context", 10);
 if (ten.length < 280 || ten.length > 520) errors.push(`10% cohort is ${ten.length}/4000, expected about 400`);
-const fifty = new Set(inCohort("deeptutor-agent", 50));
+const fifty = new Set(inCohort("assistant-context", 50));
 for (const member of ten) if (!fifty.has(member)) errors.push("raising the percentage must keep everyone already included");
-const other = new Set(inCohort("clinical-learning-hub", 10));
+const other = new Set(inCohort("assistant-quick-ask", 10));
 if (ten.every((member) => other.has(member))) errors.push("different flags must use different cohorts");
-assert.equal(rolloutBucket("deeptutor-agent", "member-1"), rolloutBucket("deeptutor-agent", "member-1"), "bucketing is deterministic");
+assert.equal(rolloutBucket("assistant-context", "member-1"), rolloutBucket("assistant-context", "member-1"), "bucketing is deterministic");
 
 // --- preview + kill switch --------------------------------------------------------------------------
-assert.equal(resolveFlags({ viewer: admin, preview: ["deeptutor-agent"] })["deeptutor-agent"], true, "staff can preview an OFF flag");
-assert.equal(resolveFlags({ viewer: mod, preview: ["deeptutor-agent"] })["deeptutor-agent"], true);
-assert.equal(resolveFlags({ viewer: everyone, preview: ["deeptutor-agent"] })["deeptutor-agent"], false, "members cannot self-enable a flag");
-assert.equal(resolveFlags({ viewer: anon, preview: ["deeptutor-agent"] })["deeptutor-agent"], false);
-assert.deepEqual(parsePreviewIds("deeptutor-agent, nope ,clinical-learning-hub"), ["deeptutor-agent", "clinical-learning-hub"]);
+assert.equal(resolveFlags({ viewer: admin, preview: ["assistant-context"] })["assistant-context"], true, "staff can preview an OFF flag");
+assert.equal(resolveFlags({ viewer: mod, preview: ["assistant-context"] })["assistant-context"], true);
+assert.equal(resolveFlags({ viewer: everyone, preview: ["assistant-context"] })["assistant-context"], false, "members cannot self-enable a flag");
+assert.equal(resolveFlags({ viewer: anon, preview: ["assistant-context"] })["assistant-context"], false);
+assert.deepEqual(parsePreviewIds("assistant-context, nope ,assistant-quick-ask"), ["assistant-context", "assistant-quick-ask"]);
 const allOn = parseFlagOverrides(JSON.stringify(Object.fromEntries(FEATURE_FLAG_IDS.map((id) => [id, { stage: "all" }]))));
 assert.ok(all(resolveFlags({ viewer: anon, overrides: allOn })), "stage all turns every flag ON");
 assert.ok(none(resolveFlags({ viewer: admin, overrides: allOn, disabled: true, preview: [...FEATURE_FLAG_IDS] })), "kill switch beats every stage and preview");
