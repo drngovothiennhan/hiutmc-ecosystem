@@ -1,4 +1,5 @@
 import { SHELL_MODE_SCRIPT } from "./lib/shell-mode.mjs";
+import { flagsDisabled, parseFlagOverrides, parsePreviewIds, resolveFlags } from "./lib/feature-flags.mjs";
 const SUPABASE_URL = "https://gzmpnsrwqjpsbklyflqr.supabase.co";
 const SUPABASE_KEY = "sb_publishable_Y4hMhXROZ-aVgWoaQ5fFKQ_ZAcXuIzG";
 const COOKIE_NAME = "hiutmc_staff_session";
@@ -539,6 +540,32 @@ export default {
       const themeId = response.ok && payload && typeof payload.themeId === "string" && /^[a-z0-9-]{1,32}$/.test(payload.themeId) ? payload.themeId : "default";
       // Any failure falls back to the default design so the public site never depends on this call.
       return json({ themeId }, 200, { "cache-control": response.ok ? "public, max-age=60, s-maxage=60" : "public, max-age=15" });
+    }
+
+    if (pathname === "/api/flags") {
+      if (request.method !== "GET") return json({ error: "Method not allowed" }, 405);
+      // Rollout flags (lib/feature-flags.mjs). Fails closed: any problem means every flag is OFF and
+      // the site behaves exactly as it did before flags existed. Only booleans are returned, never the
+      // rollout config (tester ids, percentages). The viewer comes from the verified Supabase session.
+      let viewer = {};
+      try {
+        const token = bearer(request) || readCookie(request, COOKIE_NAME);
+        if (token) {
+          const access = await validateStaff(token);
+          if (access.authorized) viewer = { role: access.role, memberId: access.member?.id || "" };
+          // An ineligible row (unapproved, login disabled, plain member) is never treated as staff.
+          else if (access.reason === "insufficient_role" && access.member?.id) viewer = { role: "member", memberId: access.member.id };
+        }
+      } catch {
+        viewer = {};
+      }
+      const flags = resolveFlags({
+        overrides: parseFlagOverrides(env.FEATURE_FLAGS),
+        viewer,
+        disabled: flagsDisabled(env.FEATURE_FLAGS_DISABLED),
+        preview: parsePreviewIds(url.searchParams.get("preview")),
+      });
+      return json({ flags }, 200, { "cache-control": "private, no-store", vary: "Authorization, Cookie" });
     }
 
     if (pathname === "/api/staff/site-theme") {

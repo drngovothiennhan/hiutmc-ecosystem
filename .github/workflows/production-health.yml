@@ -1,0 +1,32 @@
+# DRAFT — runs only when triggered by hand until the schedule block below is uncommented.
+#
+# Runs the production smoke test against https://hiutmc.com. A failing run makes GitHub email the owner,
+# which is the cheapest "is the site still healthy?" alarm. It only reads public pages; it changes nothing.
+# To enable monitoring: uncomment the `schedule` lines, then merge through the normal main -> production flow.
+name: Production health check (draft)
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "7,37 * * * *"   # every 30 minutes (UTC); minutes are staggered to avoid GitHub's :00 rush
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Smoke production domain
+        env:
+          BASE_URL: https://hiutmc.com
+        run: npm run smoke:production

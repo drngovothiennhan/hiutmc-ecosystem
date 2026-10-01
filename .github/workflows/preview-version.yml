@@ -1,0 +1,62 @@
+# DRAFT — not used by any release. Manual trigger only.
+#
+# Uploads the selected branch as a Cloudflare Worker *version* (it does NOT become live) so a preview URL
+# can be opened before merging. Never deploys to production.
+#
+# Caveats (see docs/RELEASE_PLAYBOOK.md): the preview Worker shares production bindings — the visit counter
+# Durable Object and Supabase — so test read-only flows only. This workflow has not been exercised yet;
+# run it once on a throwaway branch and read the output before relying on it.
+name: Preview Worker version (draft)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+
+concurrency:
+  group: hiutmc-preview-version
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    if: github.ref != 'refs/heads/production'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Require Cloudflare credentials
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "$CF_TOKEN" || (echo "::error::Missing CLOUDFLARE_API_TOKEN repository secret" && exit 1)
+          test -n "$CF_ACCOUNT" || (echo "::error::Missing CLOUDFLARE_ACCOUNT_ID repository secret" && exit 1)
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package.json
+
+      - name: Install
+        run: npm install --no-audit --no-fund
+
+      - name: Materialize spirit pet assets
+        run: npm run materialize:spirit-assets
+
+      - name: Build static export
+        run: npm run build
+
+      - name: Upload Worker version (not deployed)
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.136.2"
+          command: versions upload --message "preview ${{ github.sha }}"
