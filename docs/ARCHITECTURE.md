@@ -110,7 +110,12 @@ rendered by `components/SearchExtras.tsx` (nothing renders while both are OFF):
   the existing `learning_resource_list_v1` RPC on the shared Supabase project (never drafts). Titles only; "Mở Study OS" opens Study OS.
 - `search-google-link` — a `https://www.google.com/search?q=` link, labelled as an external result not verified by HIU.
 
-Pure logic: `data/shared-search.ts` (validated by `validate:search-shared`).
+- `search-herb-names` — herb names (Vietnamese / Latin / Chinese) from `data/herb-names.generated.json`, built from Wikidata (CC0) by
+  `scripts/build-herb-names.mjs` through the manual-only workflow `herb-names-refresh.yml`, which pushes to the review branch
+  `bot/herb-names` (never main/production). Names only, no medical claims. Seed keys: `data/herb-seed.json`. Pharmacopoeia text is NOT used
+  (it is copyrighted; permission is pending with the owner).
+
+Pure logic: `data/shared-search.ts`, `data/herb-lookup.ts` (validated by `validate:search-shared`, `validate:herb-names`).
 
 ## Source layout
 

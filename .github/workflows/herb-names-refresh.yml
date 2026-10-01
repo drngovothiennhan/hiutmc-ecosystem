@@ -1,0 +1,28 @@
+name: Refresh herb names (Wikidata, manual)
+
+# Draft workflow: manual only. Fetches names from Wikidata (CC0) and pushes the result to the branch
+# `bot/herb-names` for review. It never touches main or production. Nothing here changes the live site.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build herb names from Wikidata
+        run: node scripts/build-herb-names.mjs
+      - name: Push the dataset to bot/herb-names for review
+        run: |
+          git config user.name "hiutmc-bot"
+          git config user.email "noreply@hiutmc.com"
+          git checkout -B bot/herb-names
+          git add data/herb-names.generated.json
+          git commit -m "Refresh herb names from Wikidata (CC0)" || echo "No change"
+          git push -f origin bot/herb-names
