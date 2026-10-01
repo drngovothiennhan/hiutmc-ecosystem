@@ -1,11 +1,11 @@
 {
-  "release": "HIU-YHCT-ECOSYSTEM-20260929-01",
+  "release": "HIU-YHCT-ECOSYSTEM-20261001-01",
   "product_name": "HIU TMC",
-  "checkpoint": "CP38",
-  "base_checkpoint_sha": "504dcca453fd95238c16ef2330f042f47a2cbab1",
+  "checkpoint": "CP39",
+  "base_checkpoint_sha": "c1e4288a5acc8ab8d24354fc245ec58a3576394f",
   "domain": "https://hiutmc.com",
   "hosting": "Cloudflare Workers Static Assets",
   "stage": "production",
   "repository": "drngovothiennhan/hiutmc-ecosystem",
-  "verification": "CP38 unifies display mode and page transitions across the portal and connected apps: one shell script (lib/shell-mode.mjs) runs on every portal page and is injected into every /apps/* page, so the saved PC/Mobile choice sets the viewport everywhere and every navigation uses the same view transition; assistant links now open the same-origin gateway instead of the upstream host. Homepage structure is unchanged. CI, Cloudflare deployment and production smoke remain mandatory."
+  "verification": "CP39 adds invisible release tooling and no visible change: a feature-flag service (GET /api/flags, lib/feature-flags.mjs; every flag defaults OFF, optional FEATURE_FLAGS and FEATURE_FLAGS_DISABLED Worker secrets), a service-worker safety guard in validate:pwa, CI now also runs the mission-sync, site-theme and feature-flag validators, and docs/RELEASE_PLAYBOOK.md. Homepage structure is unchanged. CI, Cloudflare deployment and production smoke remain mandatory."
 }

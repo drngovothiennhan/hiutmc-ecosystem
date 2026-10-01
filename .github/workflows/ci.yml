@@ -95,6 +95,15 @@ jobs:
       - name: Test admin-only traffic counter
         run: npm run test:traffic
 
+      - name: Validate daily-mission account sync
+        run: npm run validate:mission-sync
+
+      - name: Validate site theme and member-role endpoints
+        run: npm run validate:site-theme
+
+      - name: Validate feature flags (all default OFF, fail closed)
+        run: npm run validate:feature-flags
+
       - name: Build static export
         run: npm run build
 

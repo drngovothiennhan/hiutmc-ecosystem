@@ -19,6 +19,7 @@ Browser ──► Cloudflare Worker "hiutmc-ecosystem" (worker.mjs, custom domai
               ├─ /api/staff/*, /admin, /mod ── verifies Supabase session + club_members.role
               │    (/api/staff/members[/role] and /api/staff/site-theme are Admin-only)
               ├─ /api/site-theme ── public read of the saved site theme id (falls back to "default")
+              ├─ /api/flags ── per-viewer feature-flag booleans (all OFF unless the FEATURE_FLAGS secret raises a stage)
               ├─ /api/hub-registry, /api/admin/traffic
               ├─ Durable Object VisitCounter (binding VISITS) ── public page visit stats
               └─ /apps/<name>/* ── same-origin reverse proxy to each app (table below)
@@ -70,6 +71,18 @@ Admin-only additions:
   unchanged. `components/SiteTheme.tsx` applies the theme and light decoration; `?theme_preview=<id>`
   previews a theme in one tab without saving. Themes are not injected into the connected apps.
 
+### Feature flags (added 2026-10-01)
+
+Upgrades ship dark and are widened without a redeploy. `lib/feature-flags.mjs` holds the registry (every flag
+defaults OFF) and the pure evaluator shared by the Worker, the client hook and the validator. Stages widen only:
+`off → admin → staff → testers → percent → all`. `GET /api/flags` derives the viewer from the verified Supabase
+session (an ineligible `club_members` row is never staff), reads the optional **`FEATURE_FLAGS`** Worker secret
+(JSON, per-flag stage/percent/testers) and returns only booleans, `private, no-store`. Invalid or missing
+config means everything OFF. **`FEATURE_FLAGS_DISABLED`** (secret) is a kill switch. Verified staff can preview a
+flag in their own session with `?flag_preview=<id>`. Client code uses `useFeatureFlag(id)`
+(`components/useFeatureFlag.ts`), which starts `false`. The approved homepage does not use flags. Flags are a
+rollout control, not an authorization mechanism. Operating guide: `docs/RELEASE_PLAYBOOK.md`.
+
 ## Source layout
 
 | Path | Contents |
@@ -87,8 +100,10 @@ Admin-only additions:
 
 | Workflow | Trigger | Does |
 |---|---|---|
-| `ci.yml` | PRs to main/production, pushes to main | `npm run check` |
+| `ci.yml` | PRs to main/production, pushes to main | `npm run check` equivalent (now includes mission-sync, site-theme and feature-flag validators) |
 | `deploy-cloudflare.yml` | push to `production` (app paths) | check, deploy Worker, production smoke |
+| `preview-version.yml` | manual only (draft) | uploads a non-live Worker version for a preview URL |
+| `production-health.yml` | manual only (draft; schedule commented out) | production smoke test, for monitoring |
 | `agent-workspace-deploy.yml` | every 15 min + pushes to main | polls the private `ai-agent-workspace` build; deploys only when its SHA changed, then records it in `deploy/agent-workspace/LAST_DEPLOYED` |
 | `cp29-preview.yml` | push to `cp29-approved-home-icons`, manual | legacy CP29 preview build |
 
