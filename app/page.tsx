@@ -219,7 +219,7 @@ function HomeContent() {
                   <b>Mở ứng dụng →</b>
                 </GameHubLink>
                 <a className={styles.hub} href="/apps/game-hub/vien-thuc-hanh/" data-app-transition="" style={{ "--hub": "#6b1f2a" } as CSSProperties}>
-                  <span className={styles.hubIcon}><HomeIcon name="pathology-yhct" /></span>
+                  <span className={styles.hubIcon}><HomeIcon name="vien-thuc-hanh" /></span>
                   <strong>Viện Thực Hành</strong>
                   <p>Mô phỏng học thi lâm sàng, rồi vào trực ca bệnh.</p>
                   <b>Mở ứng dụng →</b>
