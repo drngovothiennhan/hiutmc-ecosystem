@@ -7,6 +7,7 @@ export type HomeIconName =
   | "atlas-3d"
   | "herbal-function"
   | "pathology-yhct"
+  | "vien-thuc-hanh"
   | "acupuncture"
   | "nav-home"
   | "nav-study"
@@ -91,6 +92,28 @@ export default function HomeIcon({ name, ...props }: Props) {
         </g>
       )}
 
+      {name === "vien-thuc-hanh" && (
+        <g transform="translate(4 17) scale(.26) translate(-92 -10)">
+          <circle cx="200" cy="24" r="12" fill="#FFFFFF" stroke="#E8C26A" strokeWidth="2.4" />
+          <path d="M200 12A12 12 0 0 1 200 36A6 6 0 0 1 200 24A6 6 0 0 0 200 12Z" fill="#14201C" />
+          <rect x="110" y="122" width="180" height="6" fill="#BFA46A" />
+          <rect x="120" y="118" width="160" height="5" fill="#D8C08A" />
+          <rect x="136" y="84" width="128" height="34" fill="#F3E7C8" />
+          <rect x="182" y="92" width="36" height="26" rx="2" fill="#FF9A3C" stroke="#7A2E20" strokeWidth="2" />
+          <rect x="142" y="84" width="6" height="34" fill="#A33D2B" />
+          <rect x="166" y="84" width="6" height="34" fill="#A33D2B" />
+          <rect x="228" y="84" width="6" height="34" fill="#A33D2B" />
+          <rect x="252" y="84" width="6" height="34" fill="#A33D2B" />
+          <rect x="132" y="79" width="136" height="6" fill="#7A2E20" />
+          <path d="M100 82Q124 80 140 66L260 66Q276 80 300 82Q200 72 100 82Z" fill="#1E4B41" stroke="#E8C26A" strokeWidth="2.4" />
+          <rect x="160" y="52" width="80" height="14" fill="#F3E7C8" />
+          <rect x="176" y="55" width="48" height="9" rx="1.5" fill="#E8C26A" stroke="#7A2E20" strokeWidth="1.2" />
+          <path d="M148 54Q170 52 180 40L220 40Q230 52 252 54Q200 48 148 54Z" fill="#1E4B41" stroke="#E8C26A" strokeWidth="2.4" />
+          <ellipse cx="118" cy="102" rx="7" ry="9" fill="#D9382A" stroke="#E8C26A" strokeWidth="1.6" />
+          <ellipse cx="282" cy="102" rx="7" ry="9" fill="#D9382A" stroke="#E8C26A" strokeWidth="1.6" />
+        </g>
+      )}
+
       {name === "pathology-yhct" && (
         <g {...common} stroke="#173A5E" strokeWidth="2.25">
           <circle cx="32" cy="31" r="15" />
@@ -163,5 +186,6 @@ const background: Partial<Record<HomeIconName, string>> = {
   "atlas-3d": "#E4F1F8",
   "herbal-function": "#F8ECD8",
   "pathology-yhct": "#E9F3F9",
+  "vien-thuc-hanh": "#145C4C",
   "acupuncture": "#F9E5E8",
 };
