@@ -218,6 +218,12 @@ function HomeContent() {
                   <p>Đăng nhập tài khoản HIU TMC để mở Gia Viên Dược Thảo.</p>
                   <b>Mở ứng dụng →</b>
                 </GameHubLink>
+                <a className={styles.hub} href="/apps/game-hub/vien-thuc-hanh/" data-app-transition="" style={{ "--hub": "#6b1f2a" } as CSSProperties}>
+                  <span className={styles.hubIcon}><HomeIcon name="pathology-yhct" /></span>
+                  <strong>Viện Thực Hành</strong>
+                  <p>Mô phỏng học thi lâm sàng, rồi vào trực ca bệnh.</p>
+                  <b>Mở ứng dụng →</b>
+                </a>
               </div>
             </section>
 

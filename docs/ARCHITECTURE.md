@@ -39,6 +39,10 @@ Supabase project gzmpnsrwqjpsbklyflqr ── auth, club_members, shadow Admin/Mo
 | `/apps/atlas` | 3D Atlas | GitHub Pages `/human-atlas` |
 | `/apps/game-hub` | HIU Game Hub | Cloudflare Pages `hiutmc-game-hub` |
 
+Viện Thực Hành Lâm Sàng (học, thi, trực; không phải game) là thẻ riêng ngang hàng Game Hub trong "Core Hubs".
+Nó dùng cùng upstream Pages `hiutmc-game-hub`, qua `/apps/game-hub/vien-thuc-hanh/`
+(cùng `/phong-hoc/` và `/tu-chan/` bên trong). Không thêm tuyến Worker mới.
+
 The Worker injects a small script so proxied apps keep their own path prefix
 (fetch, XHR, history, links and service-worker scope are rewritten).
 
