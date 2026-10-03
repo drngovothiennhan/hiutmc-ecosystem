@@ -47,7 +47,7 @@ function HomeContent() {
   const atlasUrl = atlasApp?.launchUrl ?? "/ecosystem/atlas/";
   const thietChanApp = apps.find((app) => app.slug === "ai-thiet-chan");
   const thietChanUrl = thietChanApp?.launchUrl ?? "/apps/thietchan/";
-  const trialGameUrl = "/apps/game-hub/y-quan-live/interview/?trial=1";
+  const yQuanUrl = "/apps/game-hub/y-quan-live/";
   const gameHubUrl = "/apps/game-hub/";
   useEffect(() => {
     if (!ready || !member || !canAccessGameHub(member.role)) return;
@@ -122,7 +122,6 @@ function HomeContent() {
           <p>Một điểm vào thống nhất cho học tập, Atlas 3D, AI, Trung Y Văn và hoạt động học thuật của cộng đồng HIU.</p>
           <div className={styles.heroCtas}>
             {ready && !member && <StudyOsLink className={styles.heroJoin} href={registerUrl.toString()}>Đăng ký thành viên <span aria-hidden="true">↗</span></StudyOsLink>}
-            <a className={styles.heroTry} href={trialGameUrl}>Chơi thử Y Quán <span aria-hidden="true">→</span></a>
           </div>
           
           <div className={styles.heroMark}>Dưỡng Tâm<br />Học Thuật<br />Hành Y Đạo</div>
@@ -146,11 +145,11 @@ function HomeContent() {
               <p>{thietChanApp?.description ?? "Học quan sát và đối chiếu đặc điểm lưỡi trong bối cảnh giáo dục YHCT."}</p>
               <b>Mở A.I Thiệt Chẩn →</b>
             </a>
-            <a className={styles.entryCard} href={trialGameUrl}>
-              <span className={styles.entryKind}>GAME HUB · DÙNG THỬ</span>
+            <a className={styles.entryCard} href={yQuanUrl}>
+              <span className={styles.entryKind}>GAME HUB</span>
               <strong>Y Quán · Luyện Thập vấn</strong>
-              <p>Thử một ca mô phỏng có sẵn trên Game Hub, không cần đăng nhập. Bản dùng thử không lưu tiến độ.</p>
-              <b>Chơi thử một ca →</b>
+              <p>Luyện hỏi bệnh theo mười câu hỏi với bệnh nhân mô phỏng trong Game Hub.</p>
+              <b>Mở Y Quán →</b>
             </a>
           </div>
         </section>
